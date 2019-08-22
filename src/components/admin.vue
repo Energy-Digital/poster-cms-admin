@@ -1,8 +1,7 @@
 <template>
   <div class="all">
-    <!--login></login-->
-    <router-view></router-view>
-    <!--div id="header-cont">
+
+    <div id="header-cont">
       <topping></topping>
     </div>
     
@@ -11,32 +10,41 @@
     </div>
     
     <div id="right-cont">
-
-    </div-->
+      <router-view></router-view>
+    </div>
     
   </div>
 </template>
 
 <script>
 
-import login from './login.vue'
 import topping from './topping.vue'
 import sidebar from "./sidebar.vue"
 
 export default {
   name: 'admin',
   components:{
-    login,
     topping,
     sidebar
   },
   props: {
     msg: String
   },
+  data(){
+    return{
+
+    }
+  },
+  created(){
+    
+    
+  },
   methods: {
     checkCookies () {
       console.log(document.cookie)
-    }
+    },
+
+    
   }
 }
 </script>

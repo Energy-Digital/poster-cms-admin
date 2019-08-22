@@ -18,6 +18,10 @@
                     <div id="header-user-name">
                         <span>Administrator</span>
                     </div>
+
+                    <div id="header-logout">
+                        <span v-on:click="logout">退出</span>
+                    </div>
                 </div>
             </div>
         </div>
@@ -25,6 +29,7 @@
 </template>
 
 <script>
+import { EventBus } from "../bus.js"
 export default {
     name:"topping",
     props:{
@@ -45,6 +50,9 @@ export default {
         handleClose ( data ) {
             console.log(data)
             return
+        },
+        logout () {
+            EventBus.$emit("logout", true)
         }
     }
 }

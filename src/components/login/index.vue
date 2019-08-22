@@ -11,6 +11,7 @@
 
 <script>
 
+import { EventBus } from '../../bus.js'
 
 export default {
     name:"login",
@@ -54,17 +55,38 @@ export default {
 
                         var sucInfo = res.split(',')
 
-                        that.clearCookie()
+                        EventBus.$emit("clearCookie", true)
 
-                        that.setCookie('u_key',sucInfo[1], 30, false) // Set Key
-                        that.setCookie('u_uuid',sucInfo[2], 30, false) // Set UUID
-                        that.setCookie('u_email',that.email, 30, false) // Set UEmail
+
+                        EventBus.$emit("setCookie", {
+                            name: "u_key",
+                            value: sucInfo[1],
+                            expDays: 30,
+                            remove: false
+                        })
+
+                        EventBus.$emit("setCookie", {
+                            name: "u_uuid",
+                            value: sucInfo[2],
+                            expDays: 30,
+                            remove: false
+                        })
+
+                        EventBus.$emit("setCookie", {
+                            name: "u_email",
+                            value: that.email,
+                            expDays: 30,
+                            remove: false
+                        })
 
                         that.$notify({
                             title: '验证成功',
                             message: '已完成验证，返回成功',
                             type: 'success'
                         })
+
+                        EventBus.$emit('login', true)
+
                     } else {
                         that.$notify({
                             title: '验证失败',
