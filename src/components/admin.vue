@@ -1,6 +1,7 @@
 <template>
   <div class="all">
-    <div id="header-cont">
+    <login></login>
+    <!--div id="header-cont">
       <topping></topping>
     </div>
     
@@ -10,19 +11,21 @@
     
     <div id="right-cont">
 
-    </div>
+    </div-->
     
   </div>
 </template>
 
 <script>
 
+import login from './login.vue'
 import topping from './topping.vue'
 import sidebar from "./sidebar.vue"
 
 export default {
   name: 'admin',
   components:{
+    login,
     topping,
     sidebar
   },
