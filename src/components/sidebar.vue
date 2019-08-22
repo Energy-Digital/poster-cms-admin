@@ -11,7 +11,7 @@
 
                     <el-menu-item index="1">
                         <i class="el-icon-setting"></i>
-                        <span slot="title">Global 全局</span>
+                        <span slot="title" v-on:click="toPage('./home')">Global 全局</span>
                     </el-menu-item>
                 
                     <el-submenu index="2">
@@ -21,7 +21,7 @@
                         </template>
 
                         <el-menu-item-group title="所有">
-                            <el-menu-item index="2-1">All Posts 所有文章</el-menu-item>
+                            <el-menu-item index="2-1" v-on:click="toPage('./postslist')">All Posts 所有文章</el-menu-item>
                             <el-menu-item index="2-1">All Categories 所有分类</el-menu-item>
                         </el-menu-item-group>
 
@@ -61,6 +61,8 @@
 
 
 <script>
+import { EventBus } from '../bus.js'
+
 export default {
     name: "sidebar",
     props:{
@@ -72,7 +74,7 @@ export default {
         }
     },
     created () {
-        console.log('sidebar created')
+
     },
     methods:{
         handleOpen( data ){
@@ -82,6 +84,9 @@ export default {
         handleClose ( data ) {
             console.log(data)
             return
+        },
+        toPage (path) {
+            EventBus.$emit('toPage', path)
         }
     }
 

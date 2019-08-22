@@ -16,14 +16,17 @@
                     </div>
 
                     <div id="header-user-name">
-                        <span>Administrator</span>
+                        <span>{{username}}</span>
                     </div>
 
-                    <div id="header-logout">
-                        <span v-on:click="logout">退出</span>
-                    </div>
+                    
+                </div>
+                <div id="header-logout">
+                    <el-button v-on:click="logout" style="background:#222222;color:#ffffff;" plain>退出</el-button>
                 </div>
             </div>
+
+            
         </div>
     </div>
 </template>
@@ -33,27 +36,43 @@ import { EventBus } from "../bus.js"
 export default {
     name:"topping",
     props:{
+        
     },
     data (){
         return {
-            hello: "",
+            username: "Admin",
         }
     },
     created () {
-        console.log('header created')
+        if(this.getCookie("u_name").length > 0){
+            this.username = this.getCookie("u_name")
+        }
     },
     methods:{
         handleOpen( data ){
             console.log(data)
             return
         },
+
         handleClose ( data ) {
             console.log(data)
             return
         },
+
         logout () {
             EventBus.$emit("logout", true)
-        }
+        },
+
+        getCookie(cname){
+            var name = cname + "="
+            var ca = document.cookie.split(';')
+            for(var i=0; i<ca.length; i++) 
+            {
+                var c = ca[i].trim();
+                if (c.indexOf(name)==0) return c.substring(name.length,c.length)
+            }
+            return ""
+        },
     }
 }
 </script>
@@ -99,11 +118,13 @@ export default {
 #header-user{
     display:flex;
     margin-top:4px;
+    margin-right: 18px;
 }
 
 #header-right{
     position:absolute;
     right:40px;
+    display:flex;
 }
 
 #header-right span{
@@ -116,8 +137,8 @@ export default {
 }
 
 #header-user-name {
-    margin-top:5px;
-    margin-left:5px;
+    margin-top:6px;
+    margin-left:6px;
 }
 
 </style>

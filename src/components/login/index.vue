@@ -26,7 +26,9 @@ export default {
         }
     },
     created () {
-
+        if(this.getCookie('u_email')){
+            this.email = this.getCookie('u_email')
+        }
     },
 
     http: {
@@ -73,6 +75,13 @@ export default {
                         })
 
                         EventBus.$emit("setCookie", {
+                            name: "u_name",
+                            value: sucInfo[3],
+                            expDays: 30,
+                            remove: false
+                        })
+
+                        EventBus.$emit("setCookie", {
                             name: "u_email",
                             value: that.email,
                             expDays: 30,
@@ -102,25 +111,15 @@ export default {
             }
         },
 
-        setCookie (name, value, expDays, remove) {
-            var exp, expTime
-            
-            if(!remove){
-                expTime = (((60 * 1000)*60)*24)*expDays // 30 days
-                exp = new Date()
-                exp.setTime(exp.getTime() + expTime)
-                document.cookie = name + "=" + value + ";" + "expires=" + exp.toGMTString()+";"
-            } else {
-                document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;"
+        getCookie (cname) {
+            var name = cname + "="
+            var ca = document.cookie.split(';')
+            for(var i=0; i<ca.length; i++){
+                var c = ca[i].trim()
+                if (c.indexOf(name)==0) return c.substring(name.length,c.length)
             }
-            
+            return ""
         },
-
-        clearCookie () {
-            this.setCookie('u_key', 0, 30, true) // Set Key
-            this.setCookie('u_uuid', 0, 30, true) // Set UUID
-            this.setCookie('u_email', 0, 30, true) // Set UEmail
-        }
     }
 }
 </script>

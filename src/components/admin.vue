@@ -18,6 +18,7 @@
 
 <script>
 
+import { EventBus } from '../bus.js'
 import topping from './topping.vue'
 import sidebar from "./sidebar.vue"
 
@@ -28,21 +29,28 @@ export default {
     sidebar
   },
   props: {
-    msg: String
+    username: String
   },
   data(){
     return{
-
+      user:"Admin",
     }
   },
   created(){
-    
+    var that = this
+    EventBus.$on("toPage", function(data){
+      that.toPage(data)
+    })
     
   },
   methods: {
     checkCookies () {
       console.log(document.cookie)
     },
+
+    toPage (dir) {
+      this.$router.push({ path: dir })
+    }
 
     
   }
@@ -78,7 +86,7 @@ a {
   top: 80px;
   left: 0px;
   height:100%;
-  width:32%;
+  width:22%;
 }
 
 #right-cont{
@@ -86,6 +94,6 @@ a {
   top:80px;
   right:0px;
   height:100%;
-  width:68%;
+  width:78%;
 }
 </style>

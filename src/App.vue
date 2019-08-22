@@ -18,7 +18,8 @@ export default {
   },
   data(){
     return{
-      login: false
+      login: false,
+      username: "Admin",
     }
     
   },
@@ -27,6 +28,8 @@ export default {
 
     if(this.getCookie('u_key') && this.getCookie('u_uuid')){
       this.login = true
+    } else {
+      this.username = this.getCookie('u_email')
     }
 
     EventBus.$on('login', function(data){
