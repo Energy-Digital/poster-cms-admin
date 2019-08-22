@@ -1,6 +1,7 @@
 <template>
   <div class="all">
-    <login></login>
+    <!--login></login-->
+    <router-view></router-view>
     <!--div id="header-cont">
       <topping></topping>
     </div>
@@ -31,6 +32,11 @@ export default {
   },
   props: {
     msg: String
+  },
+  methods: {
+    checkCookies () {
+      console.log(document.cookie)
+    }
   }
 }
 </script>

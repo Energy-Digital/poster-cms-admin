@@ -39,7 +39,7 @@ export default {
             if(this.email.length > 0 && this.psw.length > 0) {
 
                 // Initial API Token
-                const key = "txmedicalworld";
+                const key = "isjeffcomlogin";
                 const key_encode =  window.btoa(key);
 
                 var postReady = {email: this.email, psw: this.psw, token: key_encode}
@@ -59,7 +59,7 @@ export default {
                         that.setCookie('u_key',sucInfo[1], 30, false) // Set Key
                         that.setCookie('u_uuid',sucInfo[2], 30, false) // Set UUID
                         that.setCookie('u_email',that.email, 30, false) // Set UEmail
-                        
+
                         that.$notify({
                             title: '验证成功',
                             message: '已完成验证，返回成功',
