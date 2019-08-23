@@ -34,7 +34,7 @@ export default {
   data(){
     return{
       user:"Admin",
-      pid: "new",
+      pid: "1",
     }
   },
   created(){
