@@ -10,7 +10,7 @@
     </div>
     
     <div id="right-cont">
-      <router-view></router-view>
+      <router-view :pid.sync = "pid"></router-view>
     </div>
     
   </div>
@@ -34,12 +34,17 @@ export default {
   data(){
     return{
       user:"Admin",
+      pid: "new",
     }
   },
   created(){
     var that = this
     EventBus.$on("toPage", function(data){
       that.toPage(data)
+    })
+
+    EventBus.$on('toPostSingle', function(data){
+      that.toPostSingle(data)
     })
     
   },
@@ -50,6 +55,11 @@ export default {
 
     toPage (dir) {
       this.$router.push({ path: dir })
+    },
+
+    toPostSingle (id) {
+      this.pid = id
+      this.$router.push({ path: '/postsingle' })
     }
 
     

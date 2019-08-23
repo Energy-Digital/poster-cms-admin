@@ -72,6 +72,7 @@
 </template>
 
 <script>
+import { EventBus } from '../../bus';
 export default {
   name: "postlist",
   props:{
@@ -123,7 +124,7 @@ export default {
     },
 
     handleClick (data) {
-      console.log(data)
+      EventBus.$emit('toPostSingle', data.id)
     }
 
   }
