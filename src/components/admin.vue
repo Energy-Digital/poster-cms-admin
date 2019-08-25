@@ -10,7 +10,7 @@
     </div>
     
     <div id="right-cont">
-      <router-view :pid.sync = "pid"></router-view>
+      <router-view :pid.sync="pid"></router-view>
     </div>
     
   </div>

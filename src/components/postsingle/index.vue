@@ -11,28 +11,35 @@
       </div>
 
       <div id="pc-content">
-        <quill-editor 
-          :content="postData.content"
-          :options="editorOption"
-          @change="onEditorChange($event)">
-        </quill-editor>
+        <text-editor v-if="loaded" :text.sync="postContent" @update="textUpdate"></text-editor>
+        
       </div>
     </div>
+
+    <div id="submit">
+      <el-button class="primary" @click="submit()">SAVE</el-button>
+    </div>
+    
   </div>
 </template>
 
 <script>
 // require styles
-import 'quill/dist/quill.core.css'
+/*import 'quill/dist/quill.core.css'
 import 'quill/dist/quill.snow.css'
 import 'quill/dist/quill.bubble.css'
 
-import { quillEditor } from 'vue-quill-editor'
+import { quillEditor } from 'vue-quill-editor'*/
+
+
+import TextEditor from '../texteditor/index.vue'
+
+//import Editor from 'tt-vue-editor'
 
 export default {
   name: "postsingle",
   components: {
-    quillEditor
+    TextEditor
   },
   props:{
     pid: String,
@@ -40,9 +47,11 @@ export default {
   data () {
     return{
       api: "https://api.isjeff.com/pot/data_posts_single.php?pid=",
+      api_up_assets:"/",
       postData: "",
-      editorOption: { /* quill options */ }
-
+      postContent: "aaaa",
+      postLang: 0, //0: First lang, second++
+      loaded: false,
     }
   },
   http: {
@@ -53,12 +62,7 @@ export default {
     this.getData()
     console.log(this.pid)
   },
-  mounted() {
-    console.log('Editor Ref: ', this.quillEditor)
-  },
-  computed: {
-
-  },
+  
   methods: {
     getData () {
       this.axios.get(this.api + this.pid).then((response) => {
@@ -66,6 +70,11 @@ export default {
         res.content = this.parseRichText(res.content)
         res.content_sublang = this.parseRichText(res.content_sublang)
         this.postData = res
+
+        this.postContent = this.postLang == 0 ? res.content : res.content_sublang
+        this.$nextTick(()=>{
+          this.loaded = true
+        })
       })
     },
 
@@ -76,6 +85,14 @@ export default {
 
     onEditorChange (data) {
 
+    },
+
+    textUpdate (data) {
+      this.postContent = data
+    },
+
+    submit () {
+      console.log(this.postContent)
     }
 
   }
