@@ -98,4 +98,8 @@ export default {
     #sidebar-cont{
         height:100%;
     }
+
+    .el-col-12{
+        width:100%;
+    }
 </style>

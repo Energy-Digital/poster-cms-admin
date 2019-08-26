@@ -1,9 +1,7 @@
 <template>
   <div id="all">
 
-    <div id="title">
-      <a>All Posts</a>
-    </div>
+    <WTitle txt="All Posts"></WTitle>
 
     <div id="post-cont">
       <div id="pc-title">
@@ -12,7 +10,6 @@
 
       <div id="pc-content">
         <text-editor v-if="loaded" :text.sync="postContent" @update="textUpdate"></text-editor>
-        
       </div>
     </div>
 
@@ -33,12 +30,14 @@ import { quillEditor } from 'vue-quill-editor'*/
 
 
 import TextEditor from '../texteditor/index.vue'
+import WTitle from '../widgets/w_title.vue'
 
 //import Editor from 'tt-vue-editor'
 
 export default {
   name: "postsingle",
   components: {
+    WTitle,
     TextEditor
   },
   props:{
@@ -101,5 +100,13 @@ export default {
 </script>
 
 <style scoped>
+
+#all{
+  margin: 40px;
+}
+
+#pc-content{
+  margin-top:24px;
+}
 
 </style>

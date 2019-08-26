@@ -96,7 +96,8 @@ a {
   top: 80px;
   left: 0px;
   height:100%;
-  width:22%;
+  width:20%;
+  overflow: hidden;
 }
 
 #right-cont{
@@ -104,6 +105,6 @@ a {
   top:80px;
   right:0px;
   height:100%;
-  width:78%;
+  width:80%;
 }
 </style>
