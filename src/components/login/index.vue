@@ -1,12 +1,13 @@
 <template>
     <div id="all">
-        <el-input v-model="email" placeholder="Email Account"></el-input>
-        <br>
-        <el-input v-model="psw" placeholder="Passcode" type="password"></el-input>
-        <br>
-        <el-button type="primary" v-on:click="submit">LOGIN</el-button>
+        <div id="login-window">
+            <el-input v-model="email" placeholder="Email Account"></el-input>
+            <br>
+            <el-input v-model="psw" placeholder="Passcode" type="password"></el-input>
+            <br>
+            <el-button id="submitBtn" type="primary" v-on:click="submit">LOGIN</el-button>
+        </div>
     </div>
-    
 </template>
 
 <script>
@@ -20,7 +21,7 @@ export default {
     },
     data () {
         return {
-            api:"https://api.isjeff.com/pot/login.php",
+            api:"https://api.isjeff.com/pot/login/",
             email: "",
             psw: ""
         }
@@ -125,5 +126,26 @@ export default {
 </script>
 
 <style scoped>
+#all{
+    width:100%;
+    margin-top:10%;
+    text-align: center;
+}
 
+#login-window{
+    width:25%;
+    height:400px;
+    text-align:center;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+#login-window .el-input{
+    margin-top:10px;
+    margin-bottom:10px;
+}
+
+#submitBtn { 
+    margin-top:40px;
+}
 </style>

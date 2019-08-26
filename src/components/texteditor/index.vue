@@ -3,58 +3,77 @@
         <editor-menu-bar :editor="editor" v-slot="{ commands, isActive }">
         <div class="editor-bar">
 
+            <!-- Bold -->
             <button :class="{ 'is-active': isActive.bold() }" @click="commands.bold">
                 <span class="material-icons">format_bold</span>
             </button>
 
+            <!-- Italic -->
             <button :class="{ 'is-active': isActive.italic() }" @click="commands.italic">
                 <span class="material-icons">format_italic</span>
             </button>
 
+            <!-- Underline -->
             <button :class="{ 'is-active': isActive.underline() }" @click="commands.underline">
                 <span class="material-icons">format_underlined</span>
             </button>
             
+            <!-- Headline Text Size 1 -->
             <button :class="{ 'is-active': isActive.heading({ level: 1 }) }" @click="commands.heading({ level: 1 })">
                 <p style="font-weight:bold;">H1</p>
             </button>
 
+            <!-- Headline Text Size 2 -->
             <button :class="{ 'is-active': isActive.heading({ level: 2 }) }" @click="commands.heading({ level: 2 })">
                 <p style="font-weight:bold;">H2</p>
             </button>
 
+            <!-- Headline Text Size 3 -->
             <button :class="{ 'is-active': isActive.heading({ level: 3 }) }" @click="commands.heading({ level: 3 })">
                 <p style="font-weight:bold;">H3</p>
             </button>
 
+            <!-- Bullet List -->
             <button :class="{ 'is-active': isActive.bullet_list() }" @click="commands.bullet_list">
                 <span class="material-icons">format_list_bulleted</span>
             </button>
 
+            <!-- Order List -->
             <button :class="{ 'is-active': isActive.ordered_list() }" @click="commands.ordered_list">
                 <span class="material-icons">format_list_numbered</span>
             </button>
 
+            <!-- Quote -->
             <button :class="{ 'is-active': isActive.blockquote() }" @click="commands.blockquote">
                 <span class="material-icons">format_quote</span>
             </button>
 
+            <!-- Code -->
             <button :class="{ 'is-active': isActive.code_block() }" @click="commands.code_block">
                 <span class="material-icons">code</span>
             </button>
 
+            <!-- Image Upload -->
             <button @click="showImagePrompt(commands.image)">
                 <span class="material-icons">image</span>
             </button>
 
+            <!-- IFrame Upload -->
+            <button @click="showIframePrompt(commands.iframe)">
+                <span class="material-icons">video_library</span>
+            </button>
+            
+            <!-- Horizontal Line -->
             <button @click="commands.horizontal_rule">
                 <span class="material-icons">drag_handle</span>
             </button>
 
+            <!-- History Backward -->
             <button @click="commands.undo">
                 <span class="material-icons">undo</span>
             </button>
 
+            <!-- History Forward -->
             <button @click="commands.redo">
                 <span class="material-icons">redo</span>
             </button>
@@ -93,6 +112,8 @@ import {
     Underline,
     History,
 } from 'tiptap-extensions'
+
+import Iframe from './iframe/iframe.js'
 
 export default {
     name: "texteditor",
@@ -135,6 +156,7 @@ export default {
                 new Strike(),
                 new Underline(),
                 new History(),
+                new Iframe(),
             ],
             onUpdate(){
                 that.$emit('update', this.getHTML())
@@ -151,10 +173,79 @@ export default {
         this.editor.destroy()
     },
     methods:{
+
+        // Add Image
         showImagePrompt(command) {
-            const src = prompt('Enter the url of your image here')
-            if (src !== null) {
-                command({ src })
+
+            this.$prompt('请输入图片地址', '提示', {
+
+            confirmButtonText: '确定',
+            cancelButtonText: '取消',
+            
+
+            }).then(({ value }) => {
+
+
+                this.$message({
+                    type: 'success',
+                    message: '插入图片'
+                })
+
+                if(value != null){
+                    this.addImage(value, command)
+                }
+
+            }).catch((err) => {
+                /*console.log(err)
+                this.$message({
+                    type: 'info',
+                    message: '输入取消'
+                })*/      
+            })
+            
+        },
+
+        
+
+        // Add Iframe
+        showIframePrompt (command) {
+            this.$prompt('请输入视频地址', '提示', {
+
+            confirmButtonText: '确定',
+            cancelButtonText: '取消',
+            inputPlaceholder: '请插入iframe标签中的src后的部分'
+
+            }).then(({ value }) => {
+
+
+                this.$message({
+                    type: 'success',
+                    message: '插入视频'
+                })
+
+                if(value != null){
+                    this.addIframe(value, command)
+                }
+
+            }).catch((err) => {
+                /*console.log(err)
+                this.$message({
+                    type: 'info',
+                    message: '输入取消'
+                })*/       
+            })
+            
+        },
+
+        addImage (src, command) {
+            if(src){
+                command({src})
+            }
+        },
+
+        addIframe (src, command) {
+            if(src) {
+                command({src})
             }
         }
     }

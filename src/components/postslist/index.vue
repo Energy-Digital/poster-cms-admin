@@ -1,9 +1,7 @@
 <template>
   <div id="all">
 
-    <div id="title">
-      <a>All Posts</a>
-    </div>
+    <WTitle txt="All Post"></WTitle>
 
     <div id="list">
       <el-table
@@ -29,6 +27,12 @@
         prop="title"
         label="Title"
         width="150">
+      </el-table-column>
+
+      <el-table-column
+        prop="cname"
+        label="Category"
+        width="120">
       </el-table-column>
 
       <el-table-column
@@ -72,15 +76,20 @@
 </template>
 
 <script>
-import { EventBus } from '../../bus';
+import { EventBus } from '../../bus'
+import WTitle from '../widgets/w_title.vue'
+
 export default {
   name: "postlist",
+  components:{
+    WTitle
+  },
   props:{
     
   },
   data(){
     return{
-      api: "http://api.isjeff.com/pot/data_posts_list.php",
+      api: "https://api.isjeff.com/pot/data/posts_list/",
       postsList: []
     }
   },
@@ -97,6 +106,7 @@ export default {
       var that = this
       this.axios.get(this.api).then((response) => {
         var res = response.data
+        console.log(res)
         this.postsList = res
       })
     },

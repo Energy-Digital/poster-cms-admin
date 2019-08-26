@@ -22,13 +22,13 @@
 
                         <el-menu-item-group title="所有">
                             <el-menu-item index="2-1" v-on:click="toPage('./postslist')">All Posts 所有文章</el-menu-item>
-                            <el-menu-item index="2-1">All Categories 所有分类</el-menu-item>
+                            <el-menu-item index="2-2">All Categories 所有分类</el-menu-item>
                         </el-menu-item-group>
 
                         <el-menu-item-group title="Status">
-                            <el-menu-item index="2-2">Public 公开</el-menu-item>
-                            <el-menu-item index="2-3">Saved 已保存</el-menu-item>
-                            <el-menu-item index="2-4">Deleted 回收站</el-menu-item>
+                            <el-menu-item index="2-3">Public 公开</el-menu-item>
+                            <el-menu-item index="2-4">Saved 已保存</el-menu-item>
+                            <el-menu-item index="2-5">Deleted 回收站</el-menu-item>
                         </el-menu-item-group>
                     </el-submenu>
 
