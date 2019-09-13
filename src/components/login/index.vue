@@ -3,7 +3,7 @@
         <div id="login-window">
             <el-input v-model="email" placeholder="Email Account"></el-input>
             <br>
-            <el-input v-model="psw" placeholder="Passcode" type="password"></el-input>
+            <el-input v-model="psw" placeholder="Verication Code" type="password"></el-input>
             <br>
             <el-button id="submitBtn" type="primary" v-on:click="submit">LOGIN</el-button>
         </div>

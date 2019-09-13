@@ -3,6 +3,10 @@
 
     <WTitle txt="All Post"></WTitle>
 
+    <div>
+      <el-button type="primary" v-on:click="toSingleNew()">New</el-button>
+    </div>
+
     <div id="list">
       <el-table
     :data="postsList"
@@ -16,8 +20,8 @@
         width="100">
         <template slot-scope="scope">
           <div v-if="scope.row.status == '0'" class="status" style='background:#c9a661;'>Draft</div>
-          <div v-if="scope.row.status == '1'" class="status" style='background:#61c995;'>Publish</div>
-          <div v-if="scope.row.status == '2'" class="status" style='background:#c96f61;'>Removed</div>
+          <div v-if="scope.row.status == '1'" class="status" style='background:#61c995;'>Published</div>
+          <div v-if="scope.row.status == '2'" class="status" style='background:#c96f61;'>Deprecated</div>
         </template>
         
       </el-table-column>
@@ -32,13 +36,13 @@
       <el-table-column
         prop="cname"
         label="Category"
-        width="120">
+        width="100">
       </el-table-column>
 
       <el-table-column
         prop="brief"
         label="Brief"
-        width="120">
+        width="240">
       </el-table-column>
 
       <el-table-column
@@ -50,13 +54,13 @@
       <el-table-column
         prop="date_pub"
         label="Publish Date"
-        width="120">
+        width="140">
       </el-table-column>
 
       <el-table-column
         prop="date_modi"
         label="Last Edit"
-        width="300">
+        width="140">
       </el-table-column>
 
 
@@ -65,8 +69,8 @@
         label="Action"
         width="100">
         <template slot-scope="scope">
-          <el-button @click="handleClick(scope.row)" type="text" size="small">View</el-button>
-          <el-button type="text" size="small">Edit</el-button>
+          <el-button @click="toSingleEdit(scope.row)" type="text" size="small">Edit</el-button>
+          <el-button type="text" size="small">View</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -106,35 +110,16 @@ export default {
       var that = this
       this.axios.get(this.api).then((response) => {
         var res = response.data
-        console.log(res)
         this.postsList = res
       })
     },
 
-    parseStatus (val) {
-      var res
-      switch (val) {
-        case "0":
-          res = "Saved"
-          break
-
-        case "1":
-          res = "Published"
-          break
-        
-        case "2":
-          res = "Removed"
-          break
-
-        default:
-          res = "Saved"
-      }
-
-      return res
+    toSingleEdit (data) {
+      EventBus.$emit('toPostSingle', data.id)
     },
 
-    handleClick (data) {
-      EventBus.$emit('toPostSingle', data.id)
+    toSingleNew ( data ) {
+      EventBus.$emit('toPostSingle', 'new')
     }
 
   }
@@ -144,6 +129,7 @@ export default {
 <style scoped>
 #all{
   text-align: left;
+  padding:24px;
 }
 
 #title{

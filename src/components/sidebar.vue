@@ -22,7 +22,7 @@
 
                         <el-menu-item-group title="所有">
                             <el-menu-item index="2-1" v-on:click="toPage('./postslist')">All Posts 所有文章</el-menu-item>
-                            <el-menu-item index="2-2">All Categories 所有分类</el-menu-item>
+                            <el-menu-item index="2-2" v-on:click="toPage('./cateslist')">All Categories 所有分类</el-menu-item>
                         </el-menu-item-group>
 
                         <el-menu-item-group title="Status">

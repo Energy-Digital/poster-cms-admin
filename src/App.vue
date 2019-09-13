@@ -101,12 +101,17 @@ textarea:focus, input:focus{
     outline: none;
 }
 
+a{
+  text-decoration: none;
+  outline: none;
+}
+
 [contenteditable]:focus {
     outline: 0px solid transparent;
 }
 
 #app {
-  font-family: 'Avenir', Helvetica, Arial, sans-serif;
+  font-family: Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   color: #2c3e50;

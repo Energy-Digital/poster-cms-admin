@@ -10,7 +10,7 @@
     </div>
     
     <div id="right-cont">
-      <router-view :pid.sync="pid"></router-view>
+      <router-view :pid.sync="pid" :cateId.sync="cateId"></router-view>
     </div>
     
   </div>
@@ -35,6 +35,7 @@ export default {
     return{
       user:"Admin",
       pid: "1",
+      cateId: ""
     }
   },
   created(){
@@ -45,6 +46,10 @@ export default {
 
     EventBus.$on('toPostSingle', function(data){
       that.toPostSingle(data)
+    })
+
+    EventBus.$on('toCateSingle', function(data){
+      that.toCateSingle(data)
     })
     
   },
@@ -60,9 +65,13 @@ export default {
     toPostSingle (id) {
       this.pid = id
       this.$router.push({ path: '/postsingle' })
+    },
+
+    toCateSingle (id) {
+      this.cateId = id
+      this.$router.push( { path: '/catesingle' } )
     }
 
-    
   }
 }
 </script>

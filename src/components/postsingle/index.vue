@@ -1,37 +1,105 @@
 <template>
   <div id="all">
 
-    <WTitle txt="Edit Post"></WTitle>
-
-    <div id="post-lang-selector">
-      <el-radio-group v-model="postLang" style="margin-bottom: 30px;">
-        <el-radio-button label="0">English</el-radio-button>
-        <el-radio-button label="1">中文</el-radio-button>
-      </el-radio-group>
+    <div id="post-title">
+      <WTitle txt="Edit Post"></WTitle>
+      <div id="post-lang-selector">
+        <el-radio-group v-model="postLang" style="margin-bottom: 30px;">
+          <el-radio-button label="0">ENG</el-radio-button>
+          <el-radio-button label="1">中文</el-radio-button>
+        </el-radio-group>
+      </div>
     </div>
 
     <div id="post-cont" v-if="contOpen">
       
-      <div id="pc-title">
-        <el-input v-model="postTitle" placeholder="Article Title"></el-input>
+      <div class="pc-b" id="pc-title">
+        <WSubTitle txt="Title"></WSubTitle>
+        <el-input v-model="postData.title" placeholder="Article Title" v-if="postLang === '0'"></el-input>
+        <el-input v-model="postData.title_sublang" placeholder="请输入标题" v-if="postLang === '1'"></el-input>
       </div>
 
-      <div id="pc-content">
-        <text-editor v-if="loaded" :text.sync="postContent" @update="textUpdate"></text-editor>
+      <div class="pc-b" id="pc-content" v-if="loaded">
+        <div id="pc-editmode-selector">
+          <el-radio-group v-model="editMode" style="margin-bottom: 30px;">
+            <el-radio-button label="view"><span class="material-icons">collections</span></el-radio-button>
+            <el-radio-button label="source"><span class="material-icons">edit</span></el-radio-button>
+          </el-radio-group>
+        </div>
+
+        <div id="pc-content-view" v-if="editMode === 'view'">
+          <text-editor v-if="postLang === '0'" :text.sync="postData.content" @update="textUpdate"></text-editor>
+          <text-editor v-if="postLang === '1'" :text.sync="postData.content_sublang" @update="textUpdate"></text-editor>
+        </div>
+
+        <div id="pc-content-view" v-if="editMode === 'source'">
+          <el-input
+            type="textarea"
+            :rows="20"
+            placeholder="Source code editor"
+            v-if="postLang === '0'"
+            v-model="postData.content">
+          </el-input>
+          <el-input
+            type="textarea"
+            :rows="20"
+            placeholder="Source code editor"
+            v-if="postLang === '1'"
+            v-model="postData.content_sublang">
+          </el-input>
+        </div>
+      </div>
+
+      <div class="pc-b" id="pc-brief">
+        <WSubTitle txt="Brief"></WSubTitle>
+        <el-input
+          type="textarea"
+          :rows="5"
+          placeholder="Brief"
+          v-if="postLang === '0'"
+          v-model="postData.brief">
+        </el-input>
+
+        <el-input
+          type="textarea"
+          :rows="5"
+          placeholder="文章简述"
+          v-if="postLang === '1'"
+          v-model="postData.brief_sublang">
+        </el-input>
       </div>
     </div>
 
-    <!--el-select v-model="value" placeholder="文章分类">
-      <el-option
-        v-for="item in options"
-        :key="item.value"
-        :label="item.label"
-        :value="item.value">
-      </el-option>
-    </el-select-->
 
-    <div id="submit">
-      <el-button class="primary" @click="submit()">SAVE</el-button>
+    <div class="pc-b" id="pc-cate">
+      <WSubTitle txt="Category"></WSubTitle>
+      <el-select v-model="postData.cateId" placeholder="Category" v-if="cateLoaded">
+        <el-option
+          v-for="item in postCateOptions"
+          :key="item.id"
+          :label="item.cname + ' · ' + item.cname_sublang"
+          :value="item.id">
+        </el-option>
+      </el-select>
+    </div>
+
+    
+    <div class="pc-b" id="pc-status">
+      <WSubTitle txt="Action"></WSubTitle>
+      <el-select v-model="postData.status" placeholder="Action">
+        <el-option
+          v-for="item in postStatusOptions"
+          :key="item.sid"
+          :label="item.sname"
+          :value="item.sid">
+        </el-option>
+      </el-select>
+    </div>
+    
+
+    <div class="pc-b" id="pc-submit">
+      <el-button class="primary" @click="submit()" plain>SUBMIT</el-button>
+      <el-button type="text" size="small" style="color:#FF5C5C;" @click="del()">Delete</el-button>
     </div>
     
   </div>
@@ -45,9 +113,11 @@ import 'quill/dist/quill.bubble.css'
 
 import { quillEditor } from 'vue-quill-editor'*/
 
+import { EventBus } from '../../bus.js'
 
 import TextEditor from '../texteditor/index.vue'
 import WTitle from '../widgets/w_title.vue'
+import WSubTitle from '../widgets/w_subtitle.vue'
 
 //import Editor from 'tt-vue-editor'
 
@@ -55,6 +125,7 @@ export default {
   name: "postsingle",
   components: {
     WTitle,
+    WSubTitle,
     TextEditor
   },
   props:{
@@ -62,57 +133,108 @@ export default {
   },
   data () {
     return{
+      // APIs
       api: "https://api.isjeff.com/pot/data/post_single/?pid=",
+      api_cate: "https://api.isjeff.com/pot/data/post_cate/",
       api_up_assets:"/",
       api_d_cate:"",
-      postData: "",
-      postContent: "aaaa",
-      postTitle: "bbbb",
-      postLang: "0", //0: First lang, second++
+      api_up:"https://api.isjeff.com/pot/updater/post_single/",
+      api_del: "https://api.isjeff.com/pot/updater/post_del/",
+
+      // Main Info
+      mode: "update",
+      postData: {
+        title: "",
+        title_sublang: "",
+        content: "",
+        content_sublang: "",
+        cateId: "1",
+        brief: "",
+        brief_sublang: "",
+        status: 0,
+      },
+      postCate: "",
+      postLang: "0", // 0: First lang, second++
+      postStatus: 0,
+
+      // Options Info
+      postCateOptions: [], // Storage all category, keep updated
+      postStatusOptions:[
+        {sid: 0, sname: "Draft"},
+        {sid: 1, sname: "Publish"},
+        {sid: 2, sname: "Deprecated"},
+      ],
+
+      // Edit Mode
+      editMode: "view",
+
+      // Loading Status
       loaded: false,
-      contOpen: true
+      cateLoaded: false,
+
+      // Display Gate
+      contOpen: true,
+      
     }
   },
+
   http: {
     emulateJSON: true,
     emulateHTTP: true
   },
+
   created () {
-    this.getData()
+
+    // Check if is new page
+    if(this.pid == "new"){
+
+      // Set Submit Mode
+      this.mode = "new"
+      this.loaded = true
+
+    } else {
+
+      // Set Submit Mode
+      this.mode = "update"
+      this.loaded = false
+
+      // Get Data
+      this.$nextTick(() => {
+        this.getData()
+      })
+      
+    }
+
+    // Get Category
+    this.$nextTick(()=>{
+      this.getCate()
+    })
+    
   },
   watch: {
     // Language Switcher
     postLang: function () {
-
       if(!this.loaded){
         return
       }
-
-      // Switch Data
-      this.postTitle = this.postLang === "0" ? this.postData.title : this.postData.title_sublang
-      this.postContent = this.postLang === "0" ? this.postData.content : this.postData.content_sublang
       
-
       // Refresh Container
       this.$nextTick(()=>{
         this.updateCont()
       })
-      
-    }
+    },
   },
+  
   
   methods: {
     getData () {
       this.axios.get(this.api + this.pid).then((response) => {
         var res = response.data[0]
-        res.content = this.parseRichText(res.content)
-        res.content_sublang = this.parseRichText(res.content_sublang)
+        res.content = this.decodeRichText(res.content)
+        res.content_sublang = this.decodeRichText(res.content_sublang)
+        res.status = Number(res.status)
+
         this.postData = res
-
-        this.postContent = this.postLang === "0" ? res.content : res.content_sublang
-        this.postTitle = this.postLang === "0" ? res.title : res.title_sublang
-
-        console.log(res.title_sublang)
 
         this.$nextTick(()=>{
           this.loaded = true
@@ -121,20 +243,36 @@ export default {
     },
 
     getCate () {
+      this.axios.get(this.api_cate).then((response)=>{
+        
+        this.postCateOptions = response.data
 
+        if(this.postCate === ""){
+
+        }
+
+        this.$nextTick(()=>{
+          this.cateLoaded = true
+        })
+      })
     },
 
-    parseRichText (val) {
+    decodeRichText (val) {
       var replaceall = require("replaceall")
       return replaceall('|*|', '"', val)
     },
 
-    onEditorChange (data) {
-
+    encodeRichText (val) {
+      var replaceall = require("replaceall")
+      return replaceall('"', '|*|', val)
     },
 
     textUpdate (data) {
-      this.postContent = data
+      if(this.postLang === "0") {
+        this.postData.content = data
+      } else {
+        this.postData.content_sublang = data
+      }
     },
 
     updateCont(){
@@ -144,9 +282,237 @@ export default {
       })
     },
 
+    updateAll () {
+
+      if(this.mode === "new") {
+        EventBus.$emit('toPage', './postslist')
+        return
+      }
+
+      // Get Post Single Data
+      this.getData()
+
+      // Get Category
+      this.$nextTick(() => {
+        this.getCate()
+      })
+      
+      // Refresh Container
+      this.$nextTick(() => {
+        this.updateCont()
+      })
+    },
+
     submit () {
-      console.log(this.postContent)
+      var that = this
+
+      var today = new Date().toISOString().slice(0, 19).replace('T', ' ')
+
+      // Check mandatory content is not empty and did not excess certain words count
+      if(
+        !this.limitEmpty(this.postData.title, "Post Title ") ||
+        !this.limitEmpty(this.postData.content, "Post contents ") ||
+        !this.limitLength(">", this.postData.title, 54, "Post title ") ||
+        !this.limitLength(">", this.postData.title_sublang, 54, "Chinese post title ") ||
+        !this.limitLength(">", this.postData.brief, 120, "Post brief ") ||
+        !this.limitLength(">", this.postData.brief_sublang, 120, "Chinese post brief ")
+      ){
+        return
+      }
+
+      var postReady = {
+        mode: this.mode,
+        ukey: this.getCookie('u_key'), 
+        uuid: this.getCookie('u_uuid'), 
+        pid: this.postData.id,
+        cateId: this.postData.cateId,
+        title: this.postData.title,
+        title_sublang: this.postData.title_sublang,
+        content: this.encodeRichText(this.postData.content),
+        content_sublang: this.encodeRichText(this.postData.content_sublang),
+        brief: this.postData.brief,
+        brief_sublang: this.postData.brief_sublang,
+        date_pub: this.mode === "update" ? this.postData.data_pub  : today,
+        date_modi: today,
+        status: String(this.postData.status)
+      }
+
+      var postData = this.$qs.stringify(postReady)
+
+      this.axios.post(this.api_up, postData)
+      .then(function (response) {
+
+          var res = response.data
+
+          console.log(res)
+
+          if(res.indexOf("success") != -1){
+
+              that.$notify({
+                  title: '提交成功',
+                  message: '已完成提交',
+                  type: 'success'
+              })
+
+              that.updateAll()
+              that.$nextTick(() => {
+                EventBus.$emit('toPage', './postslist')
+              })
+
+          } else {
+              that.$notify({
+                  title: '提交失败',
+                  message: '错误' + res,
+                  type: 'warning'
+              })
+          }
+      })
+    },
+
+    del () {
+
+      var that = this
+
+      this.$confirm('You will delete a post permanently, continue?', 'Alert', {
+        confirmButtonText: 'DELETE',
+        cancelButtonText: 'Cancel',
+        type: 'warning'
+      }).then(() => {
+        
+        var postReady = {
+          ukey: that.getCookie('u_key'), 
+          uuid: that.getCookie('u_uuid'), 
+          pid: that.postData.id
+        }
+
+        var postData = this.$qs.stringify(postReady)
+
+        that.axios.post(that.api_del, postData)
+        .then(function (response) {
+
+          var res = response.data
+
+          if(res.indexOf("success") != -1){
+
+              that.$notify({
+                  title: 'Success',
+                  message: 'Post has been removed',
+                  type: 'success'
+              })
+
+              EventBus.$emit('toPage', './postslist')
+
+          } else {
+              that.$notify({
+                  title: 'Fail',
+                  message: 'Error: ' + res,
+                  type: 'warning'
+              })
+          }
+        })
+
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: 'Canceled'
+        });          
+      });
+
+      
+    },
+
+    /*del () {
+
+      var that = this
+      
+      var postReady = {
+        ukey: this.getCookie('u_key'), 
+        uuid: this.getCookie('u_uuid'), 
+        pid: this.postData.id,
+      }
+
+      var postData = this.$qs.stringify(postReady)
+
+      console.log(postReady)
+
+      this.axios.post(this.api_del, postData)
+      .then(function (response) {
+
+        var res = response.data
+
+        console.log(res)
+
+        if(res.indexOf("success") != -1){
+
+          that.$notify({
+              title: 'Delete successful',
+              message: 'Post deleted, now will go back post list',
+              type: 'success'
+          })
+
+          EventBus.$emit('toPage', './postslist')
+
+        } else {
+          that.$notify({
+              title: 'Delete Fail',
+              message: res,
+              type: 'error'
+          })
+        }
+      }).catch((error) => {
+        console.log(error)
+      })
+    },*/
+
+    getCookie (cname) {
+        var name = cname + "="
+        var ca = document.cookie.split(';')
+        for(var i=0; i<ca.length; i++){
+            var c = ca[i].trim()
+            if (c.indexOf(name)==0) return c.substring(name.length,c.length)
+        }
+        return ""
+    },
+
+    limitLength (mode, str, num, name) {
+      if(mode == ">") {
+        if(str.length > num){
+          that.$notify({
+              title: 'Error',
+              message: name + ' need to more than ' + num + ' words',
+              type: 'warning'
+          })
+          return false
+        }
+      }
+
+      if(mode == "<") {
+        if(str.length < num){
+          that.$notify({
+              title: 'Error',
+              message: name + ' need to less than ' + num + ' words',
+              type: 'warning'
+          })
+          return false
+        }
+      }
+
+      return true
+    },
+
+    limitEmpty (str, name) {
+      if(!str || str.length < 1 || str == "" || str == null || typeof str == undefined || str =="undefined"){
+        this.$notify({
+            title: "Error",
+            message: name + ' must not be empty',
+            type: 'warning'
+        })
+        return false
+      }
+
+      return true
     }
+
 
   }
   
@@ -155,12 +521,25 @@ export default {
 
 <style scoped>
 
-#all{
-  margin: 40px;
+#all {
+  margin: 24px;
 }
 
-#pc-content{
+#post-title{
+  display:flex;
+}
+
+.pc-b{
   margin-top:24px;
+}
+
+#post-lang-selector{
+  right: 40px;
+  position: absolute;
+}
+
+#pc-editmode-selector .el-radio-group .el-radio-button span{
+  font-size:12px;
 }
 
 </style>

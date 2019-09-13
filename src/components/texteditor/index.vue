@@ -1,7 +1,7 @@
 <template>
     <div class="text-editor">
         <editor-menu-bar :editor="editor" v-slot="{ commands, isActive }">
-        <div class="editor-bar">
+          <div class="editor-bar">
 
             <!-- Bold -->
             <button :class="{ 'is-active': isActive.bold() }" @click="commands.bold">
@@ -19,18 +19,38 @@
             </button>
             
             <!-- Headline Text Size 1 -->
-            <button :class="{ 'is-active': isActive.heading({ level: 1 }) }" @click="commands.heading({ level: 1 })">
+            <button :class="{ 'is-active': isActive.size({ textSize: 32 }) }" @click="commands.size({ textSize: 32 })">
                 <p style="font-weight:bold;">H1</p>
             </button>
 
             <!-- Headline Text Size 2 -->
-            <button :class="{ 'is-active': isActive.heading({ level: 2 }) }" @click="commands.heading({ level: 2 })">
+            <button :class="{ 'is-active': isActive.size({ textSize: 28 }) }" @click="commands.size({ textSize: 28 })">
                 <p style="font-weight:bold;">H2</p>
             </button>
 
             <!-- Headline Text Size 3 -->
-            <button :class="{ 'is-active': isActive.heading({ level: 3 }) }" @click="commands.heading({ level: 3 })">
+            <button :class="{ 'is-active': isActive.size({ textSize: 24 }) }" @click="commands.size({ textSize: 24 })">
                 <p style="font-weight:bold;">H3</p>
+            </button>
+
+            <!-- Headline Text Size 3 -->
+            <button :class="{ 'is-active': isActive.size({ textSize: 16 }) }" @click="commands.size({ textSize: 16 })">
+                <p style="font-weight:bold;">NS</p>
+            </button>
+
+            <!-- Alignment Left -->
+            <button :class="{ 'is-active': isActive.paragraph({ textAlign: 'left' }) }" @click="commands.paragraph({ textAlign: 'left' })">
+                <span class="material-icons">format_align_left</span>
+            </button>
+
+            <!-- Alignment Center -->
+            <button :class="{ 'is-active': isActive.paragraph({ textAlign: 'center' }) }" @click="commands.paragraph({ textAlign: 'center' })">
+                <span class="material-icons">format_align_center</span>
+            </button>
+
+            <!-- Alignment right -->
+            <button :class="{ 'is-active': isActive.paragraph({ textAlign: 'right' }) }" @click="commands.paragraph({ textAlign: 'right' })">
+                <span class="material-icons">format_align_right</span>
             </button>
 
             <!-- Bullet List -->
@@ -61,6 +81,11 @@
             <!-- IFrame Upload -->
             <button @click="showIframePrompt(commands.iframe)">
                 <span class="material-icons">video_library</span>
+            </button>
+
+            <!-- Website Link -->
+            <button @click="showLinkDialog(commands.ilink)">
+                <span class="material-icons">link</span>
             </button>
             
             <!-- Horizontal Line -->
@@ -113,7 +138,10 @@ import {
     History,
 } from 'tiptap-extensions'
 
-import Iframe from './iframe/iframe.js'
+import Iframe from './ewidget/iframe.js'
+import ILink from './ewidget/ilink.js'
+import IParagraph from './ewidget/iparagraph.js'
+import ISize from './ewidget/isize.js'
 
 export default {
     name: "texteditor",
@@ -126,7 +154,11 @@ export default {
     },
     data(){
         return {
+            api_getLink: "https://api.isjeff.com/pot/data/getlink/",
+            //api_getLink: "https://api.urlmeta.org/",
             editor: null,
+            dialog_link_v: false,
+            input_link: "",
         }
     },
     created () {
@@ -142,7 +174,7 @@ export default {
                 new Blockquote(),
                 new CodeBlock(),
                 new HardBreak(),
-                new Heading({ levels: [1, 2, 3] }),
+                new ISize({ textSize: [24, 28, 32] }),
                 new HorizontalRule(),
                 new BulletList(),
                 new OrderedList(),
@@ -157,6 +189,8 @@ export default {
                 new Underline(),
                 new History(),
                 new Iframe(),
+                new ILink(),
+                new IParagraph()
             ],
             onUpdate(){
                 that.$emit('update', this.getHTML())
@@ -177,18 +211,17 @@ export default {
         // Add Image
         showImagePrompt(command) {
 
-            this.$prompt('请输入图片地址', '提示', {
+            this.$prompt('Input Image Url', 'Insert', {
 
-            confirmButtonText: '确定',
-            cancelButtonText: '取消',
+            confirmButtonText: 'OK',
+            cancelButtonText: 'Cancel',
             
 
             }).then(({ value }) => {
 
-
                 this.$message({
                     type: 'success',
-                    message: '插入图片'
+                    message: 'Image Added'
                 })
 
                 if(value != null){
@@ -205,27 +238,26 @@ export default {
             
         },
 
-        
-
         // Add Iframe
         showIframePrompt (command) {
-            this.$prompt('请输入视频地址', '提示', {
 
-            confirmButtonText: '确定',
-            cancelButtonText: '取消',
-            inputPlaceholder: '请插入iframe标签中的src后的部分'
+            this.$prompt('Input Video Url', 'Insert', {
+
+            confirmButtonText: 'OK',
+            cancelButtonText: 'Cancel',
+            inputPlaceholder: 'Input url link from <iframe> tag src= attrribute'
 
             }).then(({ value }) => {
-
-
-                this.$message({
-                    type: 'success',
-                    message: '插入视频'
-                })
 
                 if(value != null){
                     this.addIframe(value, command)
                 }
+
+
+                this.$message({
+                    type: 'success',
+                    message: 'Video Added'
+                })
 
             }).catch((err) => {
                 /*console.log(err)
@@ -235,6 +267,38 @@ export default {
                 })*/       
             })
             
+        },
+
+        showLinkDialog (command) {
+            var val = prompt('Input Website Link')
+            if(val){
+                this.addLink(val, command)
+            }
+
+
+            // BUG Cause lost focus and position issue
+            /*this.$prompt('Input Website Link', 'Insert', {
+
+            confirmButtonText: 'OK',
+            cancelButtonText: 'Cancel',
+
+            }).then(({ value }) => {
+
+                if(value != null){
+                    this.addLink(value, command)
+                }
+
+                this.$message({
+                    type: 'success',
+                    message: 'Link Added'
+                })
+
+            }).catch((err) => {
+                this.$message({
+                    type: 'info',
+                    message: '输入取消'
+                })       
+            })*/
         },
 
         addImage (src, command) {
@@ -247,7 +311,30 @@ export default {
             if(src) {
                 command({src})
             }
+        },
+
+        addLink (href, command) {
+            var that = this
+
+            // Request my own get title server
+            this.axios.get(this.api_getLink + "?link="+href).then(response => {
+                var res = response.data
+                var resSplit = res.split(':')
+                var titleText = "Open Link: "
+                if(res.indexOf("success") != -1){
+                    titleText = resSplit[1]
+                    command({href, titleText})
+                } else {
+                    command({href, titleText})
+                }
+            })
+
+        },
+
+        openLink (url) {
+            window.open(url, "_blank")
         }
+
     }
 }
 </script>
@@ -265,6 +352,7 @@ button{
 }
 
 button:hover{
+    border: 1px solid rgba(0,0,0,0.15);
     background:#fafafa;
 }
 
@@ -280,16 +368,13 @@ button p{
     padding-bottom:-5px;
 }
 
+
 .is-active{
-    border: 1px solid #409eff;
-    background:#409eff;
-    color:#ffffff;
+    border: 2px solid rgba(0,0,0,0.3);
 }
 
 .is-active:hover{
-    border: 1px solid #409eff;
-    background:#409eff;
-    color:#ffffff;
+    border: 2px solid rgba(0,0,0,0.35);
 }
 
 .text-editor{

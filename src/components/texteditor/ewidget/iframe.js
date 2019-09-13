@@ -1,5 +1,4 @@
 import { Node } from 'tiptap'
-import { nodeInputRule } from 'tiptap-commands'
 
 export default class Iframe extends Node {
 
