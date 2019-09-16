@@ -1,7 +1,7 @@
 <template>
     <div id="header-cont">
         <div id="header-content">
-            <div id="header-left">
+            <div id="header-left" v-on:click="toHome">
                 <div id="header-title">
                     <span id="header-title-big">PROTFOLIO CONTROL PANEL</span>
                     <br>
@@ -63,6 +63,10 @@ export default {
             EventBus.$emit("logout", true)
         },
 
+        toHome () {
+            EventBus.$emit("toPage", '/home')
+        },
+
         getCookie(cname){
             var name = cname + "="
             var ca = document.cookie.split(';')
@@ -95,6 +99,7 @@ export default {
 #header-left{
     position:absolute;
     left:20px;
+    cursor: pointer;
 }
 
 #header-title{

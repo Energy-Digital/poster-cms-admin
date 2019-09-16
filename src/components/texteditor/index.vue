@@ -108,6 +108,32 @@
 
       <editor-content class="editor-content" :editor="editor" />
 
+      <div id="assets_upload" v-if="upload_win">
+
+        <div id="au_title">
+            <span>Upload File</span>
+        </div>
+
+
+        <div id="au_upload_button">
+            <el-upload
+                class="upload-demo"
+                drag
+                :action="api_upImg"
+                :http-request="uploadImg">
+
+                <i class="el-icon-upload"></i>
+                <div class="el-upload__text">Drop file <em>or click to upload</em></div>
+                <div class="el-upload__tip" slot="tip">jpg/png/gif only, 3M maximum</div>
+
+            </el-upload>
+
+        </div>
+
+      </div>
+
+      <div id="assets_upload_bg" v-if="upload_win" v-on:click="closeUpWin"></div>
+
     </div>
 </template>
 
@@ -154,11 +180,14 @@ export default {
     },
     data(){
         return {
+            base_url: "https://api.isjeff.com/pot/",
             api_getLink: "https://api.isjeff.com/pot/data/getlink/",
-            //api_getLink: "https://api.urlmeta.org/",
+            api_upImg: "https://api.isjeff.com/pot/manager/up_img/",
             editor: null,
             dialog_link_v: false,
             input_link: "",
+            upload_win: false,
+            img_command: "",
         }
     },
     created () {
@@ -208,13 +237,16 @@ export default {
     },
     methods:{
 
-        // Add Image
+        // Add Image Input Window
         showImagePrompt(command) {
 
-            this.$prompt('Input Image Url', 'Insert', {
+            this.upload_win = true
+            this.img_command = command
 
-            confirmButtonText: 'OK',
-            cancelButtonText: 'Cancel',
+            /*this.$prompt('Input Image Url', 'Insert', {
+
+                confirmButtonText: 'OK',
+                cancelButtonText: 'Cancel',
             
 
             }).then(({ value }) => {
@@ -229,16 +261,16 @@ export default {
                 }
 
             }).catch((err) => {
-                /*console.log(err)
+                console.log(err)
                 this.$message({
                     type: 'info',
                     message: '输入取消'
-                })*/      
-            })
+                })     
+            })*/
             
         },
 
-        // Add Iframe
+        // Add Iframe Input Window
         showIframePrompt (command) {
 
             this.$prompt('Input Video Url', 'Insert', {
@@ -301,18 +333,21 @@ export default {
             })*/
         },
 
+        // Insert an image
         addImage (src, command) {
             if(src){
                 command({src})
             }
         },
 
+        // Insert an iframe
         addIframe (src, command) {
             if(src) {
                 command({src})
             }
         },
 
+        // Insert an link
         addLink (href, command) {
             var that = this
 
@@ -328,7 +363,57 @@ export default {
                     command({href, titleText})
                 }
             })
+        },
 
+        // Insert an image
+        uploadImg (obj) {
+            var that = this
+            var img = obj.file
+
+            let formObj = new FormData()
+
+            formObj.append('file',img)
+
+            let h = {
+                headers:{'Content-Type':'multipart/form-data'}
+            }
+
+            this.$http.post(this.api_upImg,formObj,h)
+            .then(function(response) {
+                var res = response.data
+                if(res.indexOf('success' != -1)) {
+
+                    var r = res.split(',')
+                    
+                    // Get image command from the local temp variable
+                    // Call add image func
+                    that.addImage(that.base_url + r[1], that.img_command)
+
+                    // Close window
+                    that.closeUpWin()
+
+                    // Clear image command
+                    that.img_command = ""
+
+                    that.$notify({
+                        title: "Uploaded",
+                        message: 'Upload Successful: ' + r[1],
+                        type: 'success'
+                    })
+
+                } else {
+                    that.$notify({
+                        title: "Upload Fail",
+                        message: 'Error: ' + res,
+                        type: 'warning'
+                    })
+                }
+            })
+        },
+
+
+        closeUpWin () {
+            this.upload_win = false
         },
 
         openLink (url) {
@@ -398,6 +483,31 @@ button p{
     padding:8px;
     height:500px;
     overflow-y: scroll;
+}
+
+#assets_upload{
+    background: rgba(255,255,255,1);
+    position: fixed;
+    padding:20px;
+    top: 35%;
+    left:35%;
+    z-index:999;
+    border-radius: 10px;
+}
+
+#assets_upload_bg{
+    position: fixed;
+    top:0px;
+    left:0px;
+    background: rgba(0,0,0,0.6);
+    height:100%;
+    width:100%;
+    z-index:998;
+}
+
+#au_title{
+    font-size: 18px;
+    margin-bottom: 7px;
 }
 
 </style>

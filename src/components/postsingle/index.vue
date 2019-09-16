@@ -99,7 +99,7 @@
 
     <div class="pc-b" id="pc-submit">
       <el-button class="primary" @click="submit()" plain>SUBMIT</el-button>
-      <el-button type="text" size="small" style="color:#FF5C5C;" @click="del()">Delete</el-button>
+      <el-button type="text" size="small" style="color:#FF5C5C;" @click="del()" v-if="mode === 'update'">Delete</el-button>
     </div>
     
   </div>
@@ -421,48 +421,6 @@ export default {
       
     },
 
-    /*del () {
-
-      var that = this
-      
-      var postReady = {
-        ukey: this.getCookie('u_key'), 
-        uuid: this.getCookie('u_uuid'), 
-        pid: this.postData.id,
-      }
-
-      var postData = this.$qs.stringify(postReady)
-
-      console.log(postReady)
-
-      this.axios.post(this.api_del, postData)
-      .then(function (response) {
-
-        var res = response.data
-
-        console.log(res)
-
-        if(res.indexOf("success") != -1){
-
-          that.$notify({
-              title: 'Delete successful',
-              message: 'Post deleted, now will go back post list',
-              type: 'success'
-          })
-
-          EventBus.$emit('toPage', './postslist')
-
-        } else {
-          that.$notify({
-              title: 'Delete Fail',
-              message: res,
-              type: 'error'
-          })
-        }
-      }).catch((error) => {
-        console.log(error)
-      })
-    },*/
 
     getCookie (cname) {
         var name = cname + "="
