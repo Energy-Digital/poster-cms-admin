@@ -25,11 +25,11 @@
                             <el-menu-item index="2-2" v-on:click="toPage('./cateslist')">All Categories 所有分类</el-menu-item>
                         </el-menu-item-group>
 
-                        <el-menu-item-group title="Status">
+                        <!--el-menu-item-group title="Status">
                             <el-menu-item index="2-3">Public 公开</el-menu-item>
                             <el-menu-item index="2-4">Saved 已保存</el-menu-item>
                             <el-menu-item index="2-5">Deleted 回收站</el-menu-item>
-                        </el-menu-item-group>
+                        </el-menu-item-group-->
                     </el-submenu>
 
                     <el-submenu index="3">

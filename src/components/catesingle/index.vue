@@ -59,9 +59,13 @@
 
 <script>
 
+// Import common js
 import { EventBus }  from '../../bus.js'
-import WTitle from '../widgets/w_title.vue'
 import { isEmpty, getCookie } from '../../utils.js'
+
+// Import widgets
+import WTitle from '../widgets/w_title.vue'
+
 
 export default {
     name:"catesingle",

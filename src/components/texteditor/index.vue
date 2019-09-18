@@ -74,7 +74,7 @@
             </button>
 
             <!-- Image Upload -->
-            <button @click="showImagePrompt(commands.image)">
+            <button @click="showImagePrompt(commands.iimage)">
                 <span class="material-icons">image</span>
             </button>
 
@@ -144,7 +144,6 @@ import 'material-icons/iconfont/material-icons.css'
 // Import Tiptap Editor
 import { Editor, EditorContent, EditorMenuBar  } from 'tiptap'
 import {
-    Image,
     Blockquote,
     CodeBlock,
     HardBreak,
@@ -168,6 +167,7 @@ import Iframe from './ewidget/iframe.js'
 import ILink from './ewidget/ilink.js'
 import IParagraph from './ewidget/iparagraph.js'
 import ISize from './ewidget/isize.js'
+import IImage from './ewidget/iimage.js'
 
 export default {
     name: "texteditor",
@@ -199,7 +199,6 @@ export default {
         this.editor = new Editor({
             content: that.text,
             extensions: [
-                new Image(),
                 new Blockquote(),
                 new CodeBlock(),
                 new HardBreak(),
@@ -219,7 +218,8 @@ export default {
                 new History(),
                 new Iframe(),
                 new ILink(),
-                new IParagraph()
+                new IParagraph(),
+                new IImage()
             ],
             onUpdate(){
                 that.$emit('update', this.getHTML())
@@ -239,35 +239,8 @@ export default {
 
         // Add Image Input Window
         showImagePrompt(command) {
-
             this.upload_win = true
             this.img_command = command
-
-            /*this.$prompt('Input Image Url', 'Insert', {
-
-                confirmButtonText: 'OK',
-                cancelButtonText: 'Cancel',
-            
-
-            }).then(({ value }) => {
-
-                this.$message({
-                    type: 'success',
-                    message: 'Image Added'
-                })
-
-                if(value != null){
-                    this.addImage(value, command)
-                }
-
-            }).catch((err) => {
-                console.log(err)
-                this.$message({
-                    type: 'info',
-                    message: '输入取消'
-                })     
-            })*/
-            
         },
 
         // Add Iframe Input Window
@@ -335,7 +308,6 @@ export default {
 
         // Insert an image
         addImage (src, command) {
-            console.log(command)
             if(src){
                 command({src})
             }

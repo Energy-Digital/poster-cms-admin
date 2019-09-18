@@ -22,8 +22,8 @@
       <div class="pc-b" id="pc-content" v-if="loaded">
         <div id="pc-editmode-selector">
           <el-radio-group v-model="editMode" style="margin-bottom: 30px;">
-            <el-radio-button label="view"><span class="material-icons">collections</span></el-radio-button>
-            <el-radio-button label="source"><span class="material-icons">edit</span></el-radio-button>
+            <el-radio-button label="view">Visual</el-radio-button>
+            <el-radio-button label="source">Text</el-radio-button>
           </el-radio-group>
         </div>
 
