@@ -15,7 +15,7 @@
       
       <div class="pc-b" id="pc-title">
         <WSubTitle txt="Title"></WSubTitle>
-        <el-input v-model="postData.title" placeholder="Article Title" v-if="postLang === '0'"></el-input>
+        <el-input v-model="postData.title" placeholder="Article Title (4 Char +)" v-if="postLang === '0'"></el-input>
         <el-input v-model="postData.title_sublang" placeholder="请输入标题" v-if="postLang === '1'"></el-input>
       </div>
 
@@ -55,7 +55,7 @@
         <el-input
           type="textarea"
           :rows="5"
-          placeholder="Brief"
+          placeholder="Brief (12 Char +)"
           v-if="postLang === '0'"
           v-model="postData.brief">
         </el-input>
@@ -114,6 +114,7 @@ import 'quill/dist/quill.bubble.css'
 import { quillEditor } from 'vue-quill-editor'*/
 
 import { EventBus } from '../../bus.js'
+import { limitLength, isEmpty, getCookie } from '../../utils.js'
 
 import TextEditor from '../texteditor/index.vue'
 import WTitle from '../widgets/w_title.vue'
@@ -310,20 +311,24 @@ export default {
 
       // Check mandatory content is not empty and did not excess certain words count
       if(
-        !this.limitEmpty(this.postData.title, "Post Title ") ||
-        !this.limitEmpty(this.postData.content, "Post contents ") ||
-        !this.limitLength(">", this.postData.title, 54, "Post title ") ||
-        !this.limitLength(">", this.postData.title_sublang, 54, "Chinese post title ") ||
-        !this.limitLength(">", this.postData.brief, 120, "Post brief ") ||
-        !this.limitLength(">", this.postData.brief_sublang, 120, "Chinese post brief ")
+        isEmpty(this.postData.title) ||
+        isEmpty(this.postData.content) ||
+        limitLength("<", this.postData.title, 4) ||
+        limitLength("<", this.postData.brief, 12)
       ){
+        this.$notify({
+            title: 'Check Needed',
+            message: 'Please check your title or contents is not empty and meet text count requirement',
+            type: 'warning'
+        })
         return
       }
 
+
       var postReady = {
         mode: this.mode,
-        ukey: this.getCookie('u_key'), 
-        uuid: this.getCookie('u_uuid'), 
+        ukey: getCookie('u_key'), 
+        uuid: getCookie('u_uuid'), 
         pid: this.postData.id,
         cateId: this.postData.cateId,
         title: this.postData.title,
@@ -380,8 +385,8 @@ export default {
       }).then(() => {
         
         var postReady = {
-          ukey: that.getCookie('u_key'), 
-          uuid: that.getCookie('u_uuid'), 
+          ukey: getCookie('u_key'), 
+          uuid: getCookie('u_uuid'), 
           pid: that.postData.id
         }
 
@@ -419,56 +424,6 @@ export default {
       });
 
       
-    },
-
-
-    getCookie (cname) {
-        var name = cname + "="
-        var ca = document.cookie.split(';')
-        for(var i=0; i<ca.length; i++){
-            var c = ca[i].trim()
-            if (c.indexOf(name)==0) return c.substring(name.length,c.length)
-        }
-        return ""
-    },
-
-    limitLength (mode, str, num, name) {
-      if(mode == ">") {
-        if(str.length > num){
-          that.$notify({
-              title: 'Error',
-              message: name + ' need to more than ' + num + ' words',
-              type: 'warning'
-          })
-          return false
-        }
-      }
-
-      if(mode == "<") {
-        if(str.length < num){
-          that.$notify({
-              title: 'Error',
-              message: name + ' need to less than ' + num + ' words',
-              type: 'warning'
-          })
-          return false
-        }
-      }
-
-      return true
-    },
-
-    limitEmpty (str, name) {
-      if(!str || str.length < 1 || str == "" || str == null || typeof str == undefined || str =="undefined"){
-        this.$notify({
-            title: "Error",
-            message: name + ' must not be empty',
-            type: 'warning'
-        })
-        return false
-      }
-
-      return true
     }
 
 

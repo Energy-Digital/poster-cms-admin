@@ -335,6 +335,7 @@ export default {
 
         // Insert an image
         addImage (src, command) {
+            console.log(command)
             if(src){
                 command({src})
             }

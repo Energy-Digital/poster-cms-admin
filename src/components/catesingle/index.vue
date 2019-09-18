@@ -4,7 +4,7 @@
             <WTitle txt="Edit Category"></WTitle>
         </div>
 
-        <div id="post-lang-selector">
+        <div id="lang">
             <el-radio-group v-model="postLang" style="margin-bottom: 30px;">
                 <el-radio-button label="0">English</el-radio-button>
                 <el-radio-button label="1">中文</el-radio-button>
@@ -15,28 +15,40 @@
             <span v-if="postLang === '0'">Category Name</span>
             <span v-if="postLang === '1'">分类名称</span>
             <br>
-            <el-input v-model="cateData.cname" placeholder="Please Input Name" v-if="postLang === '0'"></el-input>
-            <el-input v-model="cateData.cname_sublang" placeholder="请输入分类名称" v-if="postLang === '1'"></el-input>
+            <div id="form-name">
+                <el-input v-model="cateData.cname" placeholder="Please Input Name" v-if="postLang === '0'"></el-input>
+                <el-input v-model="cateData.cname_sublang" placeholder="请输入分类名称" v-if="postLang === '1'"></el-input>
+            </div>
             <br>
 
             <span v-if="postLang === '0'">Category Description</span>
             <span v-if="postLang === '1'">分类描述</span>
             <br>
-            <el-input
-                type="textarea"
-                :rows="3"
-                v-if="postLang === '0'"
-                placeholder="Please Input Description"
-                v-model="cateData.des">
-            </el-input>
-            <el-input
-                type="textarea"
-                :rows="3"
-                v-if="postLang === '1'"
-                placeholder="请输入分类描述"
-                v-model="cateData.des_sublang">
-            </el-input>
+
+            <div id="form-text">
+                <el-input
+                    type="textarea"
+                    :rows="3"
+                    v-if="postLang === '0'"
+                    placeholder="Please Input Description"
+                    v-model="cateData.des">
+                </el-input>
+
+                <el-input
+                    type="textarea"
+                    :rows="3"
+                    v-if="postLang === '1'"
+                    placeholder="请输入分类描述"
+                    v-model="cateData.des_sublang">
+                </el-input>
+            </div>
+            
             <br>
+
+            <div class="submit" id="submit">
+                <el-button class="primary" @click="submit()" plain>SUBMIT</el-button>
+                <el-button type="text" size="small" style="color:#FF5C5C;" @click="del()" v-if="mode === 'update'">Delete</el-button>
+            </div>
             
             
             
@@ -47,14 +59,16 @@
 
 <script>
 
+import { EventBus }  from '../../bus.js'
 import WTitle from '../widgets/w_title.vue'
+import { isEmpty, getCookie } from '../../utils.js'
 
 export default {
     name:"catesingle",
     props:{
         cateId: {
             type: String,
-            default: "0"
+            default: "1"
         }
     },
     components:{
@@ -62,23 +76,82 @@ export default {
     },
     data(){
         return{
-            api:"http://api.isjeff.com/pot/data/post_cate/",
+            api: "https://api.isjeff.com/pot/data/post_cate/",
+            api_up: "https://api.isjeff.com/pot/updater/cate_single/",
             cateData: "",
-            postLang: "0"
+            postLang: "0",
+            mode: "update"
         }
     },
     created(){
         this.getData()
     },
     methods:{
+
         getData(){
             this.axios.get(this.api+"?cid="+this.cateId).then((response)=>{
                 this.cateData = response.data[0]
             })
         },
 
-        submit(){
+        submit() {
+            var that = this
 
+            // Check mandatory content is not empty and did not excess certain words count
+            if(
+                isEmpty(this.cateData.cname) ||
+                isEmpty(this.cateData.des)
+            ){
+                this.$notify({
+                    title: 'Check Needed',
+                    message: 'Please check your name or description is not empty',
+                    type: 'warning'
+                })
+                return
+            }
+
+            var postReady = {
+                mode: this.mode,
+                ukey: getCookie('u_key'), 
+                uuid: getCookie('u_uuid'), 
+                cid: this.cateId,
+                cname: this.cateData.cname,
+                cname_sublang: this.cateData.cname_sublang,
+                des: this.cateData.des,
+                des_sublang: this.cateData.des_sublang
+            }
+
+            console.log(postReady)
+
+            var postData = this.$qs.stringify(postReady)
+
+            this.axios.post(this.api_up, postData)
+            .then(function (response) {
+
+                var res = response.data
+
+                console.log(res)
+
+                if(res.indexOf("success") != -1){
+
+                    that.$notify({
+                        title: '提交成功',
+                        message: '已完成提交',
+                        type: 'success'
+                    })
+
+                    that.$nextTick(() => {
+                        EventBus.$emit('toPage', './cateslist')
+                    })
+
+                } else {
+                    that.$notify({
+                        title: '提交失败',
+                        message: '错误' + res,
+                        type: 'warning'
+                    })
+                }
+            })
         }
     }
 }
@@ -86,4 +159,31 @@ export default {
 
 <style scoped>
 
+#all {
+    padding: 20px;
+}
+
+#title {
+    margin-top:24px;
+}
+
+#lang {
+    margin-top:24px;
+}
+
+#form {
+    margin-top:24px;
+}
+
+#form-name {
+    margin-top:24px;
+}
+
+#form-text {
+    margin-top:24px;
+}
+
+#submit {
+    margin-top:24px;
+}
 </style>

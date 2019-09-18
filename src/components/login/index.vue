@@ -13,6 +13,7 @@
 <script>
 
 import { EventBus } from '../../bus.js'
+import { getCookie } from '../../utils.js'
 
 export default {
     name:"login",
@@ -27,8 +28,8 @@ export default {
         }
     },
     created () {
-        if(this.getCookie('u_email')){
-            this.email = this.getCookie('u_email')
+        if(getCookie('u_email')){
+            this.email = getCookie('u_email')
         }
     },
 
@@ -110,17 +111,7 @@ export default {
 
                 
             }
-        },
-
-        getCookie (cname) {
-            var name = cname + "="
-            var ca = document.cookie.split(';')
-            for(var i=0; i<ca.length; i++){
-                var c = ca[i].trim()
-                if (c.indexOf(name)==0) return c.substring(name.length,c.length)
-            }
-            return ""
-        },
+        }
     }
 }
 </script>

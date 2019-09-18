@@ -9,71 +9,71 @@
 
     <div id="list">
       <el-table
-    :data="postsList"
-    border
-    style="width: 100%">
+      :data="postsList"
+      border
+      style="width: 100%">
 
-      <el-table-column
-        fixed
-        prop="status"
-        label="Status"
-        width="100">
-        <template slot-scope="scope">
-          <div v-if="scope.row.status == '0'" class="status" style='background:#c9a661;'>Draft</div>
-          <div v-if="scope.row.status == '1'" class="status" style='background:#61c995;'>Published</div>
-          <div v-if="scope.row.status == '2'" class="status" style='background:#c96f61;'>Deprecated</div>
-        </template>
-        
-      </el-table-column>
+        <el-table-column
+          fixed
+          prop="status"
+          label="Status"
+          width="100">
+          <template slot-scope="scope">
+            <div v-if="scope.row.status == '0'" class="status" style='background:#c9a661;'>Draft</div>
+            <div v-if="scope.row.status == '1'" class="status" style='background:#61c995;'>Published</div>
+            <div v-if="scope.row.status == '2'" class="status" style='background:#c96f61;'>Deprecated</div>
+          </template>
+          
+        </el-table-column>
 
-      <el-table-column
-        fixed
-        prop="title"
-        label="Title"
-        width="150">
-      </el-table-column>
+        <el-table-column
+          fixed
+          prop="title"
+          label="Title"
+          width="150">
+        </el-table-column>
 
-      <el-table-column
-        prop="cname"
-        label="Category"
-        width="100">
-      </el-table-column>
+        <el-table-column
+          prop="cname"
+          label="Category"
+          width="100">
+        </el-table-column>
 
-      <el-table-column
-        prop="brief"
-        label="Brief"
-        width="240">
-      </el-table-column>
+        <el-table-column
+          prop="brief"
+          label="Brief"
+          width="240">
+        </el-table-column>
 
-      <el-table-column
-        prop="name"
-        label="Author"
-        width="120">
-      </el-table-column>
+        <el-table-column
+          prop="name"
+          label="Author"
+          width="120">
+        </el-table-column>
 
-      <el-table-column
-        prop="date_pub"
-        label="Publish Date"
-        width="140">
-      </el-table-column>
+        <el-table-column
+          prop="date_pub"
+          label="Publish Date"
+          width="140">
+        </el-table-column>
 
-      <el-table-column
-        prop="date_modi"
-        label="Last Edit"
-        width="140">
-      </el-table-column>
+        <el-table-column
+          prop="date_modi"
+          label="Last Edit"
+          width="140">
+        </el-table-column>
 
 
-      <el-table-column
-        fixed="right"
-        label="Action"
-        width="100">
-        <template slot-scope="scope">
-          <el-button @click="toSingleEdit(scope.row)" type="text" size="small">Edit</el-button>
-          <el-button type="text" size="small">View</el-button>
-        </template>
-      </el-table-column>
-    </el-table>
+        <el-table-column
+          fixed="right"
+          label="Action"
+          width="100">
+          <template slot-scope="scope">
+            <el-button @click="toSingleEdit(scope.row)" type="text" size="small">Edit</el-button>
+            <el-button type="text" size="small">View</el-button>
+          </template>
+        </el-table-column>
+      </el-table>
     </div>
     
   </div>

@@ -1,7 +1,8 @@
 <template>
   <div id="all">
 
-    <WTitle txt="All Categories"></WTitle>
+    <WTitle txt="Categories"></WTitle>
+
 
     <div id="list">
       <el-table
@@ -9,47 +10,48 @@
         border
         style="width: 100%">
 
-      <el-table-column
-        fixed
-        prop="cname"
-        label="Category Name"
-        width="150">
-      </el-table-column>
+        <el-table-column
+          fixed
+          prop="cname"
+          label="Category Name"
+          width="150">
+        </el-table-column>
 
-      <el-table-column
-        prop="cname_sublang"
-        label="分类名称"
-        width="120">
-      </el-table-column>
+        <el-table-column
+          prop="cname_sublang"
+          label="分类名称"
+          width="120">
+        </el-table-column>
 
-      <el-table-column
-        prop="des"
-        label="Description"
-        width="120">
-      </el-table-column>
+        <el-table-column
+          prop="des"
+          label="Description"
+          width="120">
+        </el-table-column>
 
-      <el-table-column
-        prop="des_sublang"
-        label="分类描述"
-        width="120">
-      </el-table-column>
+        <el-table-column
+          prop="des_sublang"
+          label="分类描述"
+          width="120">
+        </el-table-column>
 
-      <el-table-column
-        prop="total"
-        label="Posts"
-        width="120">
-      </el-table-column>
+        <el-table-column
+          prop="total"
+          label="Posts"
+          width="120">
+        </el-table-column>
 
 
-      <el-table-column
-        fixed="right"
-        label="Action"
-        width="100">
-        <template slot-scope="scope">
-          <el-button @click="handleClick(scope.row)" type="text" size="small">Edit</el-button>
-        </template>
-      </el-table-column>
-    </el-table>
+        <el-table-column
+          fixed="right"
+          label="Action"
+          width="100">
+          <template slot-scope="scope">
+            <el-button @click="toCateSingle(scope.row)" type="text" size="small">Edit</el-button>
+          </template>
+        </el-table-column>
+        
+      </el-table>
     </div>
     
   </div>
@@ -90,7 +92,7 @@ export default {
       })
     },
 
-    handleClick (data) {
+    toCateSingle (data) {
       EventBus.$emit('toCateSingle', data.id)
     }
 
