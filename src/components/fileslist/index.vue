@@ -8,7 +8,43 @@
     </div>
 
     <div id="list">
-      <el-table
+
+        <div id="file-grid">
+            <div class="file-single" v-for="item in filesList" :key="item.id" >
+                <div class="file-single-img">
+                    <el-image
+                        v-if="item.type === 'image'"
+                        class="tableImage"
+                        style="width: 180px; height: 180px"
+                        :src="base_url + item.path"
+                        fit="contain"
+                        :preview-src-list="[base_url + item.path]">
+
+                        <div slot="placeholder" class="au_img_placeholder">
+                            <span>Loading</span>
+                        </div>
+
+                    </el-image>
+                </div>
+
+                <div class="file-single-action">
+                    <div class="file-single-btn" v-on:click="toCopyLink(base_url + item.path)">
+                        <span>URL</span>
+                    </div>
+
+                    <div class="file-single-btn" v-on:click="toOpenFile(base_url + item.path)">
+                        <span>View</span>
+                    </div>
+
+                    <div class="file-single-btn" v-on:click="toDelFile(item.id, item.type, item.path)">
+                        <span style="color:#F56C6C;">Remove</span>
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+
+      <!--el-table
       :data="filesList"
       border
       style="width: 100%"
@@ -17,12 +53,12 @@
         <el-table-column
           fixed
           label="Preview"
-          width="120">
+          width="200">
             <template slot-scope="scope">
                 <div v-if="scope.row.type === 'image'">
                     <el-image
                         class="tableImage"
-                        style="width: 100px; height: 100px"
+                        style="width: 200px; height: 200px"
                         :src="base_url + scope.row.path"
                         fit="contain"
                         :preview-src-list="[base_url + scope.row.path]">
@@ -30,36 +66,30 @@
                         <div slot="placeholder" class="au_img_placeholder">
                             <span>Loading</span>
                         </div>
-                        
+
                     </el-image>
                 </div>
             </template>
         </el-table-column>
 
-        <el-table-column
-          fixed
-          prop="path"
-          label="Path"
-          width="400">
-        </el-table-column>
 
         <el-table-column
           prop="type"
-          label="Tpye"
-          width="60">
+          label="Type"
+          width="100">
         </el-table-column>
 
         <el-table-column
           fixed="right"
           label="Action"
-          width="140">
+          width="300">
           <template slot-scope="scope">
             <el-button @click="toCopyLink(base_url + scope.row.path)" type="text" size="small">Link</el-button>
             <el-button @click="toOpenFile(base_url + scope.row.path)" type="text" size="small">View</el-button>
             <el-button @click="toDelFile(scope.row.id, scope.row.type, scope.row.path)" type="text" size="small">Delete</el-button>
           </template>
         </el-table-column>
-      </el-table>
+      </el-table-->
     </div>
     
   </div>
@@ -83,8 +113,7 @@ export default {
         base_url: "https://api.isjeff.com/pot",
         api: "https://api.isjeff.com/pot/manager/all_media/",
         api_img_del: "https://api.isjeff.com/pot/manager/img_del/",
-        filesList: [],
-        tableShow: true
+        filesList: []
     }
   },
   http: {
@@ -269,6 +298,51 @@ export default {
 #title{
   font-size:36px;
   font-weight: bold;
+}
+
+#file-grid{
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.file-single{
+    width:180px;
+    height: 222px;
+    margin-right:20px;
+    margin-bottom:20px;
+    border:1px dashed rgba(0,0,0,0.1);
+    border-radius: 4px;
+    transition: all 0.3s cubic-bezier(.25,.8,.25,1);
+}
+
+.file-single:hover{
+    box-shadow: 0 6px 10px rgba(0,0,0,0.04), 0 6px 6px rgba(0,0,0,0.02);
+}
+
+.file-single-img{
+    
+}
+
+.file-single-action{
+    display: flex;
+    width:100%;
+    background:rgba(0,0,0,0.03);
+}
+
+.file-single-btn{
+    font-size: 12px;
+    opacity: 0.9;
+    color: #3F9EFF;
+    width: 33%;
+    height: 24px;
+    cursor: pointer;
+    padding-top: 14px;
+    text-align: center;
+    transition: all 0.3s cubic-bezier(.25,.8,.25,1);
+}
+
+.file-single-btn:hover{
+    opacity: 1;
 }
 
 .status{
