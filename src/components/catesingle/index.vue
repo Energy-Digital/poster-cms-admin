@@ -1,7 +1,8 @@
 <template>
     <div id="all">
         <div id="title">
-            <WTitle txt="Edit Category"></WTitle>
+            <el-page-header @back="goBack" title="Back" content="Edit Category"></el-page-header>
+            <!--WTitle txt="Edit Category"></WTitle-->
         </div>
 
         <div id="lang">
@@ -82,19 +83,36 @@ export default {
         return{
             api: "https://api.isjeff.com/pot/data/post_cate/",
             api_up: "https://api.isjeff.com/pot/updater/cate_single/",
-            cateData: "",
+            api_del: "https://api.isjeff.com/pot/updater/cate_del/",
+            cateData: {
+                cname: "",
+                cname_sublang: "",
+                des: "",
+                des_sublang: ""
+            },
             postLang: "0",
             mode: "update"
         }
     },
     created(){
-        this.getData()
+
+        if(this.cateId === "new") {
+            this.mode = "new"
+        } else {
+            this.getData()
+        }
+        
     },
     methods:{
+
+        goBack() {
+            EventBus.$emit('toPage', './cateslist')
+        },
 
         getData(){
             this.axios.get(this.api+"?cid="+this.cateId).then((response)=>{
                 this.cateData = response.data[0]
+                
             })
         },
 
@@ -125,8 +143,6 @@ export default {
                 des_sublang: this.cateData.des_sublang
             }
 
-            console.log(postReady)
-
             var postData = this.$qs.stringify(postReady)
 
             this.axios.post(this.api_up, postData)
@@ -134,13 +150,11 @@ export default {
 
                 var res = response.data
 
-                console.log(res)
-
                 if(res.indexOf("success") != -1){
 
                     that.$notify({
-                        title: '提交成功',
-                        message: '已完成提交',
+                        title: 'Submit Successful',
+                        message: '',
                         type: 'success'
                     })
 
@@ -150,8 +164,47 @@ export default {
 
                 } else {
                     that.$notify({
-                        title: '提交失败',
-                        message: '错误' + res,
+                        title: 'Fail',
+                        message: 'Error: ' + res,
+                        type: 'warning'
+                    })
+                }
+            })
+        },
+
+        del () {
+
+            var that = this
+
+            var postReady = {
+                ukey: getCookie('u_key'), 
+                uuid: getCookie('u_uuid'), 
+                cid: this.cateId
+            }
+
+            var postData = this.$qs.stringify(postReady)
+
+            this.axios.post(this.api_del, postData)
+            .then(function (response) {
+
+                var res = response.data
+
+                if(res.indexOf("success") != -1){
+
+                    that.$notify({
+                        title: 'Deleted',
+                        message: '',
+                        type: 'success'
+                    })
+
+                    that.$nextTick(() => {
+                        EventBus.$emit('toPage', './cateslist')
+                    })
+
+                } else {
+                    that.$notify({
+                        title: 'Delete Fail',
+                        message: 'Error: ' + res,
                         type: 'warning'
                     })
                 }

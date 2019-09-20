@@ -3,6 +3,9 @@
 
     <WTitle txt="Categories"></WTitle>
 
+    <div id="new">
+      <el-button type="primary" v-on:click="toCateNew()" plain>New</el-button>
+    </div>
 
     <div id="list">
       <el-table
@@ -94,6 +97,10 @@ export default {
 
     toCateSingle (data) {
       EventBus.$emit('toCateSingle', data.id)
+    },
+
+    toCateNew () {
+      EventBus.$emit('toCateSingle', "new")
     }
 
   }
@@ -104,6 +111,12 @@ export default {
 #all{
   text-align: left;
   padding:24px;
+}
+
+#new {
+  margin-top: -42px;
+  margin-bottom: 14px;
+  float: right;
 }
 
 #title{

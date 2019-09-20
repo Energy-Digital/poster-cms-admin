@@ -28,8 +28,11 @@ export default class IImage extends Node {
         title: {
           default: null,
         },
+        width:{
+            default: '100%',
+        },
         style: {
-            default: 'width:100%;'
+            default: this.width
         }
       },
       group: 'inline',

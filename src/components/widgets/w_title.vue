@@ -19,8 +19,8 @@ export default {
     
 }
 #w_title span{
-    color:#222222;
-    font-size:44px;
+    color:#303133;
+    font-size:24px;
     font-weight: bold;
 }
 </style>

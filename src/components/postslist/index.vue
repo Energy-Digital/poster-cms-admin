@@ -3,8 +3,8 @@
 
     <WTitle txt="All Post"></WTitle>
 
-    <div>
-      <el-button type="primary" v-on:click="toSingleNew()">New</el-button>
+    <div id="new">
+      <el-button type="primary" v-on:click="toSingleNew()" plain>New</el-button>
     </div>
 
     <div id="list">
@@ -130,6 +130,12 @@ export default {
 #all{
   text-align: left;
   padding:24px;
+}
+
+#new {
+  margin-top: -42px;
+  margin-bottom: 14px;
+  float: right;
 }
 
 #title{

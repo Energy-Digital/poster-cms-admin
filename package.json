@@ -17,6 +17,7 @@
     "replaceall": "^0.1.6",
     "tiptap": "^1.25.0",
     "tiptap-extensions": "^1.27.0",
+    "v-clipboard": "^2.2.2",
     "vue": "^2.6.10",
     "vue-axios": "^2.1.4",
     "vue-quill-editor": "^3.0.6",

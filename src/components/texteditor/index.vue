@@ -111,23 +111,63 @@
       <div id="assets_upload" v-if="upload_win">
 
         <div id="au_title">
-            <span>Upload File</span>
+            <span>Upload Image</span>
         </div>
 
+        <el-tabs v-model="imgInsMode">
+            <el-tab-pane label="Upload" name="upload"></el-tab-pane>
+            <el-tab-pane label="URL" name="url"></el-tab-pane>
+            <el-tab-pane label="Gallery" name="gallery"></el-tab-pane>
+        </el-tabs>
 
-        <div id="au_upload_button">
+
+        <div id="au_upload_button" v-if="imgInsMode === 'upload'">
+
             <el-upload
-                class="upload-demo"
+                class="upload-win"
                 drag
-                :action="api_upImg"
+                action="0"
+                :before-upload="beforeImgUpload"
                 :http-request="uploadImg">
 
                 <i class="el-icon-upload"></i>
                 <div class="el-upload__text">Drop file <em>or click to upload</em></div>
-                <div class="el-upload__tip" slot="tip">jpg/png/gif only, 3M maximum</div>
+                <div class="el-upload__tip" slot="tip">jpg/png/gif only, 8 MB maximum</div>
 
             </el-upload>
+ 
+        </div>
 
+        <div id="au_url_input" v-if="imgInsMode === 'url'">
+
+            <div class="au_url_input_box">
+                <el-input v-model="inputedImg" placeholder="Input Image Url"></el-input>
+            </div>
+            
+            <div class="au_assets_manager_btn">
+                <el-button type="primary" style="width:80px;" v-on:click="addImage(inputedImg, img_command);closeUpWin()" plain>OK</el-button>
+            </div>
+            
+        </div>
+
+        <div id="au_assets_manager" v-if="imgInsMode === 'gallery'">
+
+            <div class="au_img_container" v-for="item in gallery" :key="item.id" :style="item.id == selectedImg.id ? imgHighlight : imgNormal">
+
+                <el-image
+                    style="width: 100px; height: 100px"
+                    :src="base_url+item.path"
+                    fit="contain"
+                    v-on:click="amSelectImg(item.id, base_url+item.path)">
+                    <div slot="placeholder" class="au_img_placeholder">
+                        <span>Loading</span>
+                    </div>
+                </el-image>
+            </div>
+
+            <div class="au_assets_manager_btn">
+                <el-button type="primary" style="width:80px;" v-on:click="addImage(selectedImg.path, img_command);closeUpWin()" plain>OK</el-button>
+            </div>
         </div>
 
       </div>
@@ -183,14 +223,22 @@ export default {
             base_url: "https://api.isjeff.com/pot/",
             api_getLink: "https://api.isjeff.com/pot/data/getlink/",
             api_upImg: "https://api.isjeff.com/pot/manager/up_img/",
+            api_getGallery: "https://api.isjeff.com/pot/manager/all_media/?limit=8",
             editor: null,
             dialog_link_v: false,
             input_link: "",
             upload_win: false,
             img_command: "",
+            imgInsMode: "upload",
+            gallery: [],
+            inputedImg: "",
+            selectedImg: {},
+            imgHighlight: "border: 1px solid #00B3FF",
+            imgNormal: "border: 1px dashed rgba(0,0,0,0.1)"
         }
     },
     created () {
+        this.getGallery()
         // this.text = this.text ? "No Content" : this.text
     },
     mounted () {
@@ -236,6 +284,14 @@ export default {
         this.editor.destroy()
     },
     methods:{
+
+        getGallery () {
+            var that = this
+            this.axios.get(this.api_getGallery).then((response) => {
+                var res = response.data
+                that.gallery = res
+            })
+        },
 
         // Add Image Input Window
         showImagePrompt(command) {
@@ -308,10 +364,14 @@ export default {
 
         // Insert an image
         addImage (src, command) {
+
             if(src){
-                command({src})
+                command({src, width:'100%'})
+                // Close window
+                this.closeUpWin()
             }
         },
+
 
         // Insert an iframe
         addIframe (src, command) {
@@ -338,6 +398,24 @@ export default {
             })
         },
 
+        beforeImgUpload (file) {
+
+            var fileSizeMB = file.size / 1024 / 1024
+
+            if (file.type != 'image/jpeg' && file.type != 'image/png' && file.type != 'image/gif') {
+                this.$message.error('JPG/PNG/GIF Image Only !')
+                return false
+            }
+
+            if (fileSizeMB > 8) {
+                console.log(file.size / 1024 / 1024)
+                this.$message.error('Maximum File Size: 8 MB !')
+                return false
+            }
+
+            return true
+        },
+
         // Insert an image
         uploadImg (obj) {
             var that = this
@@ -362,9 +440,6 @@ export default {
                     // Call add image func
                     that.addImage(that.base_url + r[1], that.img_command)
 
-                    // Close window
-                    that.closeUpWin()
-
                     // Clear image command
                     that.img_command = ""
 
@@ -386,11 +461,27 @@ export default {
 
 
         closeUpWin () {
+            // Clean Stroaged selected item
+            this.selectedImg = {}
+            this.inputedImg = ""
+
+            // Close Window
             this.upload_win = false
         },
 
         openLink (url) {
             window.open(url, "_blank")
+        },
+
+        amSelectImg (id, url) {
+            if(id === this.selectedImg.id){
+                this.selectedImg = {}
+            } else {
+                this.selectedImg = {
+                    path: url,
+                    id: id
+                }
+            }
         }
 
     }
@@ -461,9 +552,11 @@ button p{
 #assets_upload{
     background: rgba(255,255,255,1);
     position: fixed;
-    padding:20px;
-    top: 35%;
-    left:35%;
+    width: 440px;
+    height: 360px;
+    padding: 20px;
+    top: 28%;
+    left: 36%;
     z-index:999;
     border-radius: 10px;
 }
@@ -478,9 +571,41 @@ button p{
     z-index:998;
 }
 
+
 #au_title{
     font-size: 18px;
     margin-bottom: 7px;
+}
+
+#au_assets_manager{
+    display:flex;
+    flex-wrap: wrap;
+}
+
+
+.au_img_container{
+    width:100px;
+    height:100px;
+    margin-right: 4px;
+    margin-bottom: 4px;
+    border:1px dashed rgba(0,0,0,0.1);
+    cursor: pointer;
+}
+
+.au_img_container:hover{
+    background:rgba(0,0,0,0.05);
+}
+
+.au_img_placeholder{
+    font-size:14px;
+    opacity: 0.4;
+    padding-left:26px;
+    padding-top:40px;
+}
+
+.au_assets_manager_btn{
+    position: absolute;
+    bottom: 30px;
 }
 
 </style>

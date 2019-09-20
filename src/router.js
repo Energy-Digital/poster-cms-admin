@@ -8,6 +8,7 @@ import postslist from './components/postslist'
 import postsingle from './components/postsingle'
 import cateslist from './components/cateslist'
 import catesingle from './components/catesingle'
+import fileslist from './components/fileslist'
 
 
 export default new VueRouter({
@@ -18,5 +19,6 @@ export default new VueRouter({
       { path: '/postsingle', name: 'postsingle', component: postsingle },
       { path: '/cateslist', name: 'cateslist', component: cateslist },
       { path: '/catesingle', name: 'catesingle', component: catesingle },
+      { path: '/fileslist', name: 'fileslist', component: fileslist }
     ]
 })

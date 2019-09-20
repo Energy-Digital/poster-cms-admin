@@ -11,9 +11,11 @@ import 'element-ui/lib/theme-chalk/index.css'
 import axios from 'axios'
 import VueAxios from 'vue-axios'
 import router from './router.js'
+import Clipboard from 'v-clipboard'
 
 Vue.use(ElementUI)
 Vue.use(VueAxios, axios)
+Vue.use(Clipboard)
 
 
 Vue.prototype.$qs = require('querystring')

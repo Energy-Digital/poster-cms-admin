@@ -2,7 +2,9 @@
   <div id="all">
 
     <div id="post-title">
-      <WTitle txt="Edit Post"></WTitle>
+      <!--WTitle txt="Edit Post"></WTitle-->
+      <el-page-header @back="goBack" title="Back" content="Edit Post"></el-page-header>
+
       <div id="post-lang-selector">
         <el-radio-group v-model="postLang" style="margin-bottom: 30px;">
           <el-radio-button label="0">ENG</el-radio-button>
@@ -21,10 +23,14 @@
 
       <div class="pc-b" id="pc-content" v-if="loaded">
         <div id="pc-editmode-selector">
-          <el-radio-group v-model="editMode" style="margin-bottom: 30px;">
+          <el-tabs v-model="editMode" type="card">
+            <el-tab-pane label="Visual" name="view"></el-tab-pane>
+            <el-tab-pane label="Text" name="source"></el-tab-pane>
+          </el-tabs>
+          <!--el-radio-group v-model="editMode" style="margin-bottom: 30px;">
             <el-radio-button label="view">Visual</el-radio-button>
             <el-radio-button label="source">Text</el-radio-button>
-          </el-radio-group>
+          </el-radio-group-->
         </div>
 
         <div id="pc-content-view" v-if="editMode === 'view'">
@@ -129,9 +135,11 @@ export default {
     WSubTitle,
     TextEditor
   },
+
   props:{
     pid: String,
   },
+
   data () {
     return{
       // APIs
@@ -228,6 +236,11 @@ export default {
   
   
   methods: {
+
+    goBack() {
+      EventBus.$emit('toPage', './postslist')
+    },
+
     getData () {
       this.axios.get(this.api + this.pid).then((response) => {
         var res = response.data[0]
@@ -421,7 +434,7 @@ export default {
           type: 'info',
           message: 'Canceled'
         });          
-      });
+      })
 
       
     }
@@ -449,6 +462,10 @@ export default {
 #post-lang-selector{
   right: 40px;
   position: absolute;
+}
+
+#pc-editmode-selector{
+  margin-bottom: -16px;
 }
 
 #pc-editmode-selector .el-radio-group .el-radio-button span{
