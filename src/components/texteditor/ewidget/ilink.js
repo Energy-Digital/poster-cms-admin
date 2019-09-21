@@ -10,11 +10,14 @@ export default class ILink extends Node {
     return {
       attrs: {
         href: {
-            default: null,
+            default: null
         },
         titleText:{
-            default: null,
+            default: "Open"
         },
+        type:{
+          default: "link"
+        }
       },
       group: 'block',
       selectable: true,
@@ -22,12 +25,19 @@ export default class ILink extends Node {
         tag: 'a',
         getAttrs: dom => ({
           href: dom.getAttribute('herf'),
-        }),
+          target: '_blank',
+          dataType: this.type
+        })
+
       }],
-      toDOM: node => ['a', {
-        href: node.attrs.href,
-        target: '_blank'
-      }],
+      toDOM: node => {
+        return [
+          'a', 
+          { href: node.attrs.href, class: "ilink__embed", target: '_blank', dataType: node.attrs.type}, 
+
+          `${node.attrs.titleText}`
+        ]
+      }
     }
   }
 
@@ -51,7 +61,7 @@ export default class ILink extends Node {
           },
           set(href) {
             this.updateAttrs({
-              href,
+              href
             })
           },
         },
@@ -68,8 +78,7 @@ export default class ILink extends Node {
       },
       template: `
         <div class="ilink">
-            <!--span class="material-icons" style="color:rgba(0,0,0,0.2);">link</span-->
-            <a class="ilink__embed" :href="href" target="_blank" style="color:rgba(0,0,0,0.7);padding:10px;background:rgba(237,241,243,1);border:1px solid rgba(0,0,0,0.15);border-radius:8px;font-size:14px;"><span class="material-icons" style="font-size:14px;padding-right:6px;transform: rotate(-45deg);">link</span>{{titleText}}</a>
+            <a class="ilink__embed" :href="href" target="_blank" :dataType="type">{{titleText}}</a>
         </div>
       `,
     }

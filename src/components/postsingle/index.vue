@@ -362,13 +362,10 @@ export default {
 
           var res = response.data
 
-          console.log(res)
-
           if(res.indexOf("success") != -1){
 
               that.$notify({
-                  title: '提交成功',
-                  message: '已完成提交',
+                  title: 'Submitted',
                   type: 'success'
               })
 
@@ -379,8 +376,8 @@ export default {
 
           } else {
               that.$notify({
-                  title: '提交失败',
-                  message: '错误' + res,
+                  title: 'Submit Fail',
+                  message: 'Error: ' + res,
                   type: 'warning'
               })
           }

@@ -74,18 +74,23 @@
             </button>
 
             <!-- Image Upload -->
-            <button @click="showImagePrompt(commands.iimage)">
+            <button @click="showUpWin(commands.iimage, 'Image')">
                 <span class="material-icons">image</span>
             </button>
 
-            <!-- IFrame Upload -->
-            <button @click="showIframePrompt(commands.iframe)">
-                <span class="material-icons">video_library</span>
+            <!-- File -->
+            <button @click="showUpWin(commands.ilink, 'File')">
+                <span class="material-icons">insert_drive_file</span>
             </button>
 
             <!-- Website Link -->
             <button @click="showLinkDialog(commands.ilink)">
                 <span class="material-icons">link</span>
+            </button>
+
+            <!-- IFrame Upload -->
+            <button @click="showIframePrompt(commands.iframe)">
+                <span class="material-icons">video_library</span>
             </button>
             
             <!-- Horizontal Line -->
@@ -107,72 +112,9 @@
       </editor-menu-bar>
 
       <editor-content class="editor-content" :editor="editor" />
-
-      <div id="assets_upload" v-if="upload_win">
-
-        <div id="au_title">
-            <span>Upload Image</span>
-        </div>
-
-        <el-tabs v-model="imgInsMode">
-            <el-tab-pane label="Upload" name="upload"></el-tab-pane>
-            <el-tab-pane label="URL" name="url"></el-tab-pane>
-            <el-tab-pane label="Gallery" name="gallery"></el-tab-pane>
-        </el-tabs>
-
-
-        <div id="au_upload_button" v-if="imgInsMode === 'upload'">
-
-            <el-upload
-                class="upload-win"
-                drag
-                action="0"
-                :before-upload="beforeImgUpload"
-                :http-request="uploadImg">
-
-                <i class="el-icon-upload"></i>
-                <div class="el-upload__text">Drop file <em>or click to upload</em></div>
-                <div class="el-upload__tip" slot="tip">jpg/png/gif only, 8 MB maximum</div>
-
-            </el-upload>
- 
-        </div>
-
-        <div id="au_url_input" v-if="imgInsMode === 'url'">
-
-            <div class="au_url_input_box">
-                <el-input v-model="inputedImg" placeholder="Input Image Url"></el-input>
-            </div>
-            
-            <div class="au_assets_manager_btn">
-                <el-button type="primary" style="width:80px;" v-on:click="addImage(inputedImg, img_command);closeUpWin()" plain>OK</el-button>
-            </div>
-            
-        </div>
-
-        <div id="au_assets_manager" v-if="imgInsMode === 'gallery'">
-
-            <div class="au_img_container" v-for="item in gallery" :key="item.id" :style="item.id == selectedImg.id ? imgHighlight : imgNormal">
-
-                <el-image
-                    style="width: 100px; height: 100px"
-                    :src="base_url+item.path"
-                    fit="contain"
-                    v-on:click="amSelectImg(item.id, base_url+item.path)">
-                    <div slot="placeholder" class="au_img_placeholder">
-                        <span>Loading</span>
-                    </div>
-                </el-image>
-            </div>
-
-            <div class="au_assets_manager_btn">
-                <el-button type="primary" style="width:80px;" v-on:click="addImage(selectedImg.path, img_command);closeUpWin()" plain>OK</el-button>
-            </div>
-        </div>
-
-      </div>
-
-      <div id="assets_upload_bg" v-if="upload_win" v-on:click="closeUpWin"></div>
+      
+      <upload-window v-if="upload_win"></upload-window>
+      
 
     </div>
 </template>
@@ -180,6 +122,7 @@
 <script>
 // Material Design Icon Pack
 import 'material-icons/iconfont/material-icons.css'
+import uploadWindow from '../widgets/w_upload.vue'
 
 // Import Tiptap Editor
 import { Editor, EditorContent, EditorMenuBar  } from 'tiptap'
@@ -208,6 +151,7 @@ import ILink from './ewidget/ilink.js'
 import IParagraph from './ewidget/iparagraph.js'
 import ISize from './ewidget/isize.js'
 import IImage from './ewidget/iimage.js'
+import { EventBus } from '../../bus'
 
 export default {
     name: "texteditor",
@@ -216,29 +160,36 @@ export default {
     },
     components: {
         EditorMenuBar,
-        EditorContent
+        EditorContent,
+        uploadWindow
     },
     data(){
         return {
             base_url: "https://api.isjeff.com/pot/",
             api_getLink: "https://api.isjeff.com/pot/data/getlink/",
-            api_upImg: "https://api.isjeff.com/pot/manager/up_img/",
-            api_getGallery: "https://api.isjeff.com/pot/manager/all_media/?limit=8",
             editor: null,
             dialog_link_v: false,
             input_link: "",
             upload_win: false,
-            img_command: "",
-            imgInsMode: "upload",
-            gallery: [],
-            inputedImg: "",
-            selectedImg: {},
-            imgHighlight: "border: 1px solid #00B3FF",
-            imgNormal: "border: 1px dashed rgba(0,0,0,0.1)"
+            current_command: "",
+            upload_state: false, // Return bol
+            upload_res: "" // Return URL
         }
     },
     created () {
-        this.getGallery()
+        var that = this
+        EventBus.$on("closeUpWin", function(data){
+            that.upload_win = false
+        })
+
+        EventBus.$on("upWinRes", function(data){
+            if(data.type === "Image"){
+                that.addImage(data.path, that.current_command, data.type)
+            } else {
+                that.addFile(data.path, data.name, that.current_command, 'file')
+                // Do nothing for now
+            }
+        })
         // this.text = this.text ? "No Content" : this.text
     },
     mounted () {
@@ -267,7 +218,7 @@ export default {
                 new Iframe(),
                 new ILink(),
                 new IParagraph(),
-                new IImage()
+                new IImage(),
             ],
             onUpdate(){
                 that.$emit('update', this.getHTML())
@@ -275,28 +226,23 @@ export default {
         })
     },
     watch: {
-        text: function () {
-            
-            // this.editor.content = this.text
-        }
+
     },
     beforeDestroy() {
         this.editor.destroy()
     },
     methods:{
 
-        getGallery () {
-            var that = this
-            this.axios.get(this.api_getGallery).then((response) => {
-                var res = response.data
-                that.gallery = res
-            })
+        // Add File Upload Window
+        showUpWin(command, openType) {
+            this.upload_win = true
+            this.current_command = command
         },
 
-        // Add Image Input Window
-        showImagePrompt(command) {
-            this.upload_win = true
-            this.img_command = command
+        closeUpWin () {
+            // Close Window
+            this.upload_win = false
+            this.current_command = ""
         },
 
         // Add Iframe Input Window
@@ -372,6 +318,16 @@ export default {
             }
         },
 
+        // Insert an File
+        addFile (href, titleText, command) {
+
+            if(href){
+                command({href, titleText})
+                // Close window
+                this.closeUpWin()
+            }
+        },
+
 
         // Insert an iframe
         addIframe (src, command) {
@@ -398,91 +354,9 @@ export default {
             })
         },
 
-        beforeImgUpload (file) {
-
-            var fileSizeMB = file.size / 1024 / 1024
-
-            if (file.type != 'image/jpeg' && file.type != 'image/png' && file.type != 'image/gif') {
-                this.$message.error('JPG/PNG/GIF Image Only !')
-                return false
-            }
-
-            if (fileSizeMB > 8) {
-                console.log(file.size / 1024 / 1024)
-                this.$message.error('Maximum File Size: 8 MB !')
-                return false
-            }
-
-            return true
-        },
-
-        // Insert an image
-        uploadImg (obj) {
-            var that = this
-            var img = obj.file
-
-            let formObj = new FormData()
-
-            formObj.append('file',img)
-
-            let h = {
-                headers:{'Content-Type':'multipart/form-data'}
-            }
-
-            this.$http.post(this.api_upImg,formObj,h)
-            .then(function(response) {
-                var res = response.data
-                if(res.indexOf('success' != -1)) {
-
-                    var r = res.split(',')
-                    
-                    // Get image command from the local temp variable
-                    // Call add image func
-                    that.addImage(that.base_url + r[1], that.img_command)
-
-                    // Clear image command
-                    that.img_command = ""
-
-                    that.$notify({
-                        title: "Uploaded",
-                        message: 'Upload Successful: ' + r[1],
-                        type: 'success'
-                    })
-
-                } else {
-                    that.$notify({
-                        title: "Upload Fail",
-                        message: 'Error: ' + res,
-                        type: 'warning'
-                    })
-                }
-            })
-        },
-
-
-        closeUpWin () {
-            // Clean Stroaged selected item
-            this.selectedImg = {}
-            this.inputedImg = ""
-
-            // Close Window
-            this.upload_win = false
-        },
-
         openLink (url) {
             window.open(url, "_blank")
         },
-
-        amSelectImg (id, url) {
-            if(id === this.selectedImg.id){
-                this.selectedImg = {}
-            } else {
-                this.selectedImg = {
-                    path: url,
-                    id: id
-                }
-            }
-        }
 
     }
 }
@@ -549,63 +423,6 @@ button p{
     overflow-y: scroll;
 }
 
-#assets_upload{
-    background: rgba(255,255,255,1);
-    position: fixed;
-    width: 440px;
-    height: 360px;
-    padding: 20px;
-    top: 28%;
-    left: 36%;
-    z-index:999;
-    border-radius: 10px;
-}
 
-#assets_upload_bg{
-    position: fixed;
-    top:0px;
-    left:0px;
-    background: rgba(0,0,0,0.6);
-    height:100%;
-    width:100%;
-    z-index:998;
-}
-
-
-#au_title{
-    font-size: 18px;
-    margin-bottom: 7px;
-}
-
-#au_assets_manager{
-    display:flex;
-    flex-wrap: wrap;
-}
-
-
-.au_img_container{
-    width:100px;
-    height:100px;
-    margin-right: 4px;
-    margin-bottom: 4px;
-    border:1px dashed rgba(0,0,0,0.1);
-    cursor: pointer;
-}
-
-.au_img_container:hover{
-    background:rgba(0,0,0,0.05);
-}
-
-.au_img_placeholder{
-    font-size:14px;
-    opacity: 0.4;
-    padding-left:26px;
-    padding-top:40px;
-}
-
-.au_assets_manager_btn{
-    position: absolute;
-    bottom: 30px;
-}
 
 </style>

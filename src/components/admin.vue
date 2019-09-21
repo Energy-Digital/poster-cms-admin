@@ -55,7 +55,7 @@ export default {
   },
   methods: {
     checkCookies () {
-      console.log(document.cookie)
+      //console.log(document.cookie)
     },
 
     toPage (dir) {
@@ -96,12 +96,13 @@ a {
 #header-cont{
   height:80px;
   width:100%;
-  position: absolute;
+  position: fixed;
   top:0px;
+  z-index:999;
 }
 
 #left-cont{
-  position: absolute;
+  position: fixed;
   top: 80px;
   left: 0px;
   height:100%;

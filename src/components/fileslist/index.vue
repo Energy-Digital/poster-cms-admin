@@ -10,15 +10,15 @@
     <div id="list">
 
         <div id="file-grid">
-            <div class="file-single" v-for="item in filesList" :key="item.id" >
+            <div class="file-single" v-for="item in filesListAll" :key="item.id" >
                 <div class="file-single-img">
                     <el-image
-                        v-if="item.type === 'image'"
                         class="tableImage"
-                        style="width: 180px; height: 180px"
-                        :src="base_url + item.path"
-                        fit="contain"
-                        :preview-src-list="[base_url + item.path]">
+                        :style="'width: 180px; height: 180px'"
+                        :src="item.type_des === 'Image' ? base_url + item.path : base_url + static_icons_url + getIcon(item.type)"
+                        :fit="item.type_des === 'Image' ? 'contain' : 'none'"
+                        :preview-src-list="[base_url + item.path]"
+                        lazy>
 
                         <div slot="placeholder" class="au_img_placeholder">
                             <span>Loading</span>
@@ -28,15 +28,18 @@
                 </div>
 
                 <div class="file-single-action">
+                    <div class="file-name">
+                        <span>{{realFileName(item.name, 18)}}</span>
+                    </div>
                     <div class="file-single-btn" v-on:click="toCopyLink(base_url + item.path)">
                         <span>URL</span>
                     </div>
 
                     <div class="file-single-btn" v-on:click="toOpenFile(base_url + item.path)">
-                        <span>View</span>
+                        <span>Open</span>
                     </div>
 
-                    <div class="file-single-btn" v-on:click="toDelFile(item.id, item.type, item.path)">
+                    <div class="file-single-btn" v-on:click="toDelFile(item.id, item.path)">
                         <span style="color:#F56C6C;">Remove</span>
                     </div>
                 </div>
@@ -44,66 +47,24 @@
             </div>
         </div>
 
-      <!--el-table
-      :data="filesList"
-      border
-      style="width: 100%"
-      v-if="tableShow">
-
-        <el-table-column
-          fixed
-          label="Preview"
-          width="200">
-            <template slot-scope="scope">
-                <div v-if="scope.row.type === 'image'">
-                    <el-image
-                        class="tableImage"
-                        style="width: 200px; height: 200px"
-                        :src="base_url + scope.row.path"
-                        fit="contain"
-                        :preview-src-list="[base_url + scope.row.path]">
-
-                        <div slot="placeholder" class="au_img_placeholder">
-                            <span>Loading</span>
-                        </div>
-
-                    </el-image>
-                </div>
-            </template>
-        </el-table-column>
-
-
-        <el-table-column
-          prop="type"
-          label="Type"
-          width="100">
-        </el-table-column>
-
-        <el-table-column
-          fixed="right"
-          label="Action"
-          width="300">
-          <template slot-scope="scope">
-            <el-button @click="toCopyLink(base_url + scope.row.path)" type="text" size="small">Link</el-button>
-            <el-button @click="toOpenFile(base_url + scope.row.path)" type="text" size="small">View</el-button>
-            <el-button @click="toDelFile(scope.row.id, scope.row.type, scope.row.path)" type="text" size="small">Delete</el-button>
-          </template>
-        </el-table-column>
-      </el-table-->
     </div>
+
+    <upload-window v-if="upload_win"></upload-window>
     
   </div>
 </template>
 
 <script>
 import { EventBus } from '../../bus'
-import { getCookie } from '../../utils.js'
+import { getCookie, getFileIcon } from '../../utils.js'
 import WTitle from '../widgets/w_title.vue'
+import uploadWindow from '../widgets/w_upload.vue'
 
 export default {
   name: "fileslist",
   components:{
-    WTitle
+    WTitle,
+    uploadWindow
   },
   props:{
     
@@ -111,9 +72,11 @@ export default {
   data(){
     return{
         base_url: "https://api.isjeff.com/pot",
+        static_icons_url: "/static/icons/",
         api: "https://api.isjeff.com/pot/manager/all_media/",
         api_img_del: "https://api.isjeff.com/pot/manager/img_del/",
-        filesList: []
+        filesListAll: [],
+        upload_win: false
     }
   },
   http: {
@@ -121,7 +84,16 @@ export default {
     emulateHTTP: true
   },
   created(){
+    var that = this
     this.getList()
+
+    EventBus.$on("closeUpWin", function(data){
+        that.upload_win = false
+    })
+
+    EventBus.$on("upWinRes", function(data){
+        that.updateAll()
+    })
   },
   methods:{
 
@@ -132,13 +104,13 @@ export default {
             if(response.data){
                 var res = response.data
 
-                res.forEach((el, index) => {
+                /*res.forEach((el, index) => {
                     var ft = el.path.split(".")
-                    res[index].type = that.parseFileType(ft[ft.length - 1])
-                })
+                    //res[index].type = that.parseFileType(ft[ft.length - 1])
+                })*/
 
                 that.$nextTick(()=>{
-                    that.filesList = res
+                    that.filesListAll = res
                 })
 
             } else {
@@ -152,48 +124,14 @@ export default {
         })
     },
 
-    parseFileType (str) {
-        switch (str) {
+    getIcon (str) {
+        return getFileIcon(str)
+    },
 
-            case 'png':
-                return "image"
-            break
+    toNewFile (){
+        this.upload_win = true
+    },
 
-            case 'PNG':
-                return "image"
-            break
-
-            case 'jpg':
-                return "image"
-            break
-
-            case 'JPG':
-                return "image"
-            break
-
-            case 'jpeg':
-                return "image"
-            break
-
-            case 'JPEG':
-                return "image"
-            break
-
-            case 'PDF':
-                return "PDF"
-            break
-
-            case 'doc':
-                return "Word Document"
-            break
-
-            case 'docx':
-                return "Word Document"
-            break
-
-
-        }
-    }, 
 
     toCopyLink (link) {
 
@@ -202,7 +140,7 @@ export default {
 
         // Alert
         this.$notify({
-          title: 'Link has copied',
+          title: 'URL has copied',
           type: 'success'
         })
     },
@@ -211,7 +149,7 @@ export default {
         window.open(link)
     },
 
-    toDelFile (id, type, path) {
+    toDelFile (id, path) {
         var that = this
 
         this.$confirm('You will delete a file permanently, continue?', 'Alert', {
@@ -229,10 +167,8 @@ export default {
 
             var postData = this.$qs.stringify(postReady)
 
-            // API区分，以后可能是要检查是否使用了图片或文件的
-            var delApi = type == "image" ? this.api_img_del : ""
 
-            that.axios.post(delApi, postData)
+            that.axios.post(this.api_img_del, postData)
             .then(function (response) {
 
             var res = response.data
@@ -275,8 +211,17 @@ export default {
     },
 
     updateAll () {
-        this.filesList = []
+        this.filesListAll = []
         this.getList()
+    },
+
+    realFileName (str, limit) {
+        var res
+        var parse = str.split('_')
+        console.log(parse)
+        var res = parse[parse.length-1].length < limit ? parse[parse.length-1] : parse[parse.length-1].slice(0, limit) + '...'
+
+        return res
     }
 
   }
@@ -307,7 +252,7 @@ export default {
 
 .file-single{
     width:180px;
-    height: 222px;
+    height: 244px;
     margin-right:20px;
     margin-bottom:20px;
     border:1px dashed rgba(0,0,0,0.1);
@@ -325,8 +270,16 @@ export default {
 
 .file-single-action{
     display: flex;
+    flex-wrap: wrap;
     width:100%;
-    background:rgba(0,0,0,0.03);
+    background:rgba(0,0,0,0.01);
+}
+
+.file-name{
+    width:100%;
+    height: 24px;
+    color:#555;
+    text-align: center;
 }
 
 .file-single-btn{
@@ -349,9 +302,5 @@ export default {
   color:#ffffff;
   border-radius:4px;
   text-align:center;
-}
-
-.tableImage{
-    z-index: 12000;
 }
 </style>
