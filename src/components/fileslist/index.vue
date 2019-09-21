@@ -13,10 +13,10 @@
             <div class="file-single" v-for="item in filesListAll" :key="item.id" >
                 <div class="file-single-img">
                     <el-image
-                        class="tableImage"
-                        :style="'width: 180px; height: 180px'"
+                        class="file-single-img-img"
+                        :style="item.type_des === 'Image' ? 'width: 180px; height: 180px' : 'width: 60px; height: 60px;margin-top: 60px;margin-left: 30px;'"
                         :src="item.type_des === 'Image' ? base_url + item.path : base_url + static_icons_url + getIcon(item.type)"
-                        :fit="item.type_des === 'Image' ? 'contain' : 'none'"
+                        :fit="item.type_des === 'Image' ? 'contain' : 'scale-down'"
                         :preview-src-list="[base_url + item.path]"
                         lazy>
 
@@ -25,6 +25,11 @@
                         </div>
 
                     </el-image>
+
+                    <span v-if="item.type_des !== 'Image'" class="file-single-des">
+                        {{item.type_des}}
+                    </span>
+
                 </div>
 
                 <div class="file-single-action">
@@ -49,7 +54,7 @@
 
     </div>
 
-    <upload-window v-if="upload_win"></upload-window>
+    <upload-window v-if="upload_win" @uploaded="uploadHandler" @close="closeUpWin"></upload-window>
     
   </div>
 </template>
@@ -86,16 +91,16 @@ export default {
   created(){
     var that = this
     this.getList()
-
-    EventBus.$on("closeUpWin", function(data){
-        that.upload_win = false
-    })
-
-    EventBus.$on("upWinRes", function(data){
-        that.updateAll()
-    })
   },
   methods:{
+
+    uploadHandler () {
+        this.updateAll()
+    },
+
+    closeUpWin () {
+        this.upload_win = false
+    },
 
     getList () {
         var that = this
@@ -265,7 +270,18 @@ export default {
 }
 
 .file-single-img{
-    
+    display:flex;
+    width:180px;
+    height:180px;
+}
+
+
+.file-single-des{
+    width: 60px;
+    margin-top: 74px;
+    font-size: 12px;
+    font-weight: bold;
+    opacity: 0.7;
 }
 
 .file-single-action{

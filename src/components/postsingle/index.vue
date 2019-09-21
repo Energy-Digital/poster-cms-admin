@@ -74,6 +74,34 @@
           v-model="postData.brief_sublang">
         </el-input>
       </div>
+
+      <div class="pc-ti" id="pc-ti">
+        <WSubTitle txt="Title_img"></WSubTitle>
+
+        <div class="pc-ti-img-cont">
+
+          <span v-if="postData.title_img == null" v-on:click="uploadTitleImg">+ Add Title Image</span>
+
+          <el-image
+            v-if="postData.title_img != null"
+            class="tableImage"
+            :style="'width: 400px; height: 160px'"
+            :src="postData.title_img"
+            fit="contain"
+            :preview-src-list="[postData.title_img]"
+            lazy>
+
+            <div slot="placeholder" class="au_img_placeholder">
+                <span>Loading</span>
+            </div>
+
+          </el-image>
+
+          <el-button v-if="postData.title_img != null" type="text" class="pc-ti-img-btn" v-on:click="uploadTitleImg">Change</el-button>
+        </div>
+
+        
+      </div>
     </div>
 
 
@@ -107,6 +135,9 @@
       <el-button class="primary" @click="submit()" plain>SUBMIT</el-button>
       <el-button type="text" size="small" style="color:#FF5C5C;" @click="del()" v-if="mode === 'update'">Delete</el-button>
     </div>
+
+
+    <upload-window v-if="upload_win" @uploaded="uploadHandler" @close="closeUpWin"></upload-window>
     
   </div>
 </template>
@@ -121,6 +152,7 @@ import { quillEditor } from 'vue-quill-editor'*/
 
 import { EventBus } from '../../bus.js'
 import { limitLength, isEmpty, getCookie } from '../../utils.js'
+import uploadWindow from '../widgets/w_upload.vue'
 
 import TextEditor from '../texteditor/index.vue'
 import WTitle from '../widgets/w_title.vue'
@@ -133,7 +165,8 @@ export default {
   components: {
     WTitle,
     WSubTitle,
-    TextEditor
+    TextEditor,
+    uploadWindow
   },
 
   props:{
@@ -143,6 +176,7 @@ export default {
   data () {
     return{
       // APIs
+      base_url: "https://api.isjeff.com/pot",
       api: "https://api.isjeff.com/pot/data/post_single/?pid=",
       api_cate: "https://api.isjeff.com/pot/data/post_cate/",
       api_up_assets:"/",
@@ -150,11 +184,15 @@ export default {
       api_up:"https://api.isjeff.com/pot/updater/post_single/",
       api_del: "https://api.isjeff.com/pot/updater/post_del/",
 
+      // Upload Window
+      upload_win: false,
+
       // Main Info
       mode: "update",
       postData: {
         title: "",
         title_sublang: "",
+        title_img: "",
         content: "",
         content_sublang: "",
         cateId: "1",
@@ -194,6 +232,8 @@ export default {
 
   created () {
 
+    var that = this
+
     // Check if is new page
     if(this.pid == "new"){
 
@@ -218,6 +258,14 @@ export default {
     this.$nextTick(()=>{
       this.getCate()
     })
+        
+    EventBus.$on("closeUpWin", function(data){
+        that.upload_win = false
+    })
+
+    EventBus.$on("upWinRes", function(data){
+        
+    })
     
   },
   watch: {
@@ -236,6 +284,24 @@ export default {
   
   
   methods: {
+
+    uploadHandler (data) {
+
+
+      if(data.type.type === "Image"){
+
+        this.setTitleImg(data.path)
+
+      } else {
+
+        this.$notify({
+            title: 'Title image must be an image',
+            message: 'Please check if you uploaded an image file',
+            type: 'warning'
+        })
+        
+      }
+    },
 
     goBack() {
       EventBus.$emit('toPage', './postslist')
@@ -346,6 +412,7 @@ export default {
         cateId: this.postData.cateId,
         title: this.postData.title,
         title_sublang: this.postData.title_sublang,
+        title_img: this.postData.title_img,
         content: this.encodeRichText(this.postData.content),
         content_sublang: this.encodeRichText(this.postData.content_sublang),
         brief: this.postData.brief,
@@ -432,8 +499,18 @@ export default {
           message: 'Canceled'
         });          
       })
+    },
 
-      
+    uploadTitleImg () {
+      this.upload_win = true
+    },
+
+    closeUpWin () {
+      this.upload_win = false
+    },
+
+    setTitleImg (url) {
+      this.postData.title_img = url
     }
 
 
@@ -454,6 +531,26 @@ export default {
 
 .pc-b{
   margin-top:24px;
+}
+
+.pc-ti{
+  margin-top:24px;
+}
+
+.pc-ti-img-cont{
+  width:400px;
+  padding:12px;
+  border: 1px dashed rgba(0,0,0,0.1);
+  cursor: pointer;
+}
+
+.pc-ti-img-cont span{
+  opacity: 0.5;
+}
+
+.pc-ti-img-btn{
+  margin-top:6px;
+  width:100%;
 }
 
 #post-lang-selector{

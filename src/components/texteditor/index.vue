@@ -113,7 +113,7 @@
 
       <editor-content class="editor-content" :editor="editor" />
       
-      <upload-window v-if="upload_win"></upload-window>
+      <upload-window v-if="upload_win" @uploaded="uploadHandler" @close="closeUpWin"></upload-window>
       
 
     </div>
@@ -178,18 +178,7 @@ export default {
     },
     created () {
         var that = this
-        EventBus.$on("closeUpWin", function(data){
-            that.upload_win = false
-        })
 
-        EventBus.$on("upWinRes", function(data){
-            if(data.type === "Image"){
-                that.addImage(data.path, that.current_command, data.type)
-            } else {
-                that.addFile(data.path, data.name, that.current_command, 'file')
-                // Do nothing for now
-            }
-        })
         // this.text = this.text ? "No Content" : this.text
     },
     mounted () {
@@ -232,6 +221,15 @@ export default {
         this.editor.destroy()
     },
     methods:{
+
+        uploadHandler (data) {
+            if(data.type.type === "Image"){
+                this.addImage(data.path, this.current_command, data.type)
+            } else {
+                this.addFile(data.path, data.name, this.current_command, 'file')
+                // Do nothing for now
+            }
+        },
 
         // Add File Upload Window
         showUpWin(command, openType) {

@@ -87,7 +87,7 @@ export default {
         return {
             session: false,
             res: {},
-            base_url: "https://api.isjeff.com/pot/",
+            base_url: "https://api.isjeff.com/pot",
             static_icons_url: "/static/icons/",
             api_upFile: "https://api.isjeff.com/pot/manager/up_file/",
             api_getGallery: "https://api.isjeff.com/pot/manager/all_media/?limit=8",
@@ -140,6 +140,8 @@ export default {
             formObj.append('file',img)
             formObj.append('name', fileName)
             formObj.append('typeDes', fileType.type)
+            console.log('cccc: ')
+            console.log(fileType.type)
 
 
             let h = {
@@ -159,7 +161,6 @@ export default {
                         type: 'success'
                     })
 
-                    // Get image command from the local temp variable
                     that.submit(that.base_url + r[1], fileType, fileName)
 
                     
@@ -213,14 +214,14 @@ export default {
                 path: url
             }
 
-            EventBus.$emit('upWinRes', this.res)
+            this.$emit('uploaded', this.res)
             
             this.close()
         },
 
         close () {
             this.session = false
-            EventBus.$emit('closeUpWin', false)
+            this.$emit('close', false)
         },
 
         getIcon (str) {
@@ -230,7 +231,6 @@ export default {
         realFileName (str, limit) {
             var res
             var parse = str.split('_')
-            console.log(parse)
             var res = parse[parse.length-1].length < limit ? parse[parse.length-1] : parse[parse.length-1].slice(0, limit) + '...'
 
             return res
