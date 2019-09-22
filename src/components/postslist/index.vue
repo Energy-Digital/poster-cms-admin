@@ -75,6 +75,15 @@
         </el-table-column>
       </el-table>
     </div>
+
+    <div class="pagination">
+        <el-pagination
+            layout="prev, pager, next"
+            :page-size="pageSize"
+            :total="postsListTotal"
+            @current-change="changePage">
+        </el-pagination>
+    </div>
     
   </div>
 </template>
@@ -94,7 +103,10 @@ export default {
   data(){
     return{
       api: "https://api.isjeff.com/pot/data/posts_list/",
-      postsList: []
+      postsList: [],
+      postsListTotal: 0,
+      page:0,
+      pageSize:10,
     }
   },
   http: {
@@ -106,12 +118,25 @@ export default {
   },
   methods:{
 
-    getList () {
+    getList (page) {
       var that = this
-      this.axios.get(this.api).then((response) => {
-        var res = response.data
-        this.postsList = res
+
+      // Pagination
+      var limit = this.pageToLimit(page)
+      var api = page ? this.api + '?ls=' + limit + '&li=' + this.pageSize : this.api
+
+      this.axios.get(api).then((response) => {
+        this.postsList = response.data.data
+        this.postsListTotal = parseInt(response.data.total)
       })
+    },
+
+    changePage (val) {
+        this.getList(val)
+    },
+
+    pageToLimit ( val ) {
+        return (val - 1) * 10
     },
 
     toSingleEdit (data) {

@@ -54,6 +54,15 @@
 
     </div>
 
+    <div class="pagination">
+        <el-pagination
+            layout="prev, pager, next"
+            :page-size="pageSize"
+            :total="filesListTotal"
+            @current-change="changePage">
+        </el-pagination>
+    </div>
+
     <upload-window v-if="upload_win" @uploaded="uploadHandler" @close="closeUpWin"></upload-window>
     
   </div>
@@ -81,6 +90,9 @@ export default {
         api: "https://api.isjeff.com/pot/manager/all_media/",
         api_img_del: "https://api.isjeff.com/pot/manager/img_del/",
         filesListAll: [],
+        filesListTotal: 0,
+        page:0,
+        pageSize:10,
         upload_win: false
     }
   },
@@ -90,7 +102,7 @@ export default {
   },
   created(){
     var that = this
-    this.getList()
+    this.getList(1)
   },
   methods:{
 
@@ -102,20 +114,20 @@ export default {
         this.upload_win = false
     },
 
-    getList () {
+    getList (page) {
         var that = this
-        this.axios.get(this.api).then(function (response) {
+
+        // pagination Limit
+        var limit = this.pageToLimit(page)
+        var api = page ? this.api + '?ls=' + limit + '&li=' + this.pageSize : this.api
+
+        this.axios.get(api).then(function (response) {
 
             if(response.data){
-                var res = response.data
-
-                /*res.forEach((el, index) => {
-                    var ft = el.path.split(".")
-                    //res[index].type = that.parseFileType(ft[ft.length - 1])
-                })*/
+                that.filesListTotal = parseInt(response.data.total)
 
                 that.$nextTick(()=>{
-                    that.filesListAll = res
+                    that.filesListAll = response.data.data
                 })
 
             } else {
@@ -127,6 +139,14 @@ export default {
             }
             
         })
+    },
+
+    changePage (val) {
+        this.getList(val)
+    },
+
+    pageToLimit ( val ) {
+        return (val - 1) * 10
     },
 
     getIcon (str) {
@@ -217,14 +237,13 @@ export default {
 
     updateAll () {
         this.filesListAll = []
-        this.getList()
+        this.getList(this.page)
     },
 
     realFileName (str, limit) {
         var res
         var parse = str.split('_')
-        console.log(parse)
-        var res = parse[parse.length-1].length < limit ? parse[parse.length-1] : parse[parse.length-1].slice(0, limit) + '...'
+        res = parse[parse.length-1].length < limit ? parse[parse.length-1] : parse[parse.length-1].slice(0, limit) + '...'
 
         return res
     }
@@ -248,6 +267,11 @@ export default {
 #title{
   font-size:36px;
   font-weight: bold;
+}
+
+#list{
+    margin-top: 24px;
+    min-height: 540px;
 }
 
 #file-grid{

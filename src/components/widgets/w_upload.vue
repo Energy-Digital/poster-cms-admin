@@ -123,7 +123,7 @@ export default {
 
             //var api = openMode === "Image" ? this.api_getGallery + '&type=Image' : this.api_getGallery + '&type=File'
             this.axios.get(this.api_getGallery).then((response) => {
-                var res = response.data
+                var res = response.data.data
                 that.gallery = res
             })
         },
@@ -140,9 +140,6 @@ export default {
             formObj.append('file',img)
             formObj.append('name', fileName)
             formObj.append('typeDes', fileType.type)
-            console.log('cccc: ')
-            console.log(fileType.type)
-
 
             let h = {
                 headers:{'Content-Type':'multipart/form-data'}

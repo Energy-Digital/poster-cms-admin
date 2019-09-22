@@ -5,7 +5,7 @@
                 <div id="header-title">
                     <span id="header-title-big">PROTFOLIO CONTROL PANEL</span>
                     <br>
-                    <span id="header-title-sub">作品集管理控制面板</span>
+                    <span id="header-title-sub">JIANFENG.WU</span>
                 </div>
             </div>
 

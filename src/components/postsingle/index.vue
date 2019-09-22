@@ -287,8 +287,10 @@ export default {
 
     uploadHandler (data) {
 
+      console.log(data)
 
-      if(data.type.type === "Image"){
+
+      if(data.type === "Image"){
 
         this.setTitleImg(data.path)
 

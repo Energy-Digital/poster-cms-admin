@@ -6,6 +6,7 @@
 </template>
 
 <script>
+
 import { EventBus } from './bus.js'
 import admin from './components/admin.vue'
 import login from './components/login/index.vue'
