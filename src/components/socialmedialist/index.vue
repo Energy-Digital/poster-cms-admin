@@ -4,44 +4,40 @@
     <WTitle txt="Categories"></WTitle>
 
     <div id="new">
-      <el-button type="primary" v-on:click="toCateNew()" plain>New</el-button>
+      <el-button type="primary" v-on:click="toSMNew()" plain>New</el-button>
     </div>
 
     <div id="list" v-loading="upLoading">
       <el-table
-        :data="catesList"
+        :data="smList"
         border
         style="width: 100%">
 
         <el-table-column
           fixed
-          prop="cname"
-          label="Category Name"
+          prop="name"
+          label="Name"
           width="150">
         </el-table-column>
 
         <el-table-column
-          prop="cname_sublang"
-          label="分类名称"
-          width="120">
+          prop="url"
+          label="URL"
+          width="300">
+          <template slot-scope="scope">
+            <span @click="toLink(scope.row.url)" style="color:#409EFF;cursor:pointer;">{{scope.row.url}}</span>
+          </template>
         </el-table-column>
 
         <el-table-column
-          prop="des"
-          label="Description"
+          prop="icon"
+          label="icon"
           width="120">
-        </el-table-column>
-
-        <el-table-column
-          prop="des_sublang"
-          label="分类描述"
-          width="120">
-        </el-table-column>
-
-        <el-table-column
-          prop="total"
-          label="Posts"
-          width="120">
+          <template slot-scope="scope">
+            <div>
+                <img :src="scope.row.icon" :alt="scope.row.name" style="width:30px">
+            </div>
+        </template>
         </el-table-column>
 
 
@@ -50,7 +46,7 @@
           label="Action"
           width="100">
           <template slot-scope="scope">
-            <el-button @click="toCateSingle(scope.row)" type="text" size="small">Edit</el-button>
+            <el-button @click="toSMSingle(scope.row.id)" type="text" size="small">Edit</el-button>
           </template>
         </el-table-column>
         
@@ -74,8 +70,8 @@ export default {
   },
   data(){
     return{
-      api: "http://api.isjeff.com/pot/data/post_cate/",
-      catesList: [],
+      api: "http://api.isjeff.com/pot/data/social_media/",
+      smList: [],
       upLoading: false,
     }
   },
@@ -92,19 +88,22 @@ export default {
       this.upLoading = true
       var that = this
       this.axios.get(this.api).then((response) => {
-        var res = response.data
-        this.catesList = res
+        this.smList = response.data
         this.upLoading = false
       })
     },
 
-    toCateSingle (data) {
-      EventBus.$emit('toCateSingle', data.id)
+    toSMSingle (data) {
+      EventBus.$emit('toSMSingle', data.id)
     },
 
-    toCateNew () {
-      EventBus.$emit('toCateSingle', "new")
-    }
+    toSMNew () {
+      EventBus.$emit('toSMSingle', "new")
+    },
+
+    toLink (url) {
+        window.open(url)
+    },
 
   }
 }

@@ -47,6 +47,31 @@ export function getCookie (cname) {
     return ""
 }
 
+export function setCookie (name, value, expDays, remove) {
+    var exp, expTime
+    
+    if(!remove){
+        expTime = (((60 * 1000)*60)*24)*expDays // 30 days
+        exp = new Date()
+        exp.setTime(exp.getTime() + expTime)
+        document.cookie = name + "=" + value + ";" + "expires=" + exp.toGMTString()+";"
+    } else {
+        document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;"
+    }
+    
+}
+
+export function setCookieExInMin (name,value,minutes) {
+    if (minutes) {
+        var date = new Date();
+        date.setTime(date.getTime() + (minutes * 60 * 1000));
+        var expires = "; expires="+date.toGMTString();
+    } else {
+        var expires = "";
+    }
+    document.cookie = name + "=" + value + expires + "; path=/";
+}
+
 export function idFileTypeDes (filename) {
 
     var ft = filename.split('.')
@@ -66,4 +91,18 @@ export function getFileIcon (type) {
             return fileTypes[i].icon
         }
     }
+}
+
+export function decodeRichText (val) {
+    var replaceall = require("replaceall")
+    var val = replaceall('|*|', '"', val)
+    val = replaceall('|**|', "'", val)
+    return val
+}
+
+export function encodeRichText (val) {
+    var replaceall = require("replaceall")
+    var val = replaceall('"', '|*|', val)
+    val = replaceall("'", '|**|', val)
+    return val
 }

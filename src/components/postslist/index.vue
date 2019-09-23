@@ -7,7 +7,7 @@
       <el-button type="primary" v-on:click="toSingleNew()" plain>New</el-button>
     </div>
 
-    <div id="list">
+    <div id="list" v-loading="upLoading">
       <el-table
       :data="postsList"
       border
@@ -107,6 +107,7 @@ export default {
       postsListTotal: 0,
       page:0,
       pageSize:10,
+      upLoading: false,
     }
   },
   http: {
@@ -115,10 +116,12 @@ export default {
   },
   created(){
     this.getList()
+    
   },
   methods:{
 
     getList (page) {
+      this.upLoading = true
       var that = this
 
       // Pagination
@@ -126,8 +129,10 @@ export default {
       var api = page ? this.api + '?ls=' + limit + '&li=' + this.pageSize : this.api
 
       this.axios.get(api).then((response) => {
+        console.log(response)
         this.postsList = response.data.data
         this.postsListTotal = parseInt(response.data.total)
+        this.upLoading = false
       })
     },
 

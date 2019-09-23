@@ -10,7 +10,7 @@
     </div>
     
     <div id="right-cont">
-      <router-view :pid.sync="pid" :cateId.sync="cateId"></router-view>
+      <router-view :pid.sync="pid" :cateId.sync="cateId" :smId.sync="smId"></router-view>
     </div>
     
   </div>
@@ -35,7 +35,8 @@ export default {
     return{
       user:"Admin",
       pid: "1",
-      cateId: ""
+      cateId: "",
+      smId: "",
     }
   },
   created(){
@@ -50,6 +51,10 @@ export default {
 
     EventBus.$on('toCateSingle', function(data){
       that.toCateSingle(data)
+    })
+
+    EventBus.$on('toSMSingle', function(data){
+      that.toSMSingle(data)
     })
     
   },
@@ -70,6 +75,11 @@ export default {
     toCateSingle (id) {
       this.cateId = id
       this.$router.push( { path: '/catesingle' } )
+    },
+
+    toSMSingle (id) {
+      this.smId = id
+      this.$router.push( { path: '/socialmediasingle' } )
     }
 
   }
@@ -106,7 +116,7 @@ a {
   top: 80px;
   left: 0px;
   height:100%;
-  width:20%;
+  width:15%;
   overflow: hidden;
 }
 
@@ -115,6 +125,6 @@ a {
   top:80px;
   right:0px;
   height:100%;
-  width:80%;
+  width:85%;
 }
 </style>

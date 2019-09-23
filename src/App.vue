@@ -8,6 +8,8 @@
 <script>
 
 import { EventBus } from './bus.js'
+import {setCookie, getCookie, clearCookie} from './utils.js'
+
 import admin from './components/admin.vue'
 import login from './components/login/index.vue'
 
@@ -27,10 +29,10 @@ export default {
   created() {
     var that = this
 
-    if(this.getCookie('u_key') && this.getCookie('u_uuid')){
+    if(getCookie('u_key') && getCookie('u_uuid')){
       this.login = true
     } else {
-      this.username = this.getCookie('u_email')
+      this.username = getCookie('u_email')
     }
 
     EventBus.$on('login', function(data){
@@ -39,49 +41,26 @@ export default {
     })
 
     EventBus.$on('logout', function(data){
-      that.clearCookie()
+      that.clearLoginCookie()
       that.login = false
     })
 
     EventBus.$on('setCookie', function(data){
-      that.setCookie(data.name, data.value, data.expDays, data.remove)
+      setCookie(data.name, data.value, data.expDays, data.remove)
     })
 
     EventBus.$on('clearCookie', function(data){
-      that.clearCookie()
+      that.clearLoginCookie()
     })
 
   },
   methods:{
-    getCookie(cname){
-      var name = cname + "=";
-      var ca = document.cookie.split(';');
-      for(var i=0; i<ca.length; i++) 
-      {
-        var c = ca[i].trim();
-        if (c.indexOf(name)==0) return c.substring(name.length,c.length);
-      }
-      return "";
-    },
 
-    setCookie (name, value, expDays, remove) {
-        var exp, expTime
-        
-        if(!remove){
-            expTime = (((60 * 1000)*60)*24)*expDays // 30 days
-            exp = new Date()
-            exp.setTime(exp.getTime() + expTime)
-            document.cookie = name + "=" + value + ";" + "expires=" + exp.toGMTString()+";"
-        } else {
-            document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;"
-        }
-        
-    },
-
-    clearCookie () {
-        this.setCookie('u_key', 0, 30, true) // Set Key
-        this.setCookie('u_uuid', 0, 30, true) // Set UUID
+    clearLoginCookie () {
+        setCookie('u_key', 0, 30, true) // Set Key
+        setCookie('u_uuid', 0, 30, true) // Set UUID
     }
+    
   }
 }
 </script>

@@ -1,5 +1,5 @@
 <template>
-  <div id="all">
+  <div id="all" v-loading="upLoading">
 
     <div id="post-title">
       <!--WTitle txt="Edit Post"></WTitle-->
@@ -132,33 +132,27 @@
     
 
     <div class="pc-b" id="pc-submit">
-      <el-button class="primary" @click="submit()" plain>SUBMIT</el-button>
+      <el-button type="primary" @click="submit()">Save</el-button>
       <el-button type="text" size="small" style="color:#FF5C5C;" @click="del()" v-if="mode === 'update'">Delete</el-button>
     </div>
 
 
-    <upload-window v-if="upload_win" @uploaded="uploadHandler" @close="closeUpWin"></upload-window>
+    <upload-window v-if="upload_win" @uploaded="uploadHandler" @close="closeUpWin" :allowUrl="true" :allowSelect="true"></upload-window>
     
   </div>
 </template>
 
 <script>
-// require styles
-/*import 'quill/dist/quill.core.css'
-import 'quill/dist/quill.snow.css'
-import 'quill/dist/quill.bubble.css'
-
-import { quillEditor } from 'vue-quill-editor'*/
 
 import { EventBus } from '../../bus.js'
-import { limitLength, isEmpty, getCookie } from '../../utils.js'
+import { limitLength, isEmpty, getCookie, encodeRichText, decodeRichText } from '../../utils.js'
 import uploadWindow from '../widgets/w_upload.vue'
 
 import TextEditor from '../texteditor/index.vue'
+
 import WTitle from '../widgets/w_title.vue'
 import WSubTitle from '../widgets/w_subtitle.vue'
 
-//import Editor from 'tt-vue-editor'
 
 export default {
   name: "postsingle",
@@ -221,6 +215,9 @@ export default {
 
       // Display Gate
       contOpen: true,
+
+      // Loading status
+      upLoading: false,
       
     }
   },
@@ -287,10 +284,7 @@ export default {
 
     uploadHandler (data) {
 
-      console.log(data)
-
-
-      if(data.type === "Image"){
+      if(data.type.type === "Image"){
 
         this.setTitleImg(data.path)
 
@@ -310,16 +304,18 @@ export default {
     },
 
     getData () {
+      this.upLoading = true
       this.axios.get(this.api + this.pid).then((response) => {
         var res = response.data[0]
-        res.content = this.decodeRichText(res.content)
-        res.content_sublang = this.decodeRichText(res.content_sublang)
+        res.content = decodeRichText(res.content)
+        res.content_sublang = decodeRichText(res.content_sublang)
         res.status = Number(res.status)
 
         this.postData = res
 
         this.$nextTick(()=>{
           this.loaded = true
+          this.upLoading = false
         })
       })
     },
@@ -339,15 +335,7 @@ export default {
       })
     },
 
-    decodeRichText (val) {
-      var replaceall = require("replaceall")
-      return replaceall('|*|', '"', val)
-    },
-
-    encodeRichText (val) {
-      var replaceall = require("replaceall")
-      return replaceall('"', '|*|', val)
-    },
+    
 
     textUpdate (data) {
       if(this.postLang === "0") {
@@ -386,6 +374,9 @@ export default {
     },
 
     submit () {
+
+      this.upLoading = true
+
       var that = this
 
       var today = new Date().toISOString().slice(0, 19).replace('T', ' ')
@@ -415,8 +406,8 @@ export default {
         title: this.postData.title,
         title_sublang: this.postData.title_sublang,
         title_img: this.postData.title_img,
-        content: this.encodeRichText(this.postData.content),
-        content_sublang: this.encodeRichText(this.postData.content_sublang),
+        content: encodeRichText(this.postData.content),
+        content_sublang: encodeRichText(this.postData.content_sublang),
         brief: this.postData.brief,
         brief_sublang: this.postData.brief_sublang,
         date_pub: this.mode === "update" ? this.postData.data_pub  : today,
@@ -450,11 +441,14 @@ export default {
                   type: 'warning'
               })
           }
+          that.upLoading = false
+      }).catch(function(err){
+        that.upLoading = false
       })
     },
 
     del () {
-
+      this.upLoading = true
       var that = this
 
       this.$confirm('You will delete a post permanently, continue?', 'Alert', {
@@ -493,9 +487,12 @@ export default {
                   type: 'warning'
               })
           }
+
+          that.upLoading = false
         })
 
       }).catch(() => {
+        that.upLoading = false
         this.$message({
           type: 'info',
           message: 'Canceled'

@@ -8,8 +8,8 @@
 
         <el-tabs v-model="imgInsMode">
             <el-tab-pane label="Upload" name="upload"></el-tab-pane>
-            <el-tab-pane label="URL" name="url"></el-tab-pane>
-            <el-tab-pane label="Gallery" name="gallery"></el-tab-pane>
+            <el-tab-pane label="URL" name="url" v-if="allowUrl"></el-tab-pane>
+            <el-tab-pane label="Gallery" name="gallery" v-if="allowUrl"></el-tab-pane>
         </el-tabs>
 
 
@@ -81,7 +81,8 @@ export default {
 
     },
     props:{
-        
+        allowUrl: true,
+        allowSelect: true
     },
     data () {
         return {
@@ -178,7 +179,7 @@ export default {
             } else {
                 this.selected = {
                     path: url,
-                    type: type,
+                    type: idFileTypeDes(name),
                     name: name,
                     id: id
                 }

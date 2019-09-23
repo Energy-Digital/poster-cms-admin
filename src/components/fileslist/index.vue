@@ -7,7 +7,7 @@
       <el-button type="primary" v-on:click="toNewFile()" plain>Add</el-button>
     </div>
 
-    <div id="list">
+    <div id="list" v-loading="upLoading">
 
         <div id="file-grid">
             <div class="file-single" v-for="item in filesListAll" :key="item.id" >
@@ -63,7 +63,7 @@
         </el-pagination>
     </div>
 
-    <upload-window v-if="upload_win" @uploaded="uploadHandler" @close="closeUpWin"></upload-window>
+    <upload-window v-if="upload_win" @uploaded="uploadHandler" @close="closeUpWin" :allowUrl="false" :allowSelect="false"></upload-window>
     
   </div>
 </template>
@@ -93,7 +93,8 @@ export default {
         filesListTotal: 0,
         page:0,
         pageSize:10,
-        upload_win: false
+        upload_win: false,
+        upLoading: false,
     }
   },
   http: {
@@ -115,7 +116,14 @@ export default {
     },
 
     getList (page) {
+        this.upLoading = true
         var that = this
+
+        // Set page size by screen width
+        this.pageSize = Math.floor(window.innerWidth / 120)
+        if(this.pageSize % 2 != 0){
+            this.pageSize++
+        }
 
         // pagination Limit
         var limit = this.pageToLimit(page)
@@ -138,6 +146,8 @@ export default {
                 })
             }
             
+
+            that.upLoading = false
         })
     },
 
@@ -175,6 +185,7 @@ export default {
     },
 
     toDelFile (id, path) {
+        
         var that = this
 
         this.$confirm('You will delete a file permanently, continue?', 'Alert', {
@@ -182,56 +193,61 @@ export default {
             cancelButtonText: 'Cancel',
             type: 'warning'
         }).then(() => {
+
+                that.upLoading = true
             
-            var postReady = {
-                ukey: getCookie('u_key'), 
-                uuid: getCookie('u_uuid'), 
-                fid: id,
-                fpath: path
-            }
+                var postReady = {
+                    ukey: getCookie('u_key'), 
+                    uuid: getCookie('u_uuid'), 
+                    fid: id,
+                    fpath: path
+                }
 
-            var postData = this.$qs.stringify(postReady)
+                var postData = this.$qs.stringify(postReady)
 
 
-            that.axios.post(this.api_img_del, postData)
-            .then(function (response) {
+                that.axios.post(this.api_img_del, postData)
+                .then(function (response) {
 
-            var res = response.data
+                var res = response.data
 
-            var delRes = res.split(';')
+                var delRes = res.split(';')
 
-            if(delRes[0].indexOf("dbs") != -1 && delRes[1].indexOf("del") != -1){
-                that.$notify({
-                    title: 'Success',
-                    message: 'File has been removed',
-                    type: 'success'
-                })
+                if(delRes[0].indexOf("dbs") != -1 && delRes[1].indexOf("del") != -1){
+                    that.$notify({
+                        title: 'Success',
+                        message: 'File has been removed',
+                        type: 'success'
+                    })
 
-                // Need to re-define this update function when split pages 
-                that.updateAll()
-                return
-            } 
-            
-            if (delRes[0].indexOf("dbe") != -1){
-                that.$notify({
-                    title: "Can't delete record",
-                    message: 'Error:' + res,
-                    type: 'warning'
-                })
-            }
+                    // Need to re-define this update function when split pages 
+                    that.updateAll()
+                    that.upLoading = false
+                    return
+                } 
+                
+                if (delRes[0].indexOf("dbe") != -1){
+                    that.$notify({
+                        title: "Can't delete record",
+                        message: 'Error:' + res,
+                        type: 'warning'
+                    })
+                }
 
-            if (delRes[1].indexOf("nodel") != -1){
-                that.$notify({
-                    title: "Can't delete file",
-                    message: 'Error:' + res,
-                    type: 'warning'
-                })
-            }
-            
-        })
+                if (delRes[1].indexOf("nodel") != -1){
+                    that.$notify({
+                        title: "Can't delete file",
+                        message: 'Error:' + res,
+                        type: 'warning'
+                    })
+                }
 
-        }).catch(() => {
-            
+                that.upLoading = false
+                
+            })
+
+        }).catch((err) => {
+            that.upLoading = false
         })
     },
 

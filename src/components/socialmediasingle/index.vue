@@ -1,49 +1,42 @@
 <template>
     <div id="all" v-loading="upLoading">
         <div id="title">
-            <el-page-header @back="goBack" title="Back" content="Edit Category"></el-page-header>
+            <el-page-header @back="goBack" title="Back" content="Edit Social Media"></el-page-header>
             <!--WTitle txt="Edit Category"></WTitle-->
-        </div>
-
-        <div id="lang">
-            <el-radio-group v-model="postLang" style="margin-bottom: 30px;">
-                <el-radio-button label="0">English</el-radio-button>
-                <el-radio-button label="1">中文</el-radio-button>
-            </el-radio-group>
         </div>
         
         <div id="form">
-            <span v-if="postLang === '0'">Category Name</span>
-            <span v-if="postLang === '1'">分类名称</span>
+            <span>Name</span>
             <br>
             <div id="form-name">
-                <el-input v-model="cateData.cname" placeholder="Please Input Name" v-if="postLang === '0'"></el-input>
-                <el-input v-model="cateData.cname_sublang" placeholder="请输入分类名称" v-if="postLang === '1'"></el-input>
+                <el-input v-model="smData.name" placeholder="Please Input Name"></el-input>
             </div>
             <br>
 
-            <span v-if="postLang === '0'">Category Description</span>
-            <span v-if="postLang === '1'">分类描述</span>
+            <span>URL</span>
             <br>
-
-            <div id="form-text">
-                <el-input
-                    type="textarea"
-                    :rows="3"
-                    v-if="postLang === '0'"
-                    placeholder="Please Input Description"
-                    v-model="cateData.des">
-                </el-input>
-
-                <el-input
-                    type="textarea"
-                    :rows="3"
-                    v-if="postLang === '1'"
-                    placeholder="请输入分类描述"
-                    v-model="cateData.des_sublang">
-                </el-input>
+            <div id="form-url">
+                <el-input v-model="smData.url" placeholder="Please Input URL"></el-input>
             </div>
-            
+
+            <span>Icon</span>
+            <br>
+            <div id="form-icon">
+                <el-image
+                    class="file-single-img-img"
+                    style="width: 40px; height: 40px"
+                    :src="smData.icon"
+                    fit="contain">
+
+                    <div slot="placeholder" class="au_img_placeholder">
+                        <span>Loading</span>
+                    </div>
+
+                </el-image>
+                <br>
+                <el-button @click="upIcon">Upload</el-button>
+            </div>
+
             <br>
 
             <div class="submit" id="submit">
@@ -51,9 +44,9 @@
                 <el-button type="text" size="small" style="color:#FF5C5C;" @click="del()" v-if="mode === 'update'">Delete</el-button>
             </div>
             
-            
-            
         </div>
+
+        <upload-window v-if="upload_win" @uploaded="uploadHandler" @close="closeUpWin" :allowUrl="true" :allowSelect="true"></upload-window>
 
     </div>
 </template>
@@ -66,38 +59,39 @@ import { isEmpty, getCookie } from '../../utils.js'
 
 // Import widgets
 import WTitle from '../widgets/w_title.vue'
+import uploadWindow from '../widgets/w_upload.vue'
 
 
 export default {
     name:"catesingle",
     props:{
-        cateId: {
+        smId: {
             type: String,
             default: "1"
         }
     },
     components:{
-        WTitle
+        WTitle,
+        uploadWindow
     },
     data(){
         return{
-            api: "https://api.isjeff.com/pot/data/post_cate/",
-            api_up: "https://api.isjeff.com/pot/updater/cate_single/",
-            api_del: "https://api.isjeff.com/pot/updater/cate_del/",
-            cateData: {
-                cname: "",
-                cname_sublang: "",
-                des: "",
-                des_sublang: ""
+            api: "https://api.isjeff.com/pot/data/social_media/",
+            api_up: "https://api.isjeff.com/pot/updater/social_media_single/",
+            api_del: "https://api.isjeff.com/pot/updater/social_media_del/",
+            smData: {
+                name: "",
+                url: "",
+                icon: ""
             },
-            postLang: "0",
             mode: "update",
-            upLoading: false
+            upLoading: false,
+            upload_win: false
         }
     },
     created(){
 
-        if(this.cateId === "new") {
+        if(this.smId === "new") {
             this.mode = "new"
         } else {
             this.getData()
@@ -107,13 +101,13 @@ export default {
     methods:{
 
         goBack() {
-            EventBus.$emit('toPage', './cateslist')
+            EventBus.$emit('toPage', './socialmedialist')
         },
 
         getData(){
             this.upLoading = true
-            this.axios.get(this.api+"?cid="+this.cateId).then((response)=>{
-                this.cateData = response.data[0]
+            this.axios.get(this.api+"?sid="+this.smId).then((response)=>{
+                this.smData = response.data[0]
                 this.upLoading = false
             })
         },
@@ -123,12 +117,12 @@ export default {
 
             // Check mandatory content is not empty and did not excess certain words count
             if(
-                isEmpty(this.cateData.cname) ||
-                isEmpty(this.cateData.des)
+                isEmpty(this.smData.name) ||
+                isEmpty(this.smData.url)
             ){
                 this.$notify({
                     title: 'Check Needed',
-                    message: 'Please check your name or description is not empty',
+                    message: 'Please check your name or url is not empty',
                     type: 'warning'
                 })
                 return
@@ -140,11 +134,10 @@ export default {
                 mode: this.mode,
                 ukey: getCookie('u_key'), 
                 uuid: getCookie('u_uuid'), 
-                cid: this.cateId,
-                cname: this.cateData.cname,
-                cname_sublang: this.cateData.cname_sublang,
-                des: this.cateData.des,
-                des_sublang: this.cateData.des_sublang
+                smId: this.smId,
+                name: this.smData.name,
+                url: this.smData.url,
+                icon: this.smData.icon,
             }
 
             var postData = this.$qs.stringify(postReady)
@@ -163,7 +156,7 @@ export default {
                     })
 
                     that.$nextTick(() => {
-                        EventBus.$emit('toPage', './cateslist')
+                        EventBus.$emit('toPage', './socialmedialist')
                     })
 
                 } else {
@@ -186,7 +179,7 @@ export default {
             var postReady = {
                 ukey: getCookie('u_key'), 
                 uuid: getCookie('u_uuid'), 
-                cid: this.cateId
+                smId: this.smId
             }
 
             var postData = this.$qs.stringify(postReady)
@@ -205,7 +198,7 @@ export default {
                     })
 
                     that.$nextTick(() => {
-                        EventBus.$emit('toPage', './cateslist')
+                        EventBus.$emit('toPage', './socialmedialist')
                     })
 
                 } else {
@@ -216,6 +209,27 @@ export default {
                     })
                 }
             })
+        },
+
+        upIcon () {
+            this.upload_win = true
+        },
+
+        closeUpWin () {
+            this.upload_win = false
+        },
+
+        uploadHandler (data) {
+            console.log(data)
+            if(data.type.type === "Image"){
+                this.smData.icon = data.path
+            } else {
+                this.$notify({
+                    title: 'Icon must be an image',
+                    type: 'warning'
+                })
+            }
+            
         }
     }
 }

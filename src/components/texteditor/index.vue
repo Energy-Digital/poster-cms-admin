@@ -113,7 +113,7 @@
 
       <editor-content class="editor-content" :editor="editor" />
       
-      <upload-window v-if="upload_win" @uploaded="uploadHandler" @close="closeUpWin"></upload-window>
+      <upload-window v-if="upload_win" @uploaded="uploadHandler" @close="closeUpWin" :allowUrl="true" :allowSelect="true"></upload-window>
       
 
     </div>

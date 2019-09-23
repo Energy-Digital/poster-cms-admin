@@ -21,8 +21,8 @@
                         </template>
 
                         <el-menu-item-group>
-                            <el-menu-item index="2-1" v-on:click="toPage('./postslist')">All Posts</el-menu-item>
-                            <el-menu-item index="2-2" v-on:click="toPage('./cateslist')">All Categories</el-menu-item>
+                            <el-menu-item index="2-1" v-on:click="toPage('./postslist')">Posts</el-menu-item>
+                            <el-menu-item index="2-2" v-on:click="toPage('./cateslist')">Categories</el-menu-item>
                         </el-menu-item-group>
 
                     </el-submenu>
@@ -33,7 +33,8 @@
                             <span>Library</span>
                         </template>
 
-                        <el-menu-item index="3-1" v-on:click="toPage('./fileslist')">All Files</el-menu-item>
+                        <el-menu-item index="3-1" v-on:click="toPage('./fileslist')">Files</el-menu-item>
+                        
 
                     </el-submenu>
 
@@ -43,8 +44,11 @@
                             <span>Others</span>
                         </template>
 
-                        <el-menu-item index="4-1" disable>Social Network</el-menu-item>
-                        <el-menu-item index="4-2" disable>Settings</el-menu-item>
+                        <!--el-menu-item index="4-1" v-on:click="toPage('./visittest')">Visit Record Test</el-menu-item-->
+                        <el-menu-item index="4-2" v-on:click="toPage('./visitorlist')">Visitors</el-menu-item>
+                        <el-menu-item index="4-3" v-on:click="toPage('./socialmedialist')">Social Media</el-menu-item>
+                        <el-menu-item index="4-4" v-on:click="toPage('./settings')">Settings</el-menu-item>
+                        <el-menu-item index="4-5" v-on:click="toPage('./adminsettings')">Admin</el-menu-item>
 
                     </el-submenu>
 
