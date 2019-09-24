@@ -13,7 +13,7 @@
 <script>
 
 import { EventBus } from '../../bus.js'
-import { getCookie } from '../../utils.js'
+import { getCookie, setCookie } from '../../utils.js'
 
 export default {
     name:"login",
@@ -54,45 +54,22 @@ export default {
                 .then(function (response) {
 
                     var res = response.data
+                    console.log(res)
 
                     if(res.indexOf("success") != -1){
 
                         var sucInfo = res.split(',')
 
-                        EventBus.$emit("clearCookie", true)
+                        that.clearLoginCookie()
 
-
-                        EventBus.$emit("setCookie", {
-                            name: "u_key",
-                            value: sucInfo[1],
-                            expDays: 30,
-                            remove: false
-                        })
-
-                        EventBus.$emit("setCookie", {
-                            name: "u_uuid",
-                            value: sucInfo[2],
-                            expDays: 30,
-                            remove: false
-                        })
-
-                        EventBus.$emit("setCookie", {
-                            name: "u_name",
-                            value: sucInfo[3],
-                            expDays: 30,
-                            remove: false
-                        })
-
-                        EventBus.$emit("setCookie", {
-                            name: "u_email",
-                            value: that.email,
-                            expDays: 30,
-                            remove: false
-                        })
+                        setCookie("u_key", sucInfo[1], 30, false)
+                        setCookie("u_uuid", sucInfo[2], 30, false)
+                        setCookie("u_name", sucInfo[3], 30, false)
+                        setCookie("u_avatar", sucInfo[4], 30, false)
+                        setCookie("u_email", that.email, 30, false)
 
                         that.$notify({
-                            title: '验证成功',
-                            message: '已完成验证，返回成功',
+                            title: 'Security Verfication Successful',
                             type: 'success'
                         })
 
@@ -100,17 +77,21 @@ export default {
 
                     } else {
                         that.$notify({
-                            title: '验证失败',
-                            message: '错误',
+                            title: 'Security Verfication Fail',
+                            message: 'You can only try 10 times per day, be careful.',
                             type: 'warning'
                         })
                     }
                     
 
                 })
-
-                
             }
+        },
+        clearLoginCookie () {
+            setCookie('u_key', 0, 30, true)
+            setCookie('u_uuid', 0, 30, true)
+            setCookie('u_name', 0, 30, true)
+            setCookie('u_avatar', 0, 30, true)
         }
     }
 }

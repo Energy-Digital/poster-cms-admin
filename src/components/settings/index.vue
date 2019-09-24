@@ -28,6 +28,14 @@
             <el-input v-model="form.baseUrl"></el-input>
         </el-form-item>
 
+        <el-form-item label="Cookie Notice">
+          <el-switch
+            v-model="form.isCookieNotice"
+            active-color="#13ce66"
+            inactive-color="#ff4949">
+          </el-switch>
+        </el-form-item>
+
         <el-form-item>
             <el-button type="primary" @click="submit">Save</el-button>
         </el-form-item>
@@ -111,6 +119,8 @@ export default {
         res.subtitle = decodeRichText(res.subtitle)
         res.desText = decodeRichText(res.desText)
         res.seoTitle = decodeRichText(res.seoTitle)
+
+        res.isCookieNotice = res.isCookieNotice === "true" ? true : false
 
         this.form = res
         // Decode keywords
@@ -211,7 +221,8 @@ export default {
         subtitle: encodeRichText(this.form.subtitle),
         desText: encodeRichText(this.form.desText),
         baseUrl: this.form.baseUrl,
-        seoTitle: encodeRichText(this.form.seoTitle)
+        seoTitle: encodeRichText(this.form.seoTitle),
+        isCookieNotice: this.form.isCookieNotice
       }
 
       this.upData(postReady)

@@ -1,7 +1,7 @@
 <template>
   <div id="all">
 
-    <WTitle txt="Your visit is marked"></WTitle>
+    <WTitle txt="Your visit has marked"></WTitle>
 
   </div>
 </template>

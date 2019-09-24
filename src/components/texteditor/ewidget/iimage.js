@@ -36,7 +36,6 @@ export default class IImage extends Node {
         }
       },
       group: 'inline',
-      draggable: true,
       selectable: true,
       parseDOM: [
         {

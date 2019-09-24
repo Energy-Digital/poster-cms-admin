@@ -22,7 +22,7 @@ export default {
   data(){
     return{
       login: false,
-      username: "Admin",
+      username: "Admin"
     }
     
   },
@@ -37,20 +37,11 @@ export default {
 
     EventBus.$on('login', function(data){
       that.login = true
-      
     })
 
     EventBus.$on('logout', function(data){
       that.clearLoginCookie()
       that.login = false
-    })
-
-    EventBus.$on('setCookie', function(data){
-      setCookie(data.name, data.value, data.expDays, data.remove)
-    })
-
-    EventBus.$on('clearCookie', function(data){
-      that.clearLoginCookie()
     })
 
   },
@@ -59,6 +50,7 @@ export default {
     clearLoginCookie () {
         setCookie('u_key', 0, 30, true) // Set Key
         setCookie('u_uuid', 0, 30, true) // Set UUID
+        setCookie('u_name', 0, 30, true) // Set UUID
     }
     
   }

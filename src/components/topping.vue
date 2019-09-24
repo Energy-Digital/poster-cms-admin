@@ -3,16 +3,14 @@
         <div id="header-content">
             <div id="header-left" v-on:click="toHome">
                 <div id="header-title">
-                    <span id="header-title-big">PROTFOLIO CONTROL PANEL</span>
-                    <br>
-                    <span id="header-title-sub">JIANFENG.WU</span>
+                    <span id="header-title-sub">{{siteName}}</span>
                 </div>
             </div>
 
             <div id="header-right">
-                <div id="header-user">
-                    <div id="header-user-avator">
-                        <img src="../assets/avator.png" alt="">
+                <div id="header-user" v-on:click="toAdmSet">
+                    <div id="header-user-avatar">
+                        <el-avatar :size="24" :src="avatar"></el-avatar>
                     </div>
 
                     <div id="header-user-name">
@@ -22,7 +20,7 @@
                     
                 </div>
                 <div id="header-logout">
-                    <el-button v-on:click="logout" style="background:#222222;color:#ffffff;" plain>退出</el-button>
+                    <span v-on:click="logout">EXIT</span>
                 </div>
             </div>
 
@@ -32,20 +30,23 @@
 </template>
 
 <script>
-import { EventBus } from "../bus.js"
+import { EventBus } from "../bus"
+import { getCookie } from "../utils"
 export default {
     name:"topping",
     props:{
-        
+        siteName: ""
     },
     data (){
         return {
-            username: "Admin",
+            username: "",
+            avatar: "",
         }
     },
     created () {
         if(this.getCookie("u_name").length > 0){
-            this.username = this.getCookie("u_name")
+            this.username = getCookie("u_name")
+            this.avatar = getCookie("u_avatar")
         }
     },
     methods:{
@@ -65,6 +66,10 @@ export default {
 
         toHome () {
             EventBus.$emit("toPage", '/home')
+        },
+
+        toAdmSet () {
+            EventBus.$emit("toPage", '/adminsettings')
         },
 
         getCookie(cname){
@@ -92,13 +97,14 @@ export default {
 }
 
 #header-content{
-    padding-top:20px;
-    padding-bottom:20px;
+    padding-top:12px;
 }
 
 #header-left{
     position:absolute;
     left:20px;
+    top: 8px;
+    opacity: .9;
     cursor: pointer;
 }
 
@@ -117,14 +123,9 @@ export default {
 
 #header-title-sub{
     font-size:16px;
-    font-weight: normal;
+    font-weight: bold;
 }
 
-#header-user{
-    display:flex;
-    margin-top:4px;
-    margin-right: 18px;
-}
 
 #header-right{
     position:absolute;
@@ -137,14 +138,40 @@ export default {
     font-size:16px;
 }
 
-#header-user-avator img{
-    width:32px;
+
+#header-logout span{
+    opacity: 0.8;
+    color:#f56c6c;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(.25,.8,.25,1);
 }
 
-#header-user-name {
-    margin-top:6px;
-    margin-left:6px;
+#header-logout span:hover{
+    opacity: 1;
 }
+
+#header-user{
+    display:flex;
+    margin-top:-5px;
+    margin-right: 32px;
+    opacity: .8;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(.25,.8,.25,1);
+}
+
+#header-user:hover {
+    opacity: 1;
+}
+
+
+
+#header-user-name {
+    margin-top: 5px;
+    margin-left: 8px;
+    
+}
+
+
 
 </style>
 

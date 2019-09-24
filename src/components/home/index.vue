@@ -1,7 +1,7 @@
 <template>
   <div id="all" v-loading="upLoading">
     <div class="numbers">
-      <WSubTitle txt="Highlight"></WSubTitle>
+      <WSubTitle txt="Highlight Data"></WSubTitle>
       <div class="numbers-cont">
 
         <div class="numbers-single">
@@ -40,6 +40,35 @@
         
       </div>
     </div>
+
+    <div class="table" v-if="loaded">
+      <WSubTitle txt="MVP (Most Views Posts)"></WSubTitle>
+      <el-table
+      :data="mvpList"
+      stripe
+      style="width: 100%">
+
+        <el-table-column
+          fixed
+          prop="title"
+          label="Title"
+          width="720">
+        </el-table-column>
+
+        <el-table-column
+          prop="ux_visit"
+          label="Views"
+          width="220">
+        </el-table-column>
+
+        <el-table-column
+          prop="ux_likes"
+          label="Likes"
+          width="220">
+        </el-table-column>
+
+      </el-table>
+    </div>
   </div>
 </template>
 
@@ -63,6 +92,7 @@ export default {
       numbersData: {},
       loaded: false,
       upLoading: false,
+      mvpList:[],
       chartOptionsBasic: {
         chart: {
           id: 'recentVisit',
@@ -131,6 +161,8 @@ export default {
       this.axios.post(this.api, postData)
       .then(function (response) {
 
+        console.log(response.data)
+
         that.numbersData = response.data
 
         var hoursChartOptions = {
@@ -148,6 +180,7 @@ export default {
         that.chartRecentDays[1].data = daysData.admin
         that.chartRecentHours[0].data = hoursData.users
         that.chartRecentHours[1].data = hoursData.admin
+        that.mvpList = that.numbersData.mvp
         that.loaded = true
         that.upLoading = false
         
@@ -161,7 +194,7 @@ export default {
     recentVisit (arr, mode) {
 
       var ts = Date.parse(new Date()) / 1000
-      var gap = mode === "day" ? 24*60*60 : 60*60
+      var gap = mode === "days" ? 24*60*60 : 60*60
       var recentUsers = []
       var recentAdmin = []
 
@@ -218,7 +251,7 @@ export default {
 
 .numbers-single{
   width:250px;
-  height:150px;
+  height:100px;
 }
 
 .numbers-single-num span{
@@ -244,5 +277,9 @@ export default {
 
 .charts-single{
   width:50%;
+}
+
+.table{
+  width:100%;
 }
 </style>
