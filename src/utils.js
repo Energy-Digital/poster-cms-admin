@@ -95,14 +95,20 @@ export function getFileIcon (type) {
 
 export function decodeRichText (val) {
     var replaceall = require("replaceall")
-    var val = replaceall('|*|', '"', val)
+    val = replaceall('|*|', '"', val)
     val = replaceall('|**|', "'", val)
     return val
 }
 
 export function encodeRichText (val) {
     var replaceall = require("replaceall")
-    var val = replaceall('"', '|*|', val)
+    val = replaceall('"', '|*|', val)
     val = replaceall("'", '|**|', val)
     return val
+}
+
+export function strLenLimit (str, limit) {
+
+    return str.length < limit ? str : str.slice(0, limit) + '...'
+    
 }

@@ -93,6 +93,11 @@ export default {
       var that = this
       this.axios.get(this.api).then((response) => {
         var res = response.data
+
+        if(res.length  === 0){
+          return
+        }
+        
         this.catesList = res
         this.upLoading = false
       })

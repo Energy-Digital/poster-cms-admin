@@ -3,13 +3,13 @@
         <div id="assets_upload">
 
         <div id="au_title">
-            <span>Upload Image</span>
+            <span>Upload</span>
         </div>
 
         <el-tabs v-model="imgInsMode">
             <el-tab-pane label="Upload" name="upload"></el-tab-pane>
             <el-tab-pane label="URL" name="url" v-if="allowUrl"></el-tab-pane>
-            <el-tab-pane label="Gallery" name="gallery" v-if="allowUrl"></el-tab-pane>
+            <el-tab-pane label="Gallery" name="gallery" v-if="allowSelect"></el-tab-pane>
         </el-tabs>
 
 
@@ -46,17 +46,25 @@
 
             <div class="au_img_container" v-for="item in gallery" :key="item.id" :style="item.id == selected.id ? imgHighlight : imgNormal">
 
-                <el-image
-                    style="width: 100px; height: 100px"
-                    :src="item.type_des === 'Image' ? base_url + item.path : base_url + static_icons_url + getIcon(item.type)"
-                    fit="contain"
-                    v-on:click="selectItem(item.id, base_url+item.path, item.type_des, item.name)">
-                    <div slot="placeholder" class="au_img_placeholder">
-                        <span>Loading</span>
-                    </div>
-                </el-image>
+                <div class="file-single-img">
+                    <el-image
+                        class="file-single-img-img"
+                        style="item.type_des === 'Image' ? 'width: 180px; height: 180px' : 'width: 30px; height: 30px;margin-top: 35px;margin-left: -30px;'"
+                        :src="item.type_des === 'Image' ? base_url + item.path : base_url + static_icons_url + getIcon(item.type)"
+                        fit="contain"
+                        v-on:click="selectItem(item.id, base_url+item.path, item.type_des, item.name)">
+                        <div slot="placeholder" class="au_img_placeholder">
+                            <span>Loading</span>
+                        </div>
+                    </el-image>
 
-                <span class="au_file_name" v-if="item.type_des !== 'Image'">{{realFileName(item.name)}}</span>
+                    <span v-if="item.type_des !== 'Image'" class="file-single-des">
+                        {{item.type_des}}
+                    </span>
+
+                    <span class="au_file_name" v-if="item.type_des !== 'Image'">{{realFileName(item.name)}}</span>
+                </div>
+
             </div>
 
             <div class="au_assets_manager_btn">
@@ -73,7 +81,7 @@
 <script>
 
 import { EventBus } from '../../bus.js'
-import { idFileTypeDes, getFileIcon } from '../../utils.js'
+import { idFileTypeDes, getFileIcon, getCookie } from '../../utils.js'
 
 export default {
     name:"upload-window",
@@ -82,7 +90,8 @@ export default {
     },
     props:{
         allowUrl: true,
-        allowSelect: true
+        allowSelect: true,
+        allowType: String
     },
     data () {
         return {
@@ -104,7 +113,7 @@ export default {
     created () {
         var that = this
         that.initial()
-        this.getGallery()
+        this.getGallery(this.allowType)
     },
 
     methods: {
@@ -119,11 +128,17 @@ export default {
 
         getGallery (openMode) {
 
+            
+
             var that = this
             this.gallery = []
+            var api = this.api_getGallery
 
-            //var api = openMode === "Image" ? this.api_getGallery + '&type=Image' : this.api_getGallery + '&type=File'
-            this.axios.get(this.api_getGallery).then((response) => {
+            if(openMode){
+                api = this.api_getGallery + '&type=' + openMode
+            }
+
+            this.axios.get(api).then((response) => {
                 var res = response.data.data
                 that.gallery = res
             })
@@ -141,6 +156,8 @@ export default {
             formObj.append('file',img)
             formObj.append('name', fileName)
             formObj.append('typeDes', fileType.type)
+            formObj.append('ukey', getCookie('u_key'))
+            formObj.append('uuid', getCookie('u_uuid'))
 
             let h = {
                 headers:{'Content-Type':'multipart/form-data'}
@@ -149,6 +166,7 @@ export default {
             this.$http.post(this.api_upFile,formObj,h)
             .then(function(response) {
                 var res = response.data
+                console.log(res)
                 if(res.indexOf('success' != -1)) {
 
                     var r = res.split(',')
@@ -303,5 +321,20 @@ export default {
         font-size: 8px;
         z-index: 99;
         position: absolute;
+    }
+
+    .file-single-img{
+        display:flex;
+        width:180px;
+        height:180px;
+    }
+
+    .file-single-des{
+        width: 60px;
+        margin-top: 40px;
+        margin-left: -32px;
+        font-size: 10px;
+        font-weight: bold;
+        opacity: 0.7;
     }
 </style>

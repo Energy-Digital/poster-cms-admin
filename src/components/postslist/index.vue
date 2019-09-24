@@ -43,6 +43,9 @@
           prop="brief"
           label="Brief"
           width="240">
+          <template slot-scope="scope">
+            <span>{{parseBrief(scope.row.brief, 48)}}</span>
+          </template>
         </el-table-column>
 
         <el-table-column
@@ -61,6 +64,18 @@
           prop="date_modi"
           label="Last Edit"
           width="140">
+        </el-table-column>
+
+        <el-table-column
+          prop="ux_likes"
+          label="Likes"
+          width="120">
+        </el-table-column>
+
+        <el-table-column
+          prop="ux_visit"
+          label="Views"
+          width="120">
         </el-table-column>
 
 
@@ -90,6 +105,7 @@
 
 <script>
 import { EventBus } from '../../bus'
+import { strLenLimit } from '../../utils'
 import WTitle from '../widgets/w_title.vue'
 
 export default {
@@ -129,9 +145,14 @@ export default {
       var api = page ? this.api + '?ls=' + limit + '&li=' + this.pageSize : this.api
 
       this.axios.get(api).then((response) => {
-        console.log(response)
-        this.postsList = response.data.data
+        
         this.postsListTotal = parseInt(response.data.total)
+        
+        if(this.postsListTotal === 0){
+          return
+        }
+
+        this.postsList = response.data.data
         this.upLoading = false
       })
     },
@@ -150,6 +171,10 @@ export default {
 
     toSingleNew ( data ) {
       EventBus.$emit('toPostSingle', 'new')
+    },
+
+    parseBrief (str, limit) {
+      return strLenLimit(str, limit)
     }
 
   }

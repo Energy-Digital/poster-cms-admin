@@ -117,8 +117,14 @@ export default {
       var api = page ? this.api + '?ls=' + limit + '&li=' + this.pageSize : this.api
 
       this.axios.get(api).then((response) => {
-        this.visitorList = response.data.data
+        
         this.visitorListTotal = parseInt(response.data.total)
+        
+        if(this.visitorListTotal === 0){
+          return
+        }
+
+        this.visitorList = response.data.data
         this.upLoading = false
       })
     },

@@ -13,7 +13,7 @@ import WTitle from '../widgets/w_title.vue'
 import { setCookieExInMin, getCookie } from '../../utils.js'
 
 export default {
-  name: "visittest",
+  name: "visittestadm",
   components:{
     WTitle
   },
@@ -25,7 +25,7 @@ export default {
       api_ip: "https://api.isjeff.com/pot/data/getip/",
       api_getIpInfo: "http://api.ipstack.com/",
       api_key: "?access_key=4a0d7c9b3e1b25a888b23bea248723dd",
-      api_up: "https://api.isjeff.com/pot/updater/visit/",
+      api_up: "https://api.isjeff.com/pot/updater/visit_adm/",
       userInfoRes: {},
     }
   },
@@ -34,8 +34,9 @@ export default {
     emulateHTTP: true
   },
   created(){
-
+    console.log("a")
     setTimeout(()=>{
+      
         this.getIp()
     }, 500)
      
@@ -56,6 +57,7 @@ export default {
         var that = this
 
         this.axios.get(this.api_ip).then((response) => {
+          
 
             that.userInfoRes.ip = response.data
             that.userInfoRes.userAgent = navigator.userAgent
@@ -73,7 +75,7 @@ export default {
                     that.userInfoRes.ipCountry = res.country_name
                     that.userInfoRes.geoLocation = res.latitude + ',' + res.longitude
                     that.userInfoRes.flagIcon = res.location.country_flag
-                    that.userInfoRes.isAdmin = 0
+                    that.userInfoRes.isAdmin = 1
 
                     var postReady = {
                         ukey: getCookie('u_key'), 
@@ -85,7 +87,6 @@ export default {
 
                     that.axios.post(that.api_up, postData)
                     .then(function (response) {
-                      console.log(response.data)
                         if(response.data.indexOf("success") != -1){
                           console.log('Visit Loged')
                         }
@@ -98,7 +99,6 @@ export default {
             } else {
                 that.axios.post(that.api_up, postData)
                 .then(function (response) {
-                  console.log(response.data)
                     if(response.data.indexOf("success") != -1){
                       console.log('Visit Loged')
                     }

@@ -65,7 +65,7 @@ export default {
   },
   data(){
     return{
-      api: "https://api.isjeff.com/pot/updater/user_enc/",
+      api: "https://api.isjeff.com/pot/data_enc/user_enc/",
       api_up:"https://api.isjeff.com/pot/updater/user_up/",
       form:{},
       keywords:[],

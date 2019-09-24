@@ -79,7 +79,7 @@
             </button>
 
             <!-- File -->
-            <button @click="showUpWin(commands.ilink, 'File')">
+            <button @click="showUpWin(commands.ilink, 'Files')">
                 <span class="material-icons">insert_drive_file</span>
             </button>
 
@@ -113,7 +113,14 @@
 
       <editor-content class="editor-content" :editor="editor" />
       
-      <upload-window v-if="upload_win" @uploaded="uploadHandler" @close="closeUpWin" :allowUrl="true" :allowSelect="true"></upload-window>
+      <upload-window 
+        v-if="upload_win" 
+        @uploaded="uploadHandler" 
+        @close="closeUpWin" 
+        :allowSelect="true" 
+        :allowUrl="upload_win_url" 
+        :allowType="upload_win_type">
+      </upload-window>
       
 
     </div>
@@ -173,7 +180,9 @@ export default {
             upload_win: false,
             current_command: "",
             upload_state: false, // Return bol
-            upload_res: "" // Return URL
+            upload_res: "", // Return URL
+            upload_win_url: true,
+            upload_win_type: "all"
         }
     },
     created () {
@@ -234,6 +243,15 @@ export default {
         // Add File Upload Window
         showUpWin(command, openType) {
             this.upload_win = true
+
+            if(openType === "Image"){
+                this.upload_win_url = true
+            } else {
+                this.upload_win_url = false
+            }
+
+            this.upload_win_type = openType
+            
             this.current_command = command
         },
 

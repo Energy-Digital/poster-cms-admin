@@ -75,6 +75,27 @@
         </el-input>
       </div>
 
+      <div class="pc-b" id="pc-likes">
+        <WSubTitle txt="Likes"></WSubTitle>
+        <el-input
+          type="number"
+          :rows="5"
+          placeholder="Number only"
+          v-model="postData.ux_likes">
+        </el-input>
+      </div>
+
+      <div class="pc-b" id="pc-visit">
+        <WSubTitle txt="Views"></WSubTitle>
+        <el-input
+          type="number"
+          :rows="5"
+          placeholder="Number only"
+          v-model="postData.ux_visit">
+        </el-input>
+      </div>
+
+
       <div class="pc-ti" id="pc-ti">
         <WSubTitle txt="Title_img"></WSubTitle>
 
@@ -192,6 +213,8 @@ export default {
         cateId: "1",
         brief: "",
         brief_sublang: "",
+        ux_likes:"",
+        ux_visit:"",
         status: 0,
       },
       postCate: "",
@@ -393,6 +416,17 @@ export default {
             message: 'Please check your title or contents is not empty and meet text count requirement',
             type: 'warning'
         })
+        this.upLoading = false
+        return
+      }
+
+      if(this.postData.ux_likes > this.postData.ux_visit){
+        this.$notify({
+            title: 'Not Possible',
+            message: 'Likes count should not larger than views count',
+            type: 'warning'
+        })
+        this.upLoading = false
         return
       }
 
@@ -412,6 +446,8 @@ export default {
         brief_sublang: this.postData.brief_sublang,
         date_pub: this.mode === "update" ? this.postData.data_pub  : today,
         date_modi: today,
+        ux_visit: parseInt(this.postData.ux_visit),
+        ux_likes: parseInt(this.postData.ux_likes),
         status: String(this.postData.status)
       }
 

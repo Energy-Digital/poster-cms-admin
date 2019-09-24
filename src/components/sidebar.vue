@@ -52,6 +52,18 @@
 
                     </el-submenu>
 
+                    <el-submenu index="5">
+                        <template slot="title">
+                            <i class="el-icon-setting"></i>
+                            <span>Testing Function</span>
+                        </template>
+
+                
+                        <el-menu-item index="5-1" v-on:click="toPage('./visittest')">User Visit</el-menu-item>
+                        <el-menu-item index="5-2" v-on:click="toPage('./visittestadm')">Admin Visit</el-menu-item>
+
+                    </el-submenu>
+
                 </el-menu>
             </el-col>
         </el-row>
@@ -77,11 +89,11 @@ export default {
     },
     methods:{
         handleOpen( data ){
-            console.log(data)
+            //console.log(data)
             return
         },
         handleClose ( data ) {
-            console.log(data)
+            //console.log(data)
             return
         },
         toPage (path) {
@@ -96,6 +108,7 @@ export default {
 <style scoped>
     #sidebar-cont{
         height:100%;
+        overflow-y: scroll;
     }
 
     .el-col-12{

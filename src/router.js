@@ -10,7 +10,8 @@ import cateslist from './components/cateslist'
 import catesingle from './components/catesingle'
 import fileslist from './components/fileslist'
 import visitorlist from './components/visitorlist'
-import visitTest from './components/visittest'
+import visittest from './components/visittest'
+import visittestadm from './components/visittestadm'
 import settings from './components/settings'
 import adminsettings from './components/adminsettings'
 import socialmedialist from './components/socialmedialist'
@@ -28,7 +29,8 @@ export default new VueRouter({
       { path: '/catesingle', name: 'catesingle', component: catesingle },
       { path: '/fileslist', name: 'fileslist', component: fileslist },
       { path: '/visitorlist', name: 'visitorlist', component: visitorlist },
-      { path: '/visittest', name: 'visittest', component: visitTest },
+      { path: '/visittest', name: 'visittest', component: visittest },
+      { path: '/visittestadm', name: 'visittestadm', component: visittestadm },
       { path: '/settings', name: 'settings', component: settings },
       { path: '/adminsettings', name: 'adminsettings', component: adminsettings },
       { path: '/socialmedialist', name: 'socialmedialist', component: socialmedialist },

@@ -88,6 +88,9 @@ export default {
       this.upLoading = true
       var that = this
       this.axios.get(this.api).then((response) => {
+        if(response.data.length === 0){
+          return
+        }
         this.smList = response.data
         this.upLoading = false
       })

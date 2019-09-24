@@ -70,7 +70,7 @@
 
 <script>
 import { EventBus } from '../../bus'
-import { getCookie, getFileIcon } from '../../utils.js'
+import { getCookie, getFileIcon, strLenLimit } from '../../utils.js'
 import WTitle from '../widgets/w_title.vue'
 import uploadWindow from '../widgets/w_upload.vue'
 
@@ -132,7 +132,13 @@ export default {
         this.axios.get(api).then(function (response) {
 
             if(response.data){
+
+                
+
                 that.filesListTotal = parseInt(response.data.total)
+                if(that.filesListTotal == 0){
+                    return
+                }
 
                 that.$nextTick(()=>{
                     that.filesListAll = response.data.data
@@ -166,7 +172,6 @@ export default {
     toNewFile (){
         this.upload_win = true
     },
-
 
     toCopyLink (link) {
 
@@ -259,7 +264,8 @@ export default {
     realFileName (str, limit) {
         var res
         var parse = str.split('_')
-        res = parse[parse.length-1].length < limit ? parse[parse.length-1] : parse[parse.length-1].slice(0, limit) + '...'
+        res = strLenLimit(parse[parse.length-1], 18)
+        //res = parse[parse.length-1].length < limit ? parse[parse.length-1] : parse[parse.length-1].slice(0, limit) + '...'
 
         return res
     }
