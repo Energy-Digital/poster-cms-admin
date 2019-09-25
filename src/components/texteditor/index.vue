@@ -111,13 +111,14 @@
         </div>
       </editor-menu-bar>
 
-      <editor-content class="editor-content" :editor="editor" />
+      <editor-content class="editor-content" :editor="editor" :autoFocus="true" />
       
       <upload-window 
         v-if="upload_win" 
         @uploaded="uploadHandler" 
         @close="closeUpWin" 
         :allowSelect="true" 
+        :allowMultiple="upload_win_multiple"
         :allowUrl="upload_win_url" 
         :allowType="upload_win_type">
       </upload-window>
@@ -231,9 +232,22 @@ export default {
     },
     methods:{
 
-        uploadHandler (data) {
-            if(data.type.type === "Image"){
-                this.addImage(data.path, this.current_command, data.type)
+        uploadHandler (d) {
+
+            
+
+            var data = d.data
+
+            if(d.type_des === "Image"){
+                console.log("isImage")
+                if(d.multiple){
+                    for(var i=0;i<data.length;i++){
+                        this.addImage(data[i].path, this.current_command, data[i].type)
+                    }
+                } else {
+                    this.addImage(data.path, this.current_command, data.type)
+                }
+                
             } else {
                 this.addFile(data.path, data.name, this.current_command, 'file')
                 // Do nothing for now
@@ -245,20 +259,24 @@ export default {
             this.upload_win = true
 
             if(openType === "Image"){
+                this.upload_win_multiple = true
                 this.upload_win_url = true
             } else {
+                this.upload_win_multiple = false
                 this.upload_win_url = false
             }
 
             this.upload_win_type = openType
+            this.current_command = ""
+            this.$nextTick(()=>{
+                this.current_command = command
+            })
             
-            this.current_command = command
         },
 
         closeUpWin () {
             // Close Window
             this.upload_win = false
-            this.current_command = ""
         },
 
         // Add Iframe Input Window

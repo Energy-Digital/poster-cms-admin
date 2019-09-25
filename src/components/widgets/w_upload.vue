@@ -8,6 +8,7 @@
 
         <el-tabs v-model="imgInsMode">
             <el-tab-pane label="Upload" name="upload"></el-tab-pane>
+            <el-tab-pane label="Multiple" name="multiple" v-if="allowMultiple"></el-tab-pane>
             <el-tab-pane label="URL" name="url" v-if="allowUrl"></el-tab-pane>
             <el-tab-pane label="Gallery" name="gallery" v-if="allowSelect"></el-tab-pane>
         </el-tabs>
@@ -30,6 +31,32 @@
  
         </div>
 
+        <div id="au_upload_button" v-if="imgInsMode === 'multiple'">
+
+            <el-upload
+                class="upload-win"
+                drag
+                multiple
+                action="0"
+                :limit="6"
+                :on-exceed="handleExceed"
+                :on-remove="handleRemove"
+                :http-request="pushToWaittingList">
+
+                <i class="el-icon-upload"></i>
+                <div class="el-upload__text">Drop multiple file <em>or click to upload</em></div>
+                <div class="el-upload__tip" slot="tip">Image and document only, 8MB max</div>
+
+            </el-upload>
+
+            <div class="au_upload_confirm">
+                <el-button type="primary" v-on:click="multipleUpload" v-if="waittingList.length > 0">Upload</el-button>
+            </div>
+
+            
+ 
+        </div>
+
         <div id="au_url_input" v-if="imgInsMode === 'url'">
 
             <div class="au_url_input_box">
@@ -37,7 +64,7 @@
             </div>
             
             <div class="au_assets_manager_btn">
-                <el-button type="primary" style="width:80px;" v-on:click="submit(inputedImg, 'Image', 'noname')" plain>OK</el-button>
+                <el-button type="primary" style="width:80px;" v-on:click="submit(inputedImg, 'Image', 'noname', 0, false)" plain>OK</el-button>
             </div>
             
         </div>
@@ -49,7 +76,7 @@
                 <div class="file-single-img">
                     <el-image
                         class="file-single-img-img"
-                        style="item.type_des === 'Image' ? 'width: 180px; height: 180px' : 'width: 30px; height: 30px;margin-top: 35px;margin-left: -30px;'"
+                        :style="item.type_des === 'Image' ? 'width: 100px; height: 100px' : 'width: 30px; height: 30px;margin-top: 35px;margin-left: -30px;'"
                         :src="item.type_des === 'Image' ? base_url + item.path : base_url + static_icons_url + getIcon(item.type)"
                         fit="contain"
                         v-on:click="selectItem(item.id, base_url+item.path, item.type_des, item.name)">
@@ -68,7 +95,7 @@
             </div>
 
             <div class="au_assets_manager_btn">
-                <el-button type="primary" style="width:80px;" v-on:click="submit(selected.path, selected.type, selected.name)" plain>OK</el-button>
+                <el-button type="primary" style="width:80px;" v-on:click="submit(selected.path, selected.type, selected.name, 0, false)" plain>OK</el-button>
             </div>
         </div>
 
@@ -82,6 +109,7 @@
 
 import { EventBus } from '../../bus.js'
 import { idFileTypeDes, getFileIcon, getCookie } from '../../utils.js'
+import BMF from 'browser-md5-file'
 
 export default {
     name:"upload-window",
@@ -91,6 +119,7 @@ export default {
     props:{
         allowUrl: true,
         allowSelect: true,
+        allowMultiple: true,
         allowType: String
     },
     data () {
@@ -107,7 +136,10 @@ export default {
             selected: {},
             fileType: "",
             imgHighlight: "border: 1px solid #00B3FF",
-            imgNormal: "border: 1px dashed rgba(0,0,0,0.1)"
+            imgNormal: "border: 1px dashed rgba(0,0,0,0.1)",
+            // For multiple upload
+            waittingList:[],
+            returnList:[],
         }
     },
     created () {
@@ -124,11 +156,11 @@ export default {
             this.selected = ""
             this.imgInsMode = "upload"
             this.res = {}
+            this.waittingList = []
+            this.returnList = []
         },
 
         getGallery (openMode) {
-
-            
 
             var that = this
             this.gallery = []
@@ -141,7 +173,6 @@ export default {
             }
 
             this.axios.get(api).then((response) => {
-                console.log(response.data)
                 var res = response.data.data
                 that.gallery = res
             })
@@ -149,46 +180,82 @@ export default {
 
         // Insert an image
         uploadFile (obj) {
+            
             var that = this
             var img = obj.file
-
-            let formObj = new FormData()
             var fileName = obj.file.name
             var fileType = idFileTypeDes(obj.file.name)
 
-            formObj.append('file',img)
-            formObj.append('name', fileName)
-            formObj.append('typeDes', fileType.type)
-            formObj.append('ukey', getCookie('u_key'))
-            formObj.append('uuid', getCookie('u_uuid'))
+            // BMF plugin to read files md5
+            const bmf = new BMF()
 
-            let h = {
-                headers:{'Content-Type':'multipart/form-data'}
-            }
+            bmf.md5(obj.file, (err, md5) => {
+                let formObj = new FormData()
+                formObj.append('file',img)
+                formObj.append('name', fileName)
+                formObj.append('typeDes', fileType.type)
+                formObj.append('md5', md5)
+                formObj.append('ukey', getCookie('u_key'))
+                formObj.append('uuid', getCookie('u_uuid'))
 
-            this.$http.post(this.api_upFile,formObj,h)
-            .then(function(response) {
-                var res = response.data
-                if(res.indexOf('success' != -1)) {
-
-                    var r = res.split(',')
-
-                    that.$notify({
-                        title: "Uploaded",
-                        message: 'Upload Successful: ' + r[1],
-                        type: 'success'
-                    })
-
-                    that.submit(that.base_url + r[1], fileType, fileName)
-
-                } else {
-                    that.$notify({
-                        title: "Upload Fail",
-                        message: 'Error: ' + res,
-                        type: 'warning'
-                    })
+                let h = {
+                    headers:{'Content-Type':'multipart/form-data'}
                 }
+
+                that.$http.post(that.api_upFile,formObj,h)
+                .then(function(response) {
+                    var res = response.data
+                    if(res.indexOf('success' != -1)) {
+
+                        var r = res.split(',')
+
+                        that.$notify({
+                            title: "Finish",
+                            type: 'success'
+                        })
+
+                        // If is not multiple upload
+                        if(that.waittingList.length === 0){
+                            that.submit(that.base_url + r[1], fileType, fileName, 0, false)
+                        } else {
+                            that.pushToReturnList(that.base_url + r[1], fileType, fileName)
+                        }
+
+                    } else {
+                        that.$notify({
+                            title: "Fail",
+                            message: 'Error: ' + res,
+                            type: 'warning'
+                        })
+                    }
+                })
             })
+
+        },
+
+        pushToWaittingList (obj) {
+            this.waittingList.push(obj)
+        },
+
+        pushToReturnList (url, type, name) {
+            var res = {
+                uploadState: true,
+                type: type,
+                name: name,
+                path: url
+            }
+            this.returnList.push(res)
+
+            // If finished than submit
+            if(this.returnList.length === this.waittingList.length){
+                this.submit(0, 0, 0, this.returnList, true)
+            }
+        },
+
+        multipleUpload () {
+            for(var i=0;i<this.waittingList.length;i++){
+                this.uploadFile(this.waittingList[i])
+            }
         },
 
         selectItem (id, url, type, name) {
@@ -200,6 +267,14 @@ export default {
                     type: idFileTypeDes(name),
                     name: name,
                     id: id
+                }
+            }
+        },
+
+        handleRemove (data) {
+            for(var i=0;i<this.waittingList.length;i++){
+                if(this.waittingList[i].file.uid == data.uid){
+                    this.waittingList.splice(i, 1)
                 }
             }
         },
@@ -221,16 +296,28 @@ export default {
             return true
         },
 
-        submit (url, type, name) {
+        handleExceed(){
+            this.$message.error('6 files at a time')
+        },
 
-            this.res = {
-                uploadState: true,
-                type: type,
-                name: name,
-                path: url
+        submit (url, type, name, list, isMultiple) {
+
+            if(isMultiple){
+
+                this.$emit('uploaded', {multiple: true, data: list, type_des: 'Image'})
+
+            } else {
+
+                this.res = {
+                    uploadState: true,
+                    type: type,
+                    name: name,
+                    path: url
+                }
+
+                this.$emit('uploaded', {multiple: false, data: this.res, type_des: type})
+
             }
-
-            this.$emit('uploaded', this.res)
             
             this.close()
         },
@@ -327,6 +414,7 @@ export default {
         display:flex;
         width:180px;
         height:180px;
+        text-align: center;
     }
 
     .file-single-des{
@@ -336,5 +424,11 @@ export default {
         font-size: 10px;
         font-weight: bold;
         opacity: 0.7;
+    }
+
+    .au_upload_confirm{
+        position: absolute;
+        top: 340px;
+        right: 20px;
     }
 </style>

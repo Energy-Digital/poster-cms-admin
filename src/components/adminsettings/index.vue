@@ -1,7 +1,7 @@
 <template>
   <div id="all">
 
-    <WTitle txt="Admin Account"></WTitle>
+    <WTitle txt="Master Account"></WTitle>
 
     <WSubTitle txt="Settings"></WSubTitle>
 

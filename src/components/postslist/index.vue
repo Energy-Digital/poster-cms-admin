@@ -1,7 +1,7 @@
 <template>
   <div id="all">
 
-    <WTitle txt="All Post"></WTitle>
+    <WTitle txt="All Posts"></WTitle>
 
     <div id="new">
       <el-button type="primary" v-on:click="toSingleNew()" plain>New</el-button>
@@ -93,10 +93,11 @@
 
     <div class="pagination">
         <el-pagination
-            layout="prev, pager, next"
-            :page-size="pageSize"
-            :total="postsListTotal"
-            @current-change="changePage">
+          background
+          layout="prev, pager, next"
+          :page-size="pageSize"
+          :total="postsListTotal"
+          @current-change="changePage">
         </el-pagination>
     </div>
     
@@ -122,7 +123,7 @@ export default {
       postsList: [],
       postsListTotal: 0,
       page:0,
-      pageSize:7,
+      pageSize:10, // 10, 20, 30
       upLoading: false,
     }
   },
@@ -188,7 +189,7 @@ export default {
 }
 
 #new {
-  margin-top: -42px;
+  margin-top: -36px;
   margin-bottom: 14px;
   float: right;
 }
@@ -196,6 +197,12 @@ export default {
 #title{
   font-size:36px;
   font-weight: bold;
+}
+
+.pagination{
+    position: absolute;
+    right: 100px;
+    top: 26px;
 }
 
 .status{

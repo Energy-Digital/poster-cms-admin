@@ -122,7 +122,7 @@ export default {
 }
 
 #new {
-  margin-top: -42px;
+  margin-top: -36px;
   margin-bottom: 14px;
   float: right;
 }

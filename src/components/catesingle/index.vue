@@ -184,39 +184,53 @@ export default {
 
             var that = this
 
-            var postReady = {
-                ukey: getCookie('u_key'), 
-                uuid: getCookie('u_uuid'), 
-                cid: this.cateId
-            }
-
-            var postData = this.$qs.stringify(postReady)
-
-            this.axios.post(this.api_del, postData)
-            .then(function (response) {
-
-                var res = response.data
-
-                if(res.indexOf("success") != -1){
-
-                    that.$notify({
-                        title: 'Deleted',
-                        message: '',
-                        type: 'success'
-                    })
-
-                    that.$nextTick(() => {
-                        EventBus.$emit('toPage', './cateslist')
-                    })
-
-                } else {
-                    that.$notify({
-                        title: 'Delete Fail',
-                        message: 'Error: ' + res,
-                        type: 'warning'
-                    })
+            this.$confirm('This action will delete an category whether any posts are using, continue?', 'Alert', {
+                confirmButtonText: 'DELETE',
+                cancelButtonText: 'Cancel',
+                type: 'warning'
+            }).then(() => {
+                var postReady = {
+                    ukey: getCookie('u_key'), 
+                    uuid: getCookie('u_uuid'), 
+                    cid: this.cateId
                 }
+
+                var postData = that.$qs.stringify(postReady)
+
+                that.axios.post(that.api_del, postData)
+                .then(function (response) {
+
+                    var res = response.data
+
+                    if(res.indexOf("success") != -1){
+
+                        that.$notify({
+                            title: 'Deleted',
+                            message: '',
+                            type: 'success'
+                        })
+
+                        that.$nextTick(() => {
+                            EventBus.$emit('toPage', './cateslist')
+                        })
+
+                    } else {
+                        that.$notify({
+                            title: 'Delete Fail',
+                            message: 'Error: ' + res,
+                            type: 'warning'
+                        })
+                    }
+                })
+                // Continue doing other things..
+            }).catch(() => {
+                this.$message({
+                    type: 'info',
+                    message: 'Cancelled'
+                }) 
+
             })
+
         }
     }
 }

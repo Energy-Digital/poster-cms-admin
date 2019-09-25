@@ -66,6 +66,7 @@
 
     <div class="pagination">
         <el-pagination
+            background
             layout="prev, pager, next"
             :page-size="pageSize"
             :total="visitorListTotal"
@@ -152,6 +153,16 @@ export default {
 #all{
   text-align: left;
   padding:24px;
+}
+
+#list{
+  margin-top: 24px;
+}
+
+.pagination{
+    position: absolute;
+    right: 20px;
+    top: 26px;
 }
 
 

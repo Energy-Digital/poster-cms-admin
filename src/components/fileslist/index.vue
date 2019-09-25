@@ -7,6 +7,16 @@
       <el-button type="primary" v-on:click="toNewFile()" plain>Add</el-button>
     </div>
 
+    <div class="pagination">
+        <el-pagination
+            background
+            layout="prev, pager, next"
+            :page-size="pageSize"
+            :total="filesListTotal"
+            @current-change="changePage">
+        </el-pagination>
+    </div>
+
     <div id="list" v-loading="upLoading">
 
         <div id="file-grid">
@@ -44,7 +54,7 @@
                         <span>Open</span>
                     </div>
 
-                    <div class="file-single-btn" v-on:click="toDelFile(item.id, item.path)">
+                    <div class="file-single-btn" v-on:click="toDelFile(item.id, item.path, item.seed)">
                         <span style="color:#F56C6C;">Remove</span>
                     </div>
                 </div>
@@ -54,16 +64,7 @@
 
     </div>
 
-    <div class="pagination">
-        <el-pagination
-            layout="prev, pager, next"
-            :page-size="pageSize"
-            :total="filesListTotal"
-            @current-change="changePage">
-        </el-pagination>
-    </div>
-
-    <upload-window v-if="upload_win" @uploaded="uploadHandler" @close="closeUpWin" :allowUrl="false" :allowSelect="false"></upload-window>
+    <upload-window v-if="upload_win" @uploaded="uploadHandler" @close="closeUpWin" :allowMultiple="true" :allowUrl="false" :allowSelect="false"></upload-window>
     
   </div>
 </template>
@@ -187,9 +188,11 @@ export default {
         window.open(link)
     },
 
-    toDelFile (id, path) {
+    toDelFile (id, path, seed) {
         
         var that = this
+
+        seed = seed != "-1" ? seed : "no"
 
         this.$confirm('You will delete a file permanently, continue?', 'Alert', {
             confirmButtonText: 'DELETE',
@@ -203,6 +206,7 @@ export default {
                     ukey: getCookie('u_key'), 
                     uuid: getCookie('u_uuid'), 
                     fid: id,
+                    fseed: seed,
                     fpath: path
                 }
 
@@ -214,14 +218,19 @@ export default {
 
                 var res = response.data
 
+
                 var delRes = res.split(';')
 
-                if(delRes[0].indexOf("dbs") != -1 && delRes[1].indexOf("del") != -1){
+                if(delRes[0].indexOf("dbs") != -1){
                     that.$notify({
                         title: 'Success',
                         message: 'File has been removed',
                         type: 'success'
                     })
+
+                    if(delRes[1].indexOf('ks')){
+                        console.log("Delete record only, file seed keeped")
+                    }
 
                     // Need to re-define this update function when split pages 
                     that.updateAll()
@@ -279,7 +288,7 @@ export default {
 }
 
 #new {
-  margin-top: -42px;
+  margin-top: -36px;
   margin-bottom: 14px;
   float: right;
 }
@@ -287,6 +296,12 @@ export default {
 #title{
   font-size:36px;
   font-weight: bold;
+}
+
+.pagination{
+    position: absolute;
+    right: 100px;
+    top: 26px;
 }
 
 #list{

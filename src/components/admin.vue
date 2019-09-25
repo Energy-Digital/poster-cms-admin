@@ -125,7 +125,7 @@ a {
 
 #left-cont{
   position: fixed;
-  top: 40px;
+  top: 0px;
   left: 0px;
   height:100%;
   width:15%;

@@ -2,25 +2,41 @@
   <div id="all" v-loading="upLoading">
     <div class="numbers">
       <WSubTitle txt="Highlight Data"></WSubTitle>
-      <div class="numbers-cont">
+      <div class="numbers-cont" v-if="loaded">
 
         <div class="numbers-single">
-          <div class="numbers-single-num"><span>{{numbersData.visitor}}</span></div>
+          <div class="numbers-single-num">
+            <span>
+              <ICountUp :delay="CU_delay" :endVal="numbersData.visitor" :options="CU_options"/>
+            </span>
+          </div>
           <div class="numbers-single-name"><span>Visitors</span></div>
         </div>
 
         <div class="numbers-single">
-          <div class="numbers-single-num"><span>{{numbersData.postsTotal}}</span></div>
+          <div class="numbers-single-num">
+            <span>
+              <ICountUp :delay="CU_delay+100" :endVal="numbersData.postsTotal" :options="CU_options"/>
+            </span>
+          </div>
           <div class="numbers-single-name"><span>Posts</span></div>
         </div>
 
         <div class="numbers-single">
-          <div class="numbers-single-num"><span>{{numbersData.postsLikes}}</span></div>
+          <div class="numbers-single-num">
+            <span>
+              <ICountUp :delay="CU_delay+200" :endVal="numbersData.postsLikes" :options="CU_options"/>
+            </span>
+          </div>
           <div class="numbers-single-name"><span>Likes</span></div>
         </div>
 
         <div class="numbers-single">
-          <div class="numbers-single-num"><span>{{numbersData.postsVisit}}</span></div>
+          <div class="numbers-single-num">
+            <span>
+              <ICountUp :delay="CU_delay+300" :endVal="numbersData.postsVisit" :options="CU_options"/>
+            </span>
+          </div>
           <div class="numbers-single-name"><span>Clicked</span></div>
         </div>
 
@@ -76,6 +92,7 @@
 import { getCookie } from '../../utils'
 import VueApexCharts from 'vue-apexcharts'
 import WSubTitle from '../widgets/w_subtitle.vue'
+import ICountUp from 'vue-countup-v2';
 
 export default {
   name: "home",
@@ -85,6 +102,7 @@ export default {
   components:{
     'apexchart': VueApexCharts,
     WSubTitle,
+    ICountUp
   },
   data(){
     return{
@@ -93,6 +111,13 @@ export default {
       loaded: false,
       upLoading: false,
       mvpList:[],
+      CU_delay: 500,
+      CU_options:{
+        duration: 1,
+        useEasing: true,
+        useGrouping: true,
+        separator:""
+      },
       chartOptionsBasic: {
         chart: {
           id: 'recentVisit',
