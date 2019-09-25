@@ -88,6 +88,7 @@ export default {
       this.upLoading = true
       var that = this
       this.axios.get(this.api).then((response) => {
+        console.log(response.data)
         if(response.data.length === 0){
           return
         }

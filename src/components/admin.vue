@@ -67,7 +67,6 @@ export default {
     getData () {
       var that = this
       this.axios.get(this.api).then((response) => {
-        console.log(response.data)
         that.siteName = decodeRichText(response.data[0].title)
       })
     },

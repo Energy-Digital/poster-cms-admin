@@ -88,10 +88,10 @@ export default {
         base_url: "https://api.isjeff.com/pot",
         static_icons_url: "/static/icons/",
         api: "https://api.isjeff.com/pot/manager/all_media/",
-        api_img_del: "https://api.isjeff.com/pot/manager/img_del/",
+        api_file_del: "https://api.isjeff.com/pot/manager/file_del/",
         filesListAll: [],
         filesListTotal: 0,
-        page:0,
+        page:1,
         pageSize:10,
         upload_win: false,
         upLoading: false,
@@ -127,13 +127,11 @@ export default {
 
         // pagination Limit
         var limit = this.pageToLimit(page)
-        var api = page ? this.api + '?ls=' + limit + '&li=' + this.pageSize : this.api
+        var api = this.api + '?ls=' + limit + '&size=' + this.pageSize + '&file=All'
 
         this.axios.get(api).then(function (response) {
 
             if(response.data){
-
-                
 
                 that.filesListTotal = parseInt(response.data.total)
                 if(that.filesListTotal == 0){
@@ -211,7 +209,7 @@ export default {
                 var postData = this.$qs.stringify(postReady)
 
 
-                that.axios.post(this.api_img_del, postData)
+                that.axios.post(this.api_file_del, postData)
                 .then(function (response) {
 
                 var res = response.data

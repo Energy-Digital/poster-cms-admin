@@ -193,7 +193,7 @@ export default {
       // APIs
       base_url: "https://api.isjeff.com/pot",
       api: "https://api.isjeff.com/pot/data/post_single/?pid=",
-      api_cate: "https://api.isjeff.com/pot/data/post_cate/",
+      api_cate: "https://api.isjeff.com/pot/data/cate/",
       api_up_assets:"/",
       api_d_cate:"",
       api_up:"https://api.isjeff.com/pot/updater/post_single/",
@@ -455,7 +455,7 @@ export default {
 
       this.axios.post(this.api_up, postData)
       .then(function (response) {
-
+        console.log(response.data)
           var res = response.data
 
           if(res.indexOf("success") != -1){

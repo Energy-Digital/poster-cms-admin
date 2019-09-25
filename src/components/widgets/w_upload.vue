@@ -100,7 +100,7 @@ export default {
             base_url: "https://api.isjeff.com/pot",
             static_icons_url: "/static/icons/",
             api_upFile: "https://api.isjeff.com/pot/manager/up_file/",
-            api_getGallery: "https://api.isjeff.com/pot/manager/all_media/?limit=8",
+            api_getGallery: "https://api.isjeff.com/pot/manager/all_media/?ls=0&size=8",
             imgInsMode: "upload",
             gallery: [],
             inputedImg: "",
@@ -136,9 +136,12 @@ export default {
 
             if(openMode){
                 api = this.api_getGallery + '&type=' + openMode
+            } else {
+                api = this.api_getGallery + '&type=All'
             }
 
             this.axios.get(api).then((response) => {
+                console.log(response.data)
                 var res = response.data.data
                 that.gallery = res
             })
@@ -166,11 +169,10 @@ export default {
             this.$http.post(this.api_upFile,formObj,h)
             .then(function(response) {
                 var res = response.data
-                console.log(res)
                 if(res.indexOf('success' != -1)) {
 
                     var r = res.split(',')
-                    
+
                     that.$notify({
                         title: "Uploaded",
                         message: 'Upload Successful: ' + r[1],
@@ -178,8 +180,6 @@ export default {
                     })
 
                     that.submit(that.base_url + r[1], fileType, fileName)
-
-                    
 
                 } else {
                     that.$notify({

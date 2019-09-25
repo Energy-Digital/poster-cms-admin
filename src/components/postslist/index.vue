@@ -122,7 +122,7 @@ export default {
       postsList: [],
       postsListTotal: 0,
       page:0,
-      pageSize:10,
+      pageSize:7,
       upLoading: false,
     }
   },
@@ -131,7 +131,7 @@ export default {
     emulateHTTP: true
   },
   created(){
-    this.getList()
+    this.getList(1)
     
   },
   methods:{
@@ -142,10 +142,10 @@ export default {
 
       // Pagination
       var limit = this.pageToLimit(page)
-      var api = page ? this.api + '?ls=' + limit + '&li=' + this.pageSize : this.api
+      var api = page ? this.api + '?ls=' + limit + '&size=' + this.pageSize : this.api
 
       this.axios.get(api).then((response) => {
-        
+        console.log(response.data)
         this.postsListTotal = parseInt(response.data.total)
         
         if(this.postsListTotal === 0){

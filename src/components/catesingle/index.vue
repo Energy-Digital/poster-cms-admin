@@ -81,7 +81,7 @@ export default {
     },
     data(){
         return{
-            api: "https://api.isjeff.com/pot/data/post_cate/",
+            api: "https://api.isjeff.com/pot/data/cate/",
             api_up: "https://api.isjeff.com/pot/updater/cate_single/",
             api_del: "https://api.isjeff.com/pot/updater/cate_del/",
             cateData: {
@@ -153,6 +153,7 @@ export default {
             .then(function (response) {
 
                 var res = response.data
+                console.log(res)
 
                 if(res.indexOf("success") != -1){
 

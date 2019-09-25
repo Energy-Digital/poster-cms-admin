@@ -112,7 +112,6 @@ export default {
     },
 
     uploadHandler (data) {
-      console.log(data)
         if(data.type.type === "Image"){
 
             this.form.avatar = data.path
@@ -156,8 +155,6 @@ export default {
         avatar: this.form.avatar,
         pin: this.form.pin
       }
-
-      console.log(postReady)
 
       this.upData(postReady)
 

@@ -90,7 +90,7 @@ export default {
   },
   data(){
     return{
-      api: "https://api.isjeff.com/pot/data/visitor_list/",
+      api: "https://api.isjeff.com/pot/data_enc/visitor_list_enc/",
       visitorList: [],
       visitorListTotal: 0,
       page:0,
