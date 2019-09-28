@@ -226,7 +226,8 @@ export default {
       postStatusOptions:[
         {sid: 0, sname: "Draft"},
         {sid: 1, sname: "Publish"},
-        {sid: 2, sname: "Deprecated"},
+        {sid: 3, sname: "P & Unlisted"},
+        {sid: 2, sname: "Deprecated"}
       ],
 
       // Edit Mode
@@ -305,7 +306,9 @@ export default {
   
   methods: {
 
-    uploadHandler (data) {
+    uploadHandler (d) {
+
+      var data = d.data
 
       if(data.type.type === "Image"){
 
@@ -455,7 +458,6 @@ export default {
 
       this.axios.post(this.api_up, postData)
       .then(function (response) {
-        console.log(response.data)
           var res = response.data
 
           if(res.indexOf("success") != -1){

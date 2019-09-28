@@ -23,7 +23,7 @@ export default {
   data(){
     return{
       api_ip: "https://api.isjeff.com/pot/data/getip/",
-      api_getIpInfo: "http://api.ipstack.com/",
+      api_getIpInfo: "https://api.ipstack.com/",
       api_key: "?access_key=4a0d7c9b3e1b25a888b23bea248723dd",
       api_up: "https://api.isjeff.com/pot/updater/visit/",
       userInfoRes: {},
@@ -85,7 +85,7 @@ export default {
 
                     that.axios.post(that.api_up, postData)
                     .then(function (response) {
-                      console.log(response.data)
+                      //console.log(response.data)
                         if(response.data.indexOf("success") != -1){
                           console.log('Visit Loged')
                         }
@@ -98,7 +98,7 @@ export default {
             } else {
                 that.axios.post(that.api_up, postData)
                 .then(function (response) {
-                  console.log(response.data)
+                  //console.log(response.data)
                     if(response.data.indexOf("success") != -1){
                       console.log('Visit Loged')
                     }

@@ -70,7 +70,7 @@ export default {
   },
   data(){
     return{
-      api: "http://api.isjeff.com/pot/data/social_media/",
+      api: "https://api.isjeff.com/pot/data/social_media/",
       smList: [],
       upLoading: false,
     }

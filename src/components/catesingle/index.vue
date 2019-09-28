@@ -153,7 +153,7 @@ export default {
             .then(function (response) {
 
                 var res = response.data
-                console.log(res)
+                //console.log(res)
 
                 if(res.indexOf("success") != -1){
 

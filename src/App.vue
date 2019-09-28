@@ -48,9 +48,10 @@ export default {
   methods:{
 
     clearLoginCookie () {
-        setCookie('u_key', 0, 30, true) // Set Key
-        setCookie('u_uuid', 0, 30, true) // Set UUID
-        setCookie('u_name', 0, 30, true) // Set UUID
+      setCookie('u_key', 0, 30, true) // Set Key
+      setCookie('u_uuid', 0, 30, true) // Set UUID
+      setCookie('u_name', 0, 30, true) // Set UUID
+      setCookie('u_avatar', 0, 30, true) // Set UUID
     }
     
   }

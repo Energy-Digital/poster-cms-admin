@@ -219,8 +219,8 @@ export default {
             this.upload_win = false
         },
 
-        uploadHandler (data) {
-            console.log(data)
+        uploadHandler (d) {
+            var data = d.data
             if(data.type.type === "Image"){
                 this.smData.icon = data.path
             } else {

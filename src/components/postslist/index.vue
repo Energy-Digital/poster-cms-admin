@@ -21,6 +21,7 @@
           <template slot-scope="scope">
             <div v-if="scope.row.status == '0'" class="status" style='background:#c9a661;'>Draft</div>
             <div v-if="scope.row.status == '1'" class="status" style='background:#61c995;'>Published</div>
+            <div v-if="scope.row.status == '3'" class="status" style='background:#618BC9;'>Unlisted</div>
             <div v-if="scope.row.status == '2'" class="status" style='background:#c96f61;'>Deprecated</div>
           </template>
           
@@ -146,7 +147,7 @@ export default {
       var api = page ? this.api + '?ls=' + limit + '&size=' + this.pageSize : this.api
 
       this.axios.get(api).then((response) => {
-        console.log(response.data)
+        //console.log(response.data)
         this.postsListTotal = parseInt(response.data.total)
         
         if(this.postsListTotal === 0){
