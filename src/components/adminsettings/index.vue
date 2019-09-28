@@ -111,7 +111,8 @@ export default {
         this.upload_win = false
     },
 
-    uploadHandler (data) {
+    uploadHandler (d) {
+      var data = d.data
         if(data.type.type === "Image"){
 
             this.form.avatar = data.path

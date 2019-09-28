@@ -90,9 +90,10 @@
 
 <script>
 import { getCookie } from '../../utils'
+import { EventBus } from '../../bus'
 import VueApexCharts from 'vue-apexcharts'
 import WSubTitle from '../widgets/w_subtitle.vue'
-import ICountUp from 'vue-countup-v2';
+import ICountUp from 'vue-countup-v2'
 
 export default {
   name: "home",
@@ -186,8 +187,6 @@ export default {
       this.axios.post(this.api, postData)
       .then(function (response) {
 
-        console.log(response.data)
-
         that.numbersData = response.data
 
         var hoursChartOptions = {
@@ -210,7 +209,7 @@ export default {
         that.upLoading = false
         
       }).catch(function(err){
-        console.log(err)
+        //console.log(err)
       })
 
       

@@ -34,9 +34,7 @@ export default {
     emulateHTTP: true
   },
   created(){
-    console.log("a")
     setTimeout(()=>{
-      
         this.getIp()
     }, 500)
      
@@ -71,11 +69,15 @@ export default {
                 that.axios.get(that.api_getIpInfo + response.data + that.api_key).then((response)=>{
                     var res = response.data
 
+                    console.log(res)
+
                     that.userInfoRes.ipCountryCode = res.country_code
                     that.userInfoRes.ipCountry = res.country_name
                     that.userInfoRes.geoLocation = res.latitude + ',' + res.longitude
                     that.userInfoRes.flagIcon = res.location.country_flag
                     that.userInfoRes.isAdmin = 1
+
+                    
 
                     var postReady = {
                         ukey: getCookie('u_key'), 

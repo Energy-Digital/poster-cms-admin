@@ -74,7 +74,7 @@ export default {
   },
   data(){
     return{
-      api: "http://api.isjeff.com/pot/data/cate/",
+      api: "https://api.isjeff.com/pot/data/cate/",
       catesList: [],
       upLoading: false,
     }

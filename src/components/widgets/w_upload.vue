@@ -44,8 +44,8 @@
                 :http-request="pushToWaittingList">
 
                 <i class="el-icon-upload"></i>
-                <div class="el-upload__text">Drop multiple file <em>or click to upload</em></div>
-                <div class="el-upload__tip" slot="tip">Image and document only, 8MB max</div>
+                <div class="el-upload__text">Drop multiple image <em>or click to upload</em></div>
+                <div class="el-upload__tip" slot="tip">Image only, 8MB max</div>
 
             </el-upload>
 

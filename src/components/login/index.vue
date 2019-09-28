@@ -1,11 +1,45 @@
 <template>
     <div id="all">
-        <div id="login-window">
-            <el-input v-model="email" placeholder="Email Account"></el-input>
-            <br>
-            <el-input v-model="psw" placeholder="Verication Code" type="password"></el-input>
-            <br>
-            <el-button id="submitBtn" type="primary" v-on:click="submit">LOGIN</el-button>
+        <div>
+            <img src="" alt="">
+        </div>
+
+        <div id="login-window" @mousemove="robotTest" @keyup.enter="submit">
+
+            <el-tabs v-model="tab">
+                <el-tab-pane label="PIN+Token" name="password"></el-tab-pane>
+                <!--el-tab-pane label="Email" name="email"></el-tab-pane-->
+                <el-tab-pane label="Mobile" name="mobile"></el-tab-pane>
+            </el-tabs>
+
+            <div id="login-inner-vcode" v-if="tab==='password'">
+                <el-avatar :size="72" :src="avatar" v-if="loginTryAgain"></el-avatar>
+                <br>
+                <br>
+                <el-input v-model="email" placeholder="Email"></el-input>
+                <br>
+                <el-input v-model="psw" placeholder="PIN+Token" type="password"></el-input>
+                <br>
+                <el-button id="submitBtn" type="primary" v-on:click="submit" :disabled="goBtn">GO</el-button>
+            </div>
+
+            <div id="login-inner-mobile" v-if="tab==='mobile'">
+                <el-avatar :size="72" :src="avatar" v-if="loginTryAgain"></el-avatar>
+                <br>
+                <br>
+
+                <div id="login-inner-mobilecode" class="login-inner-vcode">
+                    <el-input v-model="phone" placeholder="Phone number"></el-input>
+                    <el-button class="login-inner-vcode-btn" type="primary" v-on:click="getVcode('phone')" :disabled="getCodeBtn" plain>{{codeCountdown}}</el-button>
+                </div>
+                
+                <br>
+
+                <el-input v-model="psw" placeholder="code" type="password"></el-input>
+                <br>
+                <el-button id="submitBtn" type="primary" v-on:click="submit" :disabled="goBtn">GO</el-button>
+            </div>
+            
         </div>
     </div>
 </template>
@@ -23,8 +57,20 @@ export default {
     data () {
         return {
             api:"https://api.isjeff.com/pot/login/",
+            api_mobile: "https://api.isjeff.com/pot/login/login_sms/",
             email: "",
-            psw: ""
+            phone: "",
+            psw: "",
+            avatar: "",
+            tab:"password",
+            goBtn: true,
+            getCodeBtn: false,
+            loginTryAgain: false,
+            robotTestLastX: false,
+            robotTestRes: false,
+            codeSent: false,
+            codeCountdown: "verify",
+            codeGetTimeGap: 60
         }
     },
     created () {
@@ -33,24 +79,91 @@ export default {
         }
     },
 
+    watch: {
+        tab: function () {
+            this.goBtn = true
+            this.psw = ""
+            this.phone = ""
+        },
+
+        psw: function () {
+            if(this.psw.length > 3){
+                this.goBtn = false
+            } else {
+                this.goBtn = true
+            }
+        },
+
+        codeCountdown: function () {
+            if(this.codeCountdown === 0) {
+                this.codeCountdown = "verify"
+                this.getCodeBtn = false
+                clearInterval()
+            }
+        }
+    },
+
+
     http: {
         emulateJSON: true,
         emulateHTTP: true
     },
 
     methods:{
+
+        
         submit () {
             var that = this
-            if(this.email.length > 0 && this.psw.length > 0) {
+
+            if(!this.robotTestRes){
+                this.$notify({
+                    title: 'Looks like you are a robot, hhhhh.',
+                    type: 'warning'
+                })
+                return
+            }
+
+            if(this.psw.length > 3) {
+
+                if(this.tab === "password"){
+                    if(this.email.length < 3){
+                        that.$notify({
+                            title: 'Email should more than 4 charcters.',
+                            type: 'warning'
+                        })
+                        return
+                    }
+                } else {
+                    if(this.phone.length < 9){
+                        that.$notify({
+                            title: 'Phone number should more than 10 charcters.',
+                            type: 'warning'
+                        })
+                        return
+                    }
+                }
 
                 // Initial API Token
                 const key = "isjeffcomlogin";
                 const key_encode =  window.btoa(key);
 
-                var postReady = {email: this.email, psw: this.psw, token: key_encode}
+                var postReady = { email: this.email, psw: this.psw, token: key_encode }
+                
+
+                // Define API
+                var api = this.api
+
+                
+                if(this.tab === "mobile"){
+                    postReady['tel'] = this.phone
+                    postReady['mode'] = "vsms"
+                    api = this.api_mobile
+                }
+
                 var postData = this.$qs.stringify(postReady)
 
-                this.axios.post(this.api, postData)
+                
+                this.axios.post(api, postData)
                 .then(function (response) {
 
                     var res = response.data
@@ -75,8 +188,12 @@ export default {
                         EventBus.$emit('login', true)
 
                     } else {
+                        
+                        var againInfo = res.split(',')
+                        that.loginTryAgain = true
+                        that.avatar = againInfo[1]
                         that.$notify({
-                            title: 'Security Verfication Fail',
+                            title: 'Verfication Fail',
                             message: 'You can only try 10 times per day, be careful.',
                             type: 'warning'
                         })
@@ -84,8 +201,119 @@ export default {
                     
 
                 })
+            } else {
+                that.$notify({
+                    title: 'Email and password should more than 3 charcters.',
+                    type: 'warning'
+                })
+
+                
             }
         },
+
+        getVcode (m) {
+
+
+            var that = this
+
+            // Initial API Token
+            const key = "isjeffcomlogin";
+            const key_encode =  window.btoa(key);
+            var postReady
+
+            if(m === "phone"){
+                postReady = {tel: this.phone, mode:'sms', token: key_encode}
+            }
+
+            var postData = this.$qs.stringify(postReady)
+
+            var api = this.api_mobile
+
+            this.axios.post(api, postData)
+            .then(function (response) {
+
+                var res = response.data
+
+                if(res.result == 0){
+                    that.codeSent = true
+                    that.getCodeBtn = true
+                    that.countDown()
+                    that.$notify({
+                        title: 'Code sent, check your inbox.',
+                        type: 'success'
+                    })
+
+                }
+
+                else if(res.result == 1024 || res.result == 1025){
+
+                    that.$notify({
+                        title: 'You can only verify 5 times pre hour, 10 times pre day. Wait or use PIN+Token.',
+                        type: 'warning'
+                    })
+
+                } 
+
+                else if(res.indexOf("sent") != -1){
+
+                    that.codeSent = true
+                    that.getCodeBtn = true
+
+                    that.countDown()
+
+                    that.$notify({
+                        title: 'Code sent, check your inbox.',
+                        type: 'warning'
+                    })
+
+                } 
+
+                else if (res.indexOf("serr") != -1){
+                    that.$notify({
+                        title: 'Could not sent',
+                        type: 'warning'
+                    })
+                }
+                
+                else if(res.indexOf("wait") != -1) {
+                    
+                    that.$notify({
+                        title: 'Slow down. Wait 1 minute.',
+                        type: 'warning'
+                    })
+                }
+            })
+            
+        },
+
+        countDown(){
+            var that = this
+            that.codeCountdown = that.codeCountdown === "verify" ? this.codeGetTimeGap - 1 : that.codeCountdown
+            setTimeout(function(){ 
+                that.codeCountdown = that.codeCountdown - 1
+                if(that.codeCountdown != 0){
+                    that.countDown()
+                }
+            }, 1000)
+        },
+
+        robotTest (e) {
+
+            if(!this.robotTestRes){
+
+                if(this.robotTestLastX != false){
+                    if(e.clientX != this.robotTestLastX + 3 || e.clientX != this.robotTestLastX - 3){
+                        this.robotTestRes = true
+                        return
+                    }
+                    
+                } else {
+                    this.robotTestLastX = e.clientX
+                }
+                
+            }
+        },
+
         clearLoginCookie () {
             setCookie('u_key', 0, 30, true)
             setCookie('u_uuid', 0, 30, true)
@@ -118,5 +346,15 @@ export default {
 
 #submitBtn { 
     margin-top:40px;
+}
+
+.login-inner-vcode{
+    display: flex;
+}
+
+.login-inner-vcode-btn{
+    height: 40px;
+    margin-top: 10px;
+    margin-left: 10px;
 }
 </style>

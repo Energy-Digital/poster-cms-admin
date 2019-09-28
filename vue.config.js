@@ -1,1 +1,1 @@
-module.exports = { runtimeCompiler: true, publicPath: "./" }
+module.exports = { runtimeCompiler: true, publicPath: "./"}

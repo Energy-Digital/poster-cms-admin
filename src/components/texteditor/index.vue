@@ -234,14 +234,15 @@ export default {
 
         uploadHandler (d) {
 
-            
+            console.log(d)
 
             var data = d.data
 
-            if(d.type_des === "Image"){
-                console.log("isImage")
+            if(d.type_des.type === "Image"){
+                
                 if(d.multiple){
                     for(var i=0;i<data.length;i++){
+                        
                         this.addImage(data[i].path, this.current_command, data[i].type)
                     }
                 } else {
@@ -250,7 +251,7 @@ export default {
                 
             } else {
                 this.addFile(data.path, data.name, this.current_command, 'file')
-                // Do nothing for now
+                // Do nothing else for now
             }
         },
 
