@@ -168,6 +168,10 @@ export default {
                 }
                 that.upLoading = false
             }).catch((err)=>{
+                that.$notify({
+                    title: 'Error: ' + err,
+                    type: 'warning'
+                })
                 that.upLoading = false
             })
         },

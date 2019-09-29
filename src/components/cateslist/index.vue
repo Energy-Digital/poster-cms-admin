@@ -98,8 +98,8 @@ export default {
           return
         }
         
-        this.catesList = res
-        this.upLoading = false
+        that.catesList = res
+        that.upLoading = false
       })
     },
 

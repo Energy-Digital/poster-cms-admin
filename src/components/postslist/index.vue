@@ -148,14 +148,14 @@ export default {
 
       this.axios.get(api).then((response) => {
         //console.log(response.data)
-        this.postsListTotal = parseInt(response.data.total)
+        that.postsListTotal = parseInt(response.data.total)
         
-        if(this.postsListTotal === 0){
+        if(that.postsListTotal === 0){
           return
         }
 
-        this.postsList = response.data.data
-        this.upLoading = false
+        that.postsList = response.data.data
+        that.upLoading = false
       })
     },
 
@@ -171,7 +171,7 @@ export default {
       EventBus.$emit('toPostSingle', data.id)
     },
 
-    toSingleNew ( data ) {
+    toSingleNew () {
       EventBus.$emit('toPostSingle', 'new')
     },
 

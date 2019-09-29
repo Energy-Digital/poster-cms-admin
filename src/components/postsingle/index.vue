@@ -171,14 +171,12 @@ import uploadWindow from '../widgets/w_upload.vue'
 
 import TextEditor from '../texteditor/index.vue'
 
-import WTitle from '../widgets/w_title.vue'
 import WSubTitle from '../widgets/w_subtitle.vue'
 
 
 export default {
   name: "postsingle",
   components: {
-    WTitle,
     WSubTitle,
     TextEditor,
     uploadWindow
@@ -351,10 +349,6 @@ export default {
         
         this.postCateOptions = response.data
 
-        if(this.postCate === ""){
-
-        }
-
         this.$nextTick(()=>{
           this.cateLoaded = true
         })
@@ -481,6 +475,12 @@ export default {
           }
           that.upLoading = false
       }).catch(function(err){
+
+        that.$notify({
+            title: 'Error: ' + err,
+            type: 'warning'
+        })
+
         that.upLoading = false
       })
     },

@@ -36,6 +36,23 @@
           </el-switch>
         </el-form-item>
 
+        <el-form-item label="Site Logo">
+            <el-image
+                class="file-single-img-img"
+                style="width: 180px; height: 180px"
+                :src="form.siteLogo"
+                fit="contain"
+                :preview-src-list="[form.siteLogo]">
+
+                <div slot="placeholder" class="au_img_placeholder">
+                    <span>Loading</span>
+                </div>
+
+            </el-image>
+            <br>
+            <el-button @click="upSiteLogo">Upload</el-button>
+        </el-form-item>
+
         <el-form-item>
             <el-button type="primary" @click="submit">Save</el-button>
         </el-form-item>
@@ -67,7 +84,7 @@
         
     </div>
 
-
+    <upload-window v-if="upload_win" @uploaded="uploadHandler" @close="closeUpWin" :allowUrl="true" :allowSelect="true"></upload-window>
     
   </div>
 </template>
@@ -77,12 +94,14 @@ import { EventBus } from '../../bus'
 import { getCookie, encodeRichText, decodeRichText, isEmpty } from '../../utils'
 import WTitle from '../widgets/w_title.vue'
 import WSubTitle from '../widgets/w_subtitle.vue'
+import uploadWindow from '../widgets/w_upload'
 
 export default {
   name: "postlist",
   components:{
     WTitle,
-    WSubTitle
+    WSubTitle,
+    uploadWindow
   },
   props:{
     
@@ -96,7 +115,8 @@ export default {
       inputVisible: false,
       inputValue: '',
       upLoading: false,
-      mode: 'normal'
+      mode: 'normal',
+      upload_win: false,
     }
   },
   http: {
@@ -108,7 +128,7 @@ export default {
   },
   methods:{
 
-    getData (page) {
+    getData () {
       this.upLoading = true
       var that = this
 
@@ -122,12 +142,12 @@ export default {
 
         res.isCookieNotice = res.isCookieNotice === "true" ? true : false
 
-        this.form = res
+        that.form = res
         // Decode keywords
-        this.keywords = res.keywords.split(',')
+        that.keywords = res.keywords.split(',')
 
         // Disable loading status
-        this.upLoading = false
+        that.upLoading = false
       })
     },
 
@@ -179,6 +199,30 @@ export default {
 
     },
 
+    uploadHandler (d) {
+      var data = d.data
+        if(data.type.type === "Image"){
+
+            this.form.siteLogo = data.path
+
+        } else {
+
+            this.$notify({
+                title: 'Site Logo must be an image',
+                type: 'warning'
+            })
+        
+        }
+    },
+
+    upSiteLogo () {
+      this.upload_win = true
+    },
+
+    closeUpWin () {
+        this.upload_win = false
+    },
+
     closeTagInput () {
       this.inputVisible = false
       this.inputValue = ''
@@ -209,8 +253,6 @@ export default {
         return
       }
 
-      var that = this
-
       this.mode = "normal"
 
       var postReady = {
@@ -219,6 +261,7 @@ export default {
         uuid: getCookie('u_uuid'), 
         title: encodeRichText(this.form.title),
         subtitle: encodeRichText(this.form.subtitle),
+        siteLogo: this.form.siteLogo,
         desText: encodeRichText(this.form.desText),
         baseUrl: this.form.baseUrl,
         seoTitle: encodeRichText(this.form.seoTitle),
@@ -264,6 +307,10 @@ export default {
 
           that.upLoading = false
       }).catch(function(err){
+        that.$notify({
+            title: 'Error: ' + err,
+            type: 'warning'
+        })
         that.upLoading = false
       })
 
@@ -271,7 +318,7 @@ export default {
 
     showInput() {
       this.inputVisible = true;
-      this.$nextTick(_ => {
+      this.$nextTick(() => {
         this.$refs.saveTagInput.$refs.input.focus();
       });
     },

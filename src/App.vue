@@ -8,7 +8,7 @@
 <script>
 
 import { EventBus } from './bus.js'
-import {setCookie, getCookie, clearCookie} from './utils.js'
+import {setCookie, getCookie} from './utils.js'
 
 import admin from './components/admin.vue'
 import login from './components/login/index.vue'

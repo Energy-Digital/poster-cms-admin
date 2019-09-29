@@ -1,6 +1,6 @@
 var fileTypes = 
     [
-        { name: "png", type:"Image" }, { name: "jpg", type:"Image" },
+        { name: "png", type:"Image" }, { name: "jpg", type:"Image" },{ name: "svg", type:"Image" },
         { name: "jpeg", type:"Image" }, { name: "pdf", type:"PDF Document", icon:"pdf.png" },
         { name: "doc", type:"Word Document", icon:"word.png" }, { name: "docx", type:"Word Document", icon:"word.png" },
         { name: "ppt", type:"PowerPoint Document", icon:"ppt.png" }, { name: "pptx", type:"PowerPoint Document", icon:"ppt.png" },
@@ -10,7 +10,8 @@ var fileTypes =
         { name: "md", type:"Readme File", icon:"txt.png" }, { name: "key", type:"Keynote File", icon:"doc.png" },
         { name: "mp3", type:"MP3 Audio", icon:"mp3.png" }, { name: "wav", type:"WAV Audio", icon:"mp3.png" },
         { name: "mov", type:"MOV Video" , icon:"video.png" }, { name: "mp4", type:"MP4 Video", icon:"video.png" },
-        { name: "zip", type:"ZIP Compressed", icon:"zip.png" }, { name: "rar", type:"RAR Compressed", icon:"zip.png" }
+        { name: "zip", type:"ZIP Compressed", icon:"zip.png" }, { name: "rar", type:"RAR Compressed", icon:"zip.png" },
+        
     ]
 
 export function limitLength (mode, str, num) {
@@ -58,16 +59,16 @@ export function setCookie (name, value, expDays, remove) {
     } else {
         document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;"
     }
-    
 }
 
 export function setCookieExInMin (name,value,minutes) {
+    var expires
     if (minutes) {
         var date = new Date();
         date.setTime(date.getTime() + (minutes * 60 * 1000));
-        var expires = "; expires="+date.toGMTString();
+        expires = "; expires="+date.toGMTString();
     } else {
-        var expires = "";
+         expires = "";
     }
     document.cookie = name + "=" + value + expires + "; path=/";
 }

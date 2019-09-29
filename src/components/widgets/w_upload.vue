@@ -117,9 +117,18 @@ export default {
 
     },
     props:{
-        allowUrl: true,
-        allowSelect: true,
-        allowMultiple: true,
+        allowUrl: {
+            type: Boolean,
+            default: true
+        },
+        allowSelect: {
+            type: Boolean,
+            default: true
+        },
+        allowMultiple: {
+            type: Boolean,
+            default: true
+        },
         allowType: String
     },
     data () {
@@ -186,50 +195,60 @@ export default {
             var fileName = obj.file.name
             var fileType = idFileTypeDes(obj.file.name)
 
-            // BMF plugin to read files md5
-            const bmf = new BMF()
-
-            bmf.md5(obj.file, (err, md5) => {
-                let formObj = new FormData()
-                formObj.append('file',img)
-                formObj.append('name', fileName)
-                formObj.append('typeDes', fileType.type)
-                formObj.append('md5', md5)
-                formObj.append('ukey', getCookie('u_key'))
-                formObj.append('uuid', getCookie('u_uuid'))
-
-                let h = {
-                    headers:{'Content-Type':'multipart/form-data'}
-                }
-
-                that.$http.post(that.api_upFile,formObj,h)
-                .then(function(response) {
-                    var res = response.data
-                    if(res.indexOf('success' != -1)) {
-
-                        var r = res.split(',')
-
-                        that.$notify({
-                            title: "Finish",
-                            type: 'success'
-                        })
-
-                        // If is not multiple upload
-                        if(that.waittingList.length === 0){
-                            that.submit(that.base_url + r[1], fileType, fileName, 0, false)
-                        } else {
-                            that.pushToReturnList(that.base_url + r[1], fileType, fileName)
-                        }
-
-                    } else {
-                        that.$notify({
-                            title: "Fail",
-                            message: 'Error: ' + res,
-                            type: 'warning'
-                        })
-                    }
+            if(!fileType) {
+                this.$notify({
+                    title: "File type not allowed",
+                    type: 'warning'
                 })
-            })
+                //this.close()
+            } else {
+                // BMF plugin to read files md5
+                const bmf = new BMF()
+
+                bmf.md5(obj.file, (err, md5) => {
+                    let formObj = new FormData()
+                    formObj.append('file',img)
+                    formObj.append('name', fileName)
+                    formObj.append('typeDes', fileType.type)
+                    formObj.append('md5', md5)
+                    formObj.append('ukey', getCookie('u_key'))
+                    formObj.append('uuid', getCookie('u_uuid'))
+
+                    let h = {
+                        headers:{'Content-Type':'multipart/form-data'}
+                    }
+
+                    that.$http.post(that.api_upFile,formObj,h)
+                    .then(function(response) {
+                        var res = response.data
+                        if(res.indexOf('success' != -1)) {
+
+                            var r = res.split(',')
+
+                            that.$notify({
+                                title: "Finish",
+                                type: 'success'
+                            })
+
+                            // If is not multiple upload
+                            if(that.waittingList.length === 0){
+                                that.submit(that.base_url + r[1], fileType, fileName, 0, false)
+                            } else {
+                                that.pushToReturnList(that.base_url + r[1], fileType, fileName)
+                            }
+
+                        } else {
+                            that.$notify({
+                                title: "Fail",
+                                message: 'Error: ' + res,
+                                type: 'warning'
+                            })
+                        }
+                    })
+                })
+            }
+
+            
 
         },
 
@@ -334,7 +353,7 @@ export default {
         realFileName (str, limit) {
             var res
             var parse = str.split('_')
-            var res = parse[parse.length-1].length < limit ? parse[parse.length-1] : parse[parse.length-1].slice(0, limit) + '...'
+            res = parse[parse.length-1].length < limit ? parse[parse.length-1] : parse[parse.length-1].slice(0, limit) + '...'
 
             return res
         }

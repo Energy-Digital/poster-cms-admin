@@ -70,7 +70,6 @@
 </template>
 
 <script>
-import { EventBus } from '../../bus'
 import { getCookie, getFileIcon, strLenLimit } from '../../utils.js'
 import WTitle from '../widgets/w_title.vue'
 import uploadWindow from '../widgets/w_upload.vue'
@@ -103,7 +102,6 @@ export default {
     emulateHTTP: true
   },
   created(){
-    var that = this
     this.getList(1)
   },
   methods:{
@@ -146,7 +144,7 @@ export default {
             } else {
                 that.$notify({
                     title: 'Unable to get all files',
-                    message: 'Error: ' + res,
+                    message: 'Error: ' + response.data,
                     type: 'warning'
                 })
             }
@@ -259,6 +257,10 @@ export default {
             })
 
         }).catch((err) => {
+            that.$notify({
+                title: 'Error:' + err,
+                type: 'warning'
+            })
             that.upLoading = false
         })
     },
@@ -271,7 +273,7 @@ export default {
     realFileName (str, limit) {
         var res
         var parse = str.split('_')
-        res = strLenLimit(parse[parse.length-1], 18)
+        res = strLenLimit(parse[parse.length-1], limit)
         //res = parse[parse.length-1].length < limit ? parse[parse.length-1] : parse[parse.length-1].slice(0, limit) + '...'
 
         return res

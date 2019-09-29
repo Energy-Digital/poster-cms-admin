@@ -64,10 +64,6 @@
 import { EventBus }  from '../../bus.js'
 import { isEmpty, getCookie } from '../../utils.js'
 
-// Import widgets
-import WTitle from '../widgets/w_title.vue'
-
-
 export default {
     name:"catesingle",
     props:{
@@ -77,7 +73,7 @@ export default {
         }
     },
     components:{
-        WTitle
+
     },
     data(){
         return{
@@ -176,6 +172,10 @@ export default {
                 }
                 that.upLoading = false
             }).catch((err)=>{
+                that.$notify({
+                    title: 'Error: ' + err,
+                    type: 'warning'
+                })
                 that.upLoading = false
             })
         },

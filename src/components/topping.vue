@@ -35,7 +35,10 @@ import { getCookie } from "../utils"
 export default {
     name:"topping",
     props:{
-        siteName: ""
+        siteName: {
+            type: String,
+            default: "Rider"
+        }
     },
     data (){
         return {
@@ -51,12 +54,12 @@ export default {
     },
     methods:{
         handleOpen( data ){
-            console.log(data)
+            //console.log(data)
             return
         },
 
         handleClose ( data ) {
-            console.log(data)
+            //console.log(data)
             return
         },
 

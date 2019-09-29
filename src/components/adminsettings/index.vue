@@ -47,7 +47,6 @@
 </template>
 
 <script>
-import { EventBus } from '../../bus'
 import { getCookie, isEmpty } from '../../utils'
 import uploadWindow from '../widgets/w_upload'
 import WTitle from '../widgets/w_title.vue'
@@ -142,8 +141,6 @@ export default {
         })
         return
       }
-
-      var that = this
 
       this.mode = "normal"
 

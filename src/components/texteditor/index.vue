@@ -159,7 +159,6 @@ import ILink from './ewidget/ilink.js'
 import IParagraph from './ewidget/iparagraph.js'
 import ISize from './ewidget/isize.js'
 import IImage from './ewidget/iimage.js'
-import { EventBus } from '../../bus'
 
 export default {
     name: "texteditor",

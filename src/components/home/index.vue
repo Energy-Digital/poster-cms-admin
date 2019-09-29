@@ -90,7 +90,6 @@
 
 <script>
 import { getCookie } from '../../utils'
-import { EventBus } from '../../bus'
 import VueApexCharts from 'vue-apexcharts'
 import WSubTitle from '../widgets/w_subtitle.vue'
 import ICountUp from 'vue-countup-v2'
@@ -209,6 +208,10 @@ export default {
         that.upLoading = false
         
       }).catch(function(err){
+        that.$notify({
+            title: 'Error: ' + err,
+            type: 'warning'
+        })
         //console.log(err)
       })
 
