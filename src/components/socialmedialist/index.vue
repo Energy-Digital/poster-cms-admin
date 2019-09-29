@@ -58,6 +58,7 @@
 
 <script>
 import { EventBus } from '../../bus'
+import { genGet } from '../../request'
 import WTitle from '../widgets/w_title.vue'
 
 export default {
@@ -87,17 +88,18 @@ export default {
     getList () {
       this.upLoading = true
       var that = this
-      this.axios.get(this.api).then((response) => {
-        if(response.data.length === 0){
-          return
+      genGet(this.api, [], (res)=>{
+        if(res.status){
+          if(res.data.length > 0){
+            that.smList = res.data
+            that.upLoading = false
+          }
         }
-        that.smList = response.data
-        that.upLoading = false
       })
     },
 
     toSMSingle (data) {
-      EventBus.$emit('toSMSingle', data.id)
+      EventBus.$emit('toSMSingle', data)
     },
 
     toSMNew () {

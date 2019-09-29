@@ -71,6 +71,7 @@
 
 <script>
 import { getCookie, getFileIcon, strLenLimit } from '../../utils.js'
+import { genGet, delFile } from '../../request'
 import WTitle from '../widgets/w_title.vue'
 import uploadWindow from '../widgets/w_upload.vue'
 
@@ -127,31 +128,31 @@ export default {
         // pagination Limit
         var limit = this.pageToLimit(page)
         var api = this.api + '?ls=' + limit + '&size=' + this.pageSize + '&file=All'
+        var param = [{
+            name: "ls",
+            val: limit
+        },{
+            name: "size",
+            val: this.pageSize
+        },{
+            name:"file",
+            val: "all"
+        }]
 
-        this.axios.get(api).then(function (response) {
-
-            if(response.data){
-
-                that.filesListTotal = parseInt(response.data.total)
-                if(that.filesListTotal == 0){
-                    return
+        genGet(this.api, param, (res)=>{
+            if(res.status){
+                that.filesListTotal = parseInt(res.data.total)
+                if(that.filesListTotal > 0){
+                    that.$nextTick(()=>{
+                        that.filesListAll = res.data.data
+                    })
                 }
-
-                that.$nextTick(()=>{
-                    that.filesListAll = response.data.data
-                })
-
-            } else {
-                that.$notify({
-                    title: 'Unable to get all files',
-                    message: 'Error: ' + response.data,
-                    type: 'warning'
-                })
             }
-            
 
             that.upLoading = false
         })
+
+        
     },
 
     changePage (val) {
@@ -201,67 +202,54 @@ export default {
                 that.upLoading = true
             
                 var postReady = {
-                    ukey: getCookie('u_key'), 
-                    uuid: getCookie('u_uuid'), 
                     fid: id,
                     fseed: seed,
                     fpath: path
                 }
 
-                var postData = this.$qs.stringify(postReady)
+                delFile(that.api_file_del, postReady, (res)=>{
+                    if(res.status === 1 || res.status === 2){
+                        that.$notify({
+                            title: 'Deleted',
+                            type: 'success'
+                        })
+                        that.updateAll()
+                    } 
+                    
+                    else if(res.status === 3) {
+                        that.$notify({
+                            title: "Can't delete record, file remains.",
+                            message: 'Error:' + res.data,
+                            type: 'warning'
+                        })
+                    } 
+                    
+                    else if(res.status === 4){
+                        that.$notify({
+                            title: "Record deleted, can't delete the file",
+                            message: 'Error:' + res.data,
+                            type: 'warning'
+                        })
+                    } 
 
-
-                that.axios.post(this.api_file_del, postData)
-                .then(function (response) {
-
-                var res = response.data
-
-
-                var delRes = res.split(';')
-
-                if(delRes[0].indexOf("dbs") != -1){
-                    that.$notify({
-                        title: 'Success',
-                        message: 'File has been removed',
-                        type: 'success'
-                    })
-
-                    if(delRes[1].indexOf('ks')){
-                        console.log("Delete record only, file seed keeped")
+                    else{
+                        that.$notify({
+                            title: "Unknow error",
+                            message: 'Error:' + res.error,
+                            type: 'warning'
+                        })
                     }
 
-                    // Need to re-define this update function when split pages 
-                    that.updateAll()
+                    
                     that.upLoading = false
-                    return
-                } 
-                
-                if (delRes[0].indexOf("dbe") != -1){
-                    that.$notify({
-                        title: "Can't delete record",
-                        message: 'Error:' + res,
-                        type: 'warning'
-                    })
-                }
+                })
 
-                if (delRes[1].indexOf("nodel") != -1){
-                    that.$notify({
-                        title: "Can't delete file",
-                        message: 'Error:' + res,
-                        type: 'warning'
-                    })
-                }
-
-                that.upLoading = false
-                
-            })
 
         }).catch((err) => {
             that.$notify({
-                title: 'Error:' + err,
+                title: 'Cancelled',
                 type: 'warning'
             })
-            that.upLoading = false
         })
     },
 

@@ -55,6 +55,7 @@
 
 // Import common js
 import { EventBus }  from '../../bus.js'
+import { genGet, genUpdate } from '../../request'
 import { isEmpty, getCookie } from '../../utils.js'
 
 // Import widgets
@@ -105,10 +106,15 @@ export default {
         },
 
         getData(){
+            var that = this
             this.upLoading = true
-            this.axios.get(this.api+"?sid="+this.smId).then((response)=>{
-                this.smData = response.data[0]
-                this.upLoading = false
+
+            genGet(this.api, [{name:"sid", val: this.smId}], (res)=>{
+                if(res.status){
+                    that.smData = res.data[0]
+                }
+                
+                that.upLoading = false
             })
         },
 
@@ -132,24 +138,15 @@ export default {
 
             var postReady = {
                 mode: this.mode,
-                ukey: getCookie('u_key'), 
-                uuid: getCookie('u_uuid'), 
                 smId: this.smId,
                 name: this.smData.name,
                 url: this.smData.url,
                 icon: this.smData.icon,
             }
 
-            var postData = this.$qs.stringify(postReady)
-
-            this.axios.post(this.api_up, postData)
-            .then(function (response) {
-
-                var res = response.data
-
-                if(res.indexOf("success") != -1){
-
-                    that.$notify({
+            genUpdate(this.api_up, postReady, (res)=>{
+                if(res.status){
+                     that.$notify({
                         title: 'Submit Successful',
                         message: '',
                         type: 'success'
@@ -158,22 +155,16 @@ export default {
                     that.$nextTick(() => {
                         EventBus.$emit('toPage', './socialmedialist')
                     })
-
-                } else {
+                } else{
                     that.$notify({
                         title: 'Fail',
-                        message: 'Error: ' + res,
+                        message: 'Error: ' + res.error,
                         type: 'warning'
                     })
                 }
                 that.upLoading = false
-            }).catch((err)=>{
-                that.$notify({
-                    title: 'Error: ' + err,
-                    type: 'warning'
-                })
-                that.upLoading = false
             })
+
         },
 
         del () {

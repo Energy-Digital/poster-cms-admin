@@ -108,6 +108,7 @@
 <script>
 import { EventBus } from '../../bus'
 import { strLenLimit } from '../../utils'
+import { genGet } from '../../request'
 import WTitle from '../widgets/w_title.vue'
 
 export default {
@@ -145,18 +146,27 @@ export default {
       // Pagination
       var limit = this.pageToLimit(page)
       var api = page ? this.api + '?ls=' + limit + '&size=' + this.pageSize : this.api
+      var param = page ? [ 
+        {
+          name: "ls", 
+          val: limit
+        }, 
+        { name: "size",
+          val: this.pageSize
+        } 
+      ] : []
 
-      this.axios.get(api).then((response) => {
-        //console.log(response.data)
-        that.postsListTotal = parseInt(response.data.total)
+      genGet(api, param, (res)=>{
+        if(res.status){
+          that.postsListTotal = parseInt(res.data.total)
         
-        if(that.postsListTotal === 0){
-          return
+          if(that.postsListTotal > 0){
+            that.postsList = res.data.data
+          }
         }
-
-        that.postsList = response.data.data
         that.upLoading = false
       })
+
     },
 
     changePage (val) {

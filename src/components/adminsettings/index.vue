@@ -48,6 +48,7 @@
 
 <script>
 import { getCookie, isEmpty } from '../../utils'
+import { encGet, genUpdate } from '../../request'
 import uploadWindow from '../widgets/w_upload'
 import WTitle from '../widgets/w_title.vue'
 import WSubTitle from '../widgets/w_subtitle.vue'
@@ -88,17 +89,13 @@ export default {
 
       var postReady = {
         userId: getCookie('u_uuid'),
-        ukey: getCookie('u_key'), 
-        uuid: getCookie('u_uuid')
       }
 
-      var postData = this.$qs.stringify(postReady)
-
-      this.axios.post(this.api, postData)
-      .then(function (response) {
-        
-          that.form = response.data[0]
+      encGet(this.api, postReady, (res)=>{
+        if(res.status){
+          that.form = res.data[0]
           that.upLoading = false
+        }
       })
     },
 
@@ -127,6 +124,8 @@ export default {
     },
 
     submit () {
+      var that = this
+      
 
       // Check mandatory content is not empty and did not excess certain words count
       if(
@@ -142,11 +141,11 @@ export default {
         return
       }
 
+      this.upLoading = true
+
       this.mode = "normal"
 
       var postReady = {
-        ukey: getCookie('u_key'), 
-        uuid: getCookie('u_uuid'), 
         userId: getCookie('u_uuid'),
         name: this.form.name,
         email: this.form.email,
@@ -154,42 +153,23 @@ export default {
         pin: this.form.pin
       }
 
-      this.upData(postReady)
+      genUpdate(this.api_up, postReady, (res)=>{
+        if(res.status){
 
-    },
+          that.$notify({
+              title: 'Submitted',
+              type: 'success'
+          })
 
-    upData (obj) {
+          that.getData()
 
-      var that = this
-
-      this.upLoading = true
-
-      var postData = this.$qs.stringify(obj)
-
-      this.axios.post(this.api_up, postData)
-      .then(function (response) {
-
-          var res = response.data
-          
-          if(res.indexOf("success") != -1){
-
-              that.$notify({
-                  title: 'Submitted',
-                  type: 'success'
-              })
-
-              that.getData()
-
-          } else {
-              that.$notify({
-                  title: 'Submit Fail',
-                  message: 'Error: ' + res,
-                  type: 'warning'
-              })
-          }
-
-          that.upLoading = false
-      }).catch(function(err){
+        }else{
+          that.$notify({
+              title: 'Submit Fail',
+              message: 'Error: ' + res.data,
+              type: 'warning'
+          })
+        }
         that.upLoading = false
       })
 

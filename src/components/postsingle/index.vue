@@ -166,6 +166,7 @@
 <script>
 
 import { EventBus } from '../../bus.js'
+import { genGet, genUpdate } from '../../request'
 import { limitLength, isEmpty, getCookie, encodeRichText, decodeRichText } from '../../utils.js'
 import uploadWindow from '../widgets/w_upload.vue'
 
@@ -190,7 +191,7 @@ export default {
     return{
       // APIs
       base_url: "https://api.isjeff.com/pot",
-      api: "https://api.isjeff.com/pot/data/post_single/?pid=",
+      api: "https://api.isjeff.com/pot/data/post_single/",
       api_cate: "https://api.isjeff.com/pot/data/cate/",
       api_up_assets:"/",
       api_d_cate:"",
@@ -328,30 +329,36 @@ export default {
     },
 
     getData () {
+      var that = this
       this.upLoading = true
-      this.axios.get(this.api + this.pid).then((response) => {
-        var res = response.data[0]
-        res.content = decodeRichText(res.content)
-        res.content_sublang = decodeRichText(res.content_sublang)
-        res.status = Number(res.status)
 
-        this.postData = res
+      genGet(this.api, [{name:"pid", val: this.pid}], (res)=>{
+        if(res.status){
+          var finalRes = res.data[0]
+          finalRes.content = decodeRichText(finalRes.content)
+          finalRes.content_sublang = decodeRichText(finalRes.content_sublang)
+          finalRes.status = Number(finalRes.status)
 
-        this.$nextTick(()=>{
-          this.loaded = true
-          this.upLoading = false
-        })
+          that.postData = finalRes
+          that.$nextTick(()=>{
+            that.loaded = true
+            that.upLoading = false
+          })
+        }
       })
+
     },
 
     getCate () {
-      this.axios.get(this.api_cate).then((response)=>{
-        
-        this.postCateOptions = response.data
+      var that = this
+      genGet(this.api_cate, [], (res)=>{
+        if(res.status){
+          that.postCateOptions = res.data
 
-        this.$nextTick(()=>{
-          this.cateLoaded = true
-        })
+          that.$nextTick(()=>{
+            that.cateLoaded = true
+          })
+        }
       })
     },
 
@@ -395,7 +402,7 @@ export default {
 
     submit () {
 
-      this.upLoading = true
+      
 
       var that = this
 
@@ -427,11 +434,10 @@ export default {
         return
       }
 
+      this.upLoading = true
 
       var postReady = {
         mode: this.mode,
-        ukey: getCookie('u_key'), 
-        uuid: getCookie('u_uuid'), 
         pid: this.postData.id,
         cateId: this.postData.cateId,
         title: this.postData.title,
@@ -448,41 +454,28 @@ export default {
         status: String(this.postData.status)
       }
 
-      var postData = this.$qs.stringify(postReady)
+      genUpdate(this.api_up, postReady, (res)=>{
+        if(res.status){
+          that.$notify({
+              title: 'Submitted',
+              type: 'success'
+          })
 
-      this.axios.post(this.api_up, postData)
-      .then(function (response) {
-          var res = response.data
-
-          if(res.indexOf("success") != -1){
-
-              that.$notify({
-                  title: 'Submitted',
-                  type: 'success'
-              })
-
-              that.updateAll()
-              that.$nextTick(() => {
-                EventBus.$emit('toPage', './postslist')
-              })
-
-          } else {
-              that.$notify({
-                  title: 'Submit Fail',
-                  message: 'Error: ' + res,
-                  type: 'warning'
-              })
-          }
-          that.upLoading = false
-      }).catch(function(err){
-
-        that.$notify({
-            title: 'Error: ' + err,
-            type: 'warning'
-        })
+          that.updateAll()
+          that.$nextTick(() => {
+            EventBus.$emit('toPage', './postslist')
+          })
+        } else {
+          that.$notify({
+              title: 'Submit Fail',
+              message: 'Error: ' + res.error,
+              type: 'warning'
+          })
+        }
 
         that.upLoading = false
       })
+
     },
 
     del () {
@@ -496,38 +489,28 @@ export default {
       }).then(() => {
         
         var postReady = {
-          ukey: getCookie('u_key'), 
-          uuid: getCookie('u_uuid'), 
           pid: that.postData.id
         }
 
-        var postData = this.$qs.stringify(postReady)
+        genUpdate(that.api_del, postReady, (res)=>{
+          if(res.status){
+            that.$notify({
+                title: 'Success',
+                message: 'Post has been removed',
+                type: 'success'
+            })
 
-        that.axios.post(that.api_del, postData)
-        .then(function (response) {
-
-          var res = response.data
-
-          if(res.indexOf("success") != -1){
-
-              that.$notify({
-                  title: 'Success',
-                  message: 'Post has been removed',
-                  type: 'success'
-              })
-
-              EventBus.$emit('toPage', './postslist')
-
-          } else {
-              that.$notify({
-                  title: 'Fail',
-                  message: 'Error: ' + res,
-                  type: 'warning'
-              })
+            EventBus.$emit('toPage', './postslist')
+          }else{
+            that.$notify({
+                title: 'Fail',
+                message: 'Error: ' + res.error,
+                type: 'warning'
+            })
           }
-
           that.upLoading = false
         })
+
 
       }).catch(() => {
         that.upLoading = false

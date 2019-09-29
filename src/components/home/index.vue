@@ -94,6 +94,8 @@ import VueApexCharts from 'vue-apexcharts'
 import WSubTitle from '../widgets/w_subtitle.vue'
 import ICountUp from 'vue-countup-v2'
 
+import { encGet } from '../../request'
+
 export default {
   name: "home",
   props:{
@@ -176,45 +178,38 @@ export default {
       this.upLoading = true
 
       var that = this
-      var postReady = {
-        ukey: getCookie('u_key'), 
-        uuid: getCookie('u_uuid')
-      }
 
-      var postData = this.$qs.stringify(postReady)
+      encGet(this.api, {}, (res)=>{
+        if(res.status){
+          var res = res.data
+          
+          that.numbersData = res
 
-      this.axios.post(this.api, postData)
-      .then(function (response) {
-
-        that.numbersData = response.data
-
-        var hoursChartOptions = {
-          xaxis: {
-            categories: ["6H", "5H", "4H", "3H", "2H", "1H", "Now"]
+          var hoursChartOptions = {
+            xaxis: {
+              categories: ["6H", "5H", "4H", "3H", "2H", "1H", "Now"]
+            }
           }
-        }
-        that.chartOptionsDays = that.deepCopy(that.chartOptionsBasic)
-        that.chartOptionsHours = Object.assign(that.chartOptionsBasic, hoursChartOptions)
+          that.chartOptionsDays = that.deepCopy(that.chartOptionsBasic)
+          that.chartOptionsHours = Object.assign(that.chartOptionsBasic, hoursChartOptions)
 
-        var daysData = that.recentVisit(that.numbersData.vts, 'days')
-        var hoursData = that.recentVisit(that.numbersData.vts, 'hours')
+          var daysData = that.recentVisit(that.numbersData.vts, 'days')
+          var hoursData = that.recentVisit(that.numbersData.vts, 'hours')
 
-        that.chartRecentDays[0].data = daysData.users
-        that.chartRecentDays[1].data = daysData.admin
-        that.chartRecentHours[0].data = hoursData.users
-        that.chartRecentHours[1].data = hoursData.admin
-        that.mvpList = that.numbersData.mvp
-        that.loaded = true
-        that.upLoading = false
-        
-      }).catch(function(err){
-        that.$notify({
-            title: 'Error: ' + err,
+          that.chartRecentDays[0].data = daysData.users
+          that.chartRecentDays[1].data = daysData.admin
+          that.chartRecentHours[0].data = hoursData.users
+          that.chartRecentHours[1].data = hoursData.admin
+          that.mvpList = that.numbersData.mvp
+          that.loaded = true
+          that.upLoading = false
+        }else {
+          that.$notify({
+            title: 'Error: ' + res.error,
             type: 'warning'
-        })
-        //console.log(err)
+          })
+        }
       })
-
       
     },
 

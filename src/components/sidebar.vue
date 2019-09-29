@@ -84,7 +84,6 @@
                             <span class="el-sb-title">Testing Function</span>
                         </template>
 
-                
                         <el-menu-item index="5-1" v-on:click="toPage('./visittest')">User Visit</el-menu-item>
                         <el-menu-item index="5-2" v-on:click="toPage('./visittestadm')">Admin Visit</el-menu-item>
 

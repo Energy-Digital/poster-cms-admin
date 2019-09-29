@@ -91,6 +91,7 @@
 
 <script>
 import { EventBus } from '../../bus'
+import { genGet, genUpdate } from '../../request'
 import { getCookie, encodeRichText, decodeRichText, isEmpty } from '../../utils'
 import WTitle from '../widgets/w_title.vue'
 import WSubTitle from '../widgets/w_subtitle.vue'
@@ -132,23 +133,27 @@ export default {
       this.upLoading = true
       var that = this
 
-      this.axios.get(this.api).then((response) => {
-        var res = response.data[0]
-        // Decode '' and ""
-        res.title = decodeRichText(res.title)
-        res.subtitle = decodeRichText(res.subtitle)
-        res.desText = decodeRichText(res.desText)
-        res.seoTitle = decodeRichText(res.seoTitle)
+      genGet(this.api, [], (res)=>{
+        if(res.status){
+          var finalRes = res.data[0]
 
-        res.isCookieNotice = res.isCookieNotice === "true" ? true : false
+          // Decode '' and ""
+          finalRes.title = decodeRichText(finalRes.title)
+          finalRes.subtitle = decodeRichText(finalRes.subtitle)
+          finalRes.desText = decodeRichText(finalRes.desText)
+          finalRes.seoTitle = decodeRichText(finalRes.seoTitle)
 
-        that.form = res
-        // Decode keywords
-        that.keywords = res.keywords.split(',')
+          finalRes.isCookieNotice = finalRes.isCookieNotice === "true" ? true : false
 
-        // Disable loading status
+          that.form = finalRes
+          // Decode keywords
+          that.keywords = finalRes.keywords.split(',')
+          
+        }
         that.upLoading = false
       })
+
+
     },
 
     tagSubmit () {
@@ -172,10 +177,10 @@ export default {
       this.mode = "keywords"
       var postReady = {
         mode: this.mode,
-        ukey: getCookie('u_key'), 
-        uuid: getCookie('u_uuid'), 
         keywords: this.keywords.join(),
       }
+
+      
 
       this.upData(postReady)
       this.closeTagInput()
@@ -189,8 +194,6 @@ export default {
 
       var postReady = {
         mode: this.mode,
-        ukey: getCookie('u_key'), 
-        uuid: getCookie('u_uuid'), 
         keywords: this.keywords.join(),
       }
       
@@ -257,8 +260,6 @@ export default {
 
       var postReady = {
         mode: this.mode,
-        ukey: getCookie('u_key'), 
-        uuid: getCookie('u_uuid'), 
         title: encodeRichText(this.form.title),
         subtitle: encodeRichText(this.form.subtitle),
         siteLogo: this.form.siteLogo,
@@ -280,37 +281,22 @@ export default {
 
       this.upLoading = true
 
-      var postData = this.$qs.stringify(obj)
+      genUpdate(this.api_up, obj, (res)=>{
+        if(res.status){
+          that.$notify({
+              title: 'Submitted',
+              type: 'success'
+          })
 
-      this.axios.post(this.api_up, postData)
-      .then(function (response) {
+          that.getData()
+        } else {
+          that.$notify({
+                title: 'Submit Fail',
+                message: 'Error: ' + res.error,
+                type: 'warning'
+            })
+        }
 
-          var res = response.data
-          
-
-          if(res.indexOf("success") != -1){
-
-              that.$notify({
-                  title: 'Submitted',
-                  type: 'success'
-              })
-
-              that.getData()
-
-          } else {
-              that.$notify({
-                  title: 'Submit Fail',
-                  message: 'Error: ' + res,
-                  type: 'warning'
-              })
-          }
-
-          that.upLoading = false
-      }).catch(function(err){
-        that.$notify({
-            title: 'Error: ' + err,
-            type: 'warning'
-        })
         that.upLoading = false
       })
 

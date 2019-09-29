@@ -62,6 +62,7 @@
 
 // Import common js
 import { EventBus }  from '../../bus.js'
+import { genGet, genUpdate } from '../../request'
 import { isEmpty, getCookie } from '../../utils.js'
 
 export default {
@@ -107,10 +108,16 @@ export default {
         },
 
         getData(){
+            var that = this
             this.upLoading = true
-            this.axios.get(this.api+"?cid="+this.cateId).then((response)=>{
-                this.cateData = response.data[0]
-                this.upLoading = false
+
+            genGet(this.api, [
+                {name: "cid", val: this.cateId}
+            ], (res)=>{
+                if(res.status){
+                    that.cateData = res.data[0]
+                }
+                that.upLoading = false
             })
         },
 
@@ -134,8 +141,6 @@ export default {
 
             var postReady = {
                 mode: this.mode,
-                ukey: getCookie('u_key'), 
-                uuid: getCookie('u_uuid'), 
                 cid: this.cateId,
                 cname: this.cateData.cname,
                 cname_sublang: this.cateData.cname_sublang,
@@ -143,15 +148,8 @@ export default {
                 des_sublang: this.cateData.des_sublang
             }
 
-            var postData = this.$qs.stringify(postReady)
-
-            this.axios.post(this.api_up, postData)
-            .then(function (response) {
-
-                var res = response.data
-                //console.log(res)
-
-                if(res.indexOf("success") != -1){
+            genUpdate(this.api_up, postReady, (res)=>{
+                if(res.status){
 
                     that.$notify({
                         title: 'Submit Successful',
@@ -162,22 +160,17 @@ export default {
                     that.$nextTick(() => {
                         EventBus.$emit('toPage', './cateslist')
                     })
-
                 } else {
                     that.$notify({
                         title: 'Fail',
-                        message: 'Error: ' + res,
+                        message: 'Error: ' + res.data,
                         type: 'warning'
                     })
                 }
-                that.upLoading = false
-            }).catch((err)=>{
-                that.$notify({
-                    title: 'Error: ' + err,
-                    type: 'warning'
-                })
+
                 that.upLoading = false
             })
+
         },
 
         del () {
@@ -190,20 +183,11 @@ export default {
                 type: 'warning'
             }).then(() => {
                 var postReady = {
-                    ukey: getCookie('u_key'), 
-                    uuid: getCookie('u_uuid'), 
                     cid: this.cateId
                 }
 
-                var postData = that.$qs.stringify(postReady)
-
-                that.axios.post(that.api_del, postData)
-                .then(function (response) {
-
-                    var res = response.data
-
-                    if(res.indexOf("success") != -1){
-
+                genUpdate(that.api_del, postReady, (res)=>{
+                    if(res.status){
                         that.$notify({
                             title: 'Deleted',
                             message: '',
@@ -213,7 +197,6 @@ export default {
                         that.$nextTick(() => {
                             EventBus.$emit('toPage', './cateslist')
                         })
-
                     } else {
                         that.$notify({
                             title: 'Delete Fail',
@@ -222,6 +205,9 @@ export default {
                         })
                     }
                 })
+
+
+
                 // Continue doing other things..
             }).catch(() => {
                 this.$message({

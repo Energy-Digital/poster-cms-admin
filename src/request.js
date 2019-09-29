@@ -2,16 +2,25 @@
 var utils = require('./utils.js')
 var qs = require('qs')
 var axios = require('axios')
+var EventBus = require('./bus.js')
 
-export function odGet (api) {
+
+// General get data
+export function genGet (api, param, callback) {
     
-    axios.get(api).then((response) => {
-        return response
-    })
+    axios.get(contParam(api, param)).then((response) => {
 
+        callback({status: true, data: response.data})
+
+    }).catch((err) => {
+
+        callback({status: false, error: err})
+
+    })
 }
 
-export function encGet (api, pd) {
+// Encryption get data
+export function encGet (api, pd, callback) {
 
     var postReady = {
         ukey: utils.getCookie('u_key'), 
@@ -24,20 +33,178 @@ export function encGet (api, pd) {
 
     axios.post(api, postData)
     .then(function (response) {
-        alert(response.data)
-        if(response.data.indexOf("success") != -1){
-            
 
-            return {res: true, data: response.data}
-
-        } else {
-
-            return {res: false, data: response.data}
+        if(checkWrongVKey(response.data)){
+            EventBus.forceLogout()
+            return
         }
+
+        callback({status: true, data: response.data})
+
     }).catch(function(err){
 
-        return {res: false, data: err}
+        callback({status: false, error: err})
 
     })
     
 }
+
+export function genUpdate (api, pd, callback) {
+    var postReady = {
+        ukey: utils.getCookie('u_key'), 
+        uuid: utils.getCookie('u_uuid')
+    }
+
+    postReady = Object.assign(postReady, pd)
+
+    var postData = qs.stringify(postReady)
+
+    axios.post(api, postData)
+    .then(function (response) {
+
+        if(checkWrongVKey(response.data)){
+            EventBus.forceLogout()
+            return
+        }
+
+        if(response.data.indexOf("success") != -1){
+            callback({status: true, data: response.data})
+        } else {
+            callback({status: false, data: response.data})
+        }
+
+    }).catch(function(err){
+
+        callback({status: false, error: err})
+
+    })
+}
+
+export function loginRequest (api, pd, callback) {
+    // Initial API Token
+    const key = "isjeffcomlogin";
+    const key_encode =  window.btoa(key);
+
+    var postReady = { token: key_encode }
+
+    postReady = Object.assign(postReady, pd)
+
+    var postData = qs.stringify(postReady)
+
+    axios.post(api, postData)
+    .then(function (response) {
+
+        callback({status: true, data: response.data})
+
+    }).catch(function(err){
+
+        callback({status: false, error: err})
+
+    })
+}
+
+export function delFile (api, pd, callback) {
+    var postReady = {
+        ukey: utils.getCookie('u_key'), 
+        uuid: utils.getCookie('u_uuid')
+    }
+
+    postReady = Object.assign(postReady, pd)
+
+    var postData = qs.stringify(postReady)
+
+    axios.post(api, postData)
+    .then(function (response) {
+
+        var delRes = response.data.split(';')
+
+        // status:
+        // 1: file deleted, 2. only delete record, seed remains, 
+        // 3. delete record fail, 4.can not delete the file
+        var status
+
+        if(delRes[0].indexOf("dbs") != -1){
+
+            status = 1
+
+            if(delRes[1].indexOf('ks')){
+                status = 2
+            }
+        } 
+        
+        if (delRes[0].indexOf("dbe") != -1){
+            status = 3
+        }
+
+        if (delRes[1].indexOf("nodel") != -1){
+            status = 4
+        }
+
+        callback({status: status, data: response.data})
+
+    }).catch(function(err){
+
+        callback({status: false, error: err})
+
+    })
+}
+
+export function genUpload (api, file, infos, callback){
+    // Construct form data
+    let form = new FormData()
+    form.append('file', file)
+    form.append('name', infos.name)
+    form.append('typeDes', infos.type.type)
+    form.append('md5', infos.md5)
+    form.append('ukey', utils.getCookie('u_key'))
+    form.append('uuid', utils.getCookie('u_uuid'))
+
+    let h = {
+        headers:{'Content-Type':'multipart/form-data'}
+    }
+
+    axios.post(api, form, h).then((response)=>{
+        if(response.data.indexOf('success') != -1){
+            callback({status: true, data: response.data})
+        } else {
+            callback({status: false, data: response.data})
+        }
+    }).catch((err)=>{
+        callback({status: false, data: err})
+    })
+}
+
+
+
+// Construct url with paramaters
+function contParam (api, param) {
+    
+    // Assumble get url paramaters
+    if(param.length > 0){
+        api = api + "?"
+        
+        
+        for(var i=0;i<param.length;i++){
+
+            if(i == param.length - 1){
+                
+                api = api + param[i].name + "=" + param[i].val
+            } else {
+                api = api + param[i].name + "=" + param[i].val + "&"
+            } 
+        }    
+    }
+
+    
+    
+    return api
+}
+
+function checkWrongVKey (res) {
+    if(typeof(res) !== "object" && res.indexOf("logout") != -1){
+        return true
+    } else {
+        return false
+    }
+}
+

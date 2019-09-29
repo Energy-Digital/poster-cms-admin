@@ -109,6 +109,7 @@
 
 import { EventBus } from '../../bus.js'
 import { idFileTypeDes, getFileIcon, getCookie } from '../../utils.js'
+import { genGet, genUpload } from '../../request'
 import BMF from 'browser-md5-file'
 
 export default {
@@ -173,17 +174,16 @@ export default {
 
             var that = this
             this.gallery = []
-            var api = this.api_getGallery
+            var param = []
 
             if(openMode){
-                api = this.api_getGallery + '&type=' + openMode
+                param = [{name: "type", val: openMode}]
             } else {
-                api = this.api_getGallery + '&type=All'
+                param = [{name: "type", val: "All"}]
             }
 
-            this.axios.get(api).then((response) => {
-                var res = response.data.data
-                that.gallery = res
+            genGet(this.api_getGallery, param, (res)=>{
+                that.gallery = res.data.data
             })
         },
 
@@ -191,9 +191,10 @@ export default {
         uploadFile (obj) {
             
             var that = this
-            var img = obj.file
+            var file = obj.file
             var fileName = obj.file.name
             var fileType = idFileTypeDes(obj.file.name)
+
 
             if(!fileType) {
                 this.$notify({
@@ -206,24 +207,15 @@ export default {
                 const bmf = new BMF()
 
                 bmf.md5(obj.file, (err, md5) => {
-                    let formObj = new FormData()
-                    formObj.append('file',img)
-                    formObj.append('name', fileName)
-                    formObj.append('typeDes', fileType.type)
-                    formObj.append('md5', md5)
-                    formObj.append('ukey', getCookie('u_key'))
-                    formObj.append('uuid', getCookie('u_uuid'))
-
-                    let h = {
-                        headers:{'Content-Type':'multipart/form-data'}
-                    }
-
-                    that.$http.post(that.api_upFile,formObj,h)
-                    .then(function(response) {
-                        var res = response.data
-                        if(res.indexOf('success' != -1)) {
-
-                            var r = res.split(',')
+                    
+                    genUpload(that.api_upFile, file, {
+                        name: fileName,
+                        type: fileType,
+                        md5: md5
+                    }, (res)=>{
+                        if(res.status){
+                            
+                            var r = res.data.split(',')
 
                             that.$notify({
                                 title: "Finish",
@@ -236,7 +228,6 @@ export default {
                             } else {
                                 that.pushToReturnList(that.base_url + r[1], fileType, fileName)
                             }
-
                         } else {
                             that.$notify({
                                 title: "Fail",
@@ -245,6 +236,18 @@ export default {
                             })
                         }
                     })
+
+                    /*that.$http.post(that.api_upFile,formObj,h)
+                    .then(function(response) {
+                        var res = response.data
+                        if(res.indexOf('success' != -1)) {
+
+                            
+
+                        } else {
+                            
+                        }
+                    })*/
                 })
             }
 

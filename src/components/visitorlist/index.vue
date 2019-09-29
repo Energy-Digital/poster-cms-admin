@@ -78,6 +78,7 @@
 </template>
 
 <script>
+import { encGet } from '../../request'
 import WTitle from '../widgets/w_title.vue'
 
 export default {
@@ -114,19 +115,25 @@ export default {
 
       // Pagination
       var limit = this.pageToLimit(page)
-      var api = page ? this.api + '?ls=' + limit + '&li=' + this.pageSize : this.api
 
-      this.axios.get(api).then((response) => {
+      var param = page ? [
+        {name: "ls", val: limit}, 
+        {name: "size", val: this.pageSize}
+      ] : []
+
+      encGet(this.api, param, (res)=>{
+        console.log(res)
+        if(res.status){
+          that.visitorListTotal = parseInt(res.data.total)
         
-        this.visitorListTotal = parseInt(response.data.total)
-        
-        if(this.visitorListTotal === 0){
-          return
+          if(that.visitorListTotal > 0){
+            that.visitorList = res.data.data
+            
+          }
         }
-
-        this.visitorList = response.data.data
-        this.upLoading = false
+        that.upLoading = false
       })
+
     },
 
     changePage (val) {

@@ -19,6 +19,7 @@
 <script>
 
 import { EventBus } from '../bus'
+import { genGet } from '../request'
 import { decodeRichText } from '../utils'
 import topping from './topping.vue'
 import sidebar from "./sidebar.vue"
@@ -66,8 +67,10 @@ export default {
 
     getData () {
       var that = this
-      this.axios.get(this.api).then((response) => {
-        that.siteName = decodeRichText(response.data[0].title)
+      genGet(this.api, [], (res)=>{
+        if(res.status){
+          that.siteName = decodeRichText(res.data[0].title)
+        }
       })
     },
 

@@ -1,5 +1,5 @@
 <template>
-    <div id="all">
+    <div id="all" v-loading="upLoading">
         <div>
             <img src="" alt="">
         </div>
@@ -47,6 +47,7 @@
 <script>
 
 import { EventBus } from '../../bus.js'
+import { loginRequest } from '../../request'
 import { getCookie, setCookie } from '../../utils.js'
 
 export default {
@@ -63,6 +64,7 @@ export default {
             psw: "",
             avatar: "",
             tab:"password",
+            upLoading: false,
             goBtn: true,
             getCodeBtn: false,
             loginTryAgain: false,
@@ -113,6 +115,7 @@ export default {
 
         
         submit () {
+            this.upLoading = true
             var that = this
 
             if(!this.robotTestRes){
@@ -143,147 +146,141 @@ export default {
                     }
                 }
 
-                // Initial API Token
-                const key = "isjeffcomlogin";
-                const key_encode =  window.btoa(key);
+                var postReady = { email: this.email, psw: this.psw }
 
-                var postReady = { email: this.email, psw: this.psw, token: key_encode }
-                
-
-                // Define API
                 var api = this.api
-
-                
+                 
                 if(this.tab === "mobile"){
                     postReady['tel'] = this.phone
                     postReady['mode'] = "vsms"
                     api = this.api_mobile
                 }
 
-                var postData = this.$qs.stringify(postReady)
+                loginRequest(api, postReady, (res)=>{
+                    if(res.status){
+                        if(res.data.indexOf('success') != -1){
+                            var sucInfo = res.data.split(',')
 
-                
-                this.axios.post(api, postData)
-                .then(function (response) {
+                            that.clearLoginCookie()
 
-                    var res = response.data
+                            setCookie("u_key", sucInfo[1], 30, false)
+                            setCookie("u_uuid", sucInfo[2], 30, false)
+                            setCookie("u_name", sucInfo[3], 30, false)
+                            setCookie("u_avatar", sucInfo[4], 30, false)
+                            setCookie("u_email", that.email, 30, false)
 
-                    if(res.indexOf("success") != -1){
+                            that.$notify({
+                                title: 'Security Verfication Successful',
+                                type: 'success'
+                            })
 
-                        var sucInfo = res.split(',')
-
-                        that.clearLoginCookie()
-
-                        setCookie("u_key", sucInfo[1], 30, false)
-                        setCookie("u_uuid", sucInfo[2], 30, false)
-                        setCookie("u_name", sucInfo[3], 30, false)
-                        setCookie("u_avatar", sucInfo[4], 30, false)
-                        setCookie("u_email", that.email, 30, false)
-
-                        that.$notify({
-                            title: 'Security Verfication Successful',
-                            type: 'success'
-                        })
-
-                        EventBus.$emit('login', true)
+                            EventBus.$emit('login', true)
+                        } else {
+                            var againInfo = res.data.split(',')
+                            that.loginTryAgain = true
+                            that.avatar = againInfo[1]
+                            that.$notify({
+                                title: 'Verfication Fail',
+                                message: 'You can only try 10 times per day, be careful.',
+                                type: 'warning'
+                            })
+                        }
 
                     } else {
-                        
-                        var againInfo = res.split(',')
-                        that.loginTryAgain = true
-                        that.avatar = againInfo[1]
                         that.$notify({
-                            title: 'Verfication Fail',
-                            message: 'You can only try 10 times per day, be careful.',
+                            title: 'Unknow error',
+                            message: 'Error: ' + res.error,
                             type: 'warning'
                         })
                     }
-                    
-
                 })
+
             } else {
                 that.$notify({
                     title: 'Email and password should more than 3 charcters.',
                     type: 'warning'
                 })
-
-                
             }
+            this.upLoading = false
         },
 
         getVcode (m) {
-
-
+            this.upLoading = true
             var that = this
+            
 
-            // Initial API Token
-            const key = "isjeffcomlogin";
-            const key_encode =  window.btoa(key);
-            var postReady
-
-            if(m === "phone"){
-                postReady = {tel: this.phone, mode:'sms', token: key_encode}
+            var postReady = {
+                tel: this.phone, 
+                mode:'sms'
             }
 
-            var postData = this.$qs.stringify(postReady)
+            loginRequest(this.api_mobile, postReady, (res)=>{
+                if(res.status){
+                    var finalRes = res.data
+                    if(finalRes.result == 0){
+                        that.codeSent = true
+                        that.getCodeBtn = true
+                        that.countDown()
+                        that.$notify({
+                            title: 'Code sent, check your inbox.',
+                            type: 'success'
+                        })
 
-            var api = this.api_mobile
+                    }
 
-            this.axios.post(api, postData)
-            .then(function (response) {
+                    else if(finalRes.result == 1024 || finalRes.result == 1025){
 
-                var res = response.data
+                        that.$notify({
+                            title: 'You can only verify 5 times pre hour, 10 times pre day. Wait or use PIN+Token.',
+                            type: 'warning'
+                        })
 
-                if(res.result == 0){
-                    that.codeSent = true
-                    that.getCodeBtn = true
-                    that.countDown()
-                    that.$notify({
-                        title: 'Code sent, check your inbox.',
-                        type: 'success'
-                    })
+                    } 
 
-                }
+                    else if(finalRes.indexOf("sent") != -1){
 
-                else if(res.result == 1024 || res.result == 1025){
+                        that.codeSent = true
+                        that.getCodeBtn = true
 
-                    that.$notify({
-                        title: 'You can only verify 5 times pre hour, 10 times pre day. Wait or use PIN+Token.',
-                        type: 'warning'
-                    })
+                        that.countDown()
 
-                } 
+                        that.$notify({
+                            title: 'Code sent, check your inbox.',
+                            type: 'warning'
+                        })
 
-                else if(res.indexOf("sent") != -1){
+                    } 
 
-                    that.codeSent = true
-                    that.getCodeBtn = true
-
-                    that.countDown()
-
-                    that.$notify({
-                        title: 'Code sent, check your inbox.',
-                        type: 'warning'
-                    })
-
-                } 
-
-                else if (res.indexOf("serr") != -1){
-                    that.$notify({
-                        title: 'Could not sent',
-                        type: 'warning'
-                    })
-                }
-                
-                else if(res.indexOf("wait") != -1) {
+                    else if (finalRes.indexOf("serr") != -1){
+                        that.$notify({
+                            title: 'Could not sent',
+                            type: 'warning'
+                        })
+                    }
                     
+                    else if(finalRes.indexOf("wait") != -1) {
+                        
+                        that.$notify({
+                            title: 'Slow down. Wait 1 minute.',
+                            type: 'warning'
+                        })
+                    }
+
+                    else {
+                        that.$notify({
+                            title: 'Unknow Error: ' + res.data.result,
+                            type: 'warning'
+                        })
+                    }
+                        
+                } else {
                     that.$notify({
-                        title: 'Slow down. Wait 1 minute.',
+                        title: 'Unknow Error: ' + res.error,
                         type: 'warning'
                     })
                 }
             })
-            
+            this.upLoading = false
         },
 
         countDown(){

@@ -128,6 +128,9 @@
 </template>
 
 <script>
+
+import { genGet } from '../../request'
+
 // Material Design Icon Pack
 import 'material-icons/iconfont/material-icons.css'
 import uploadWindow from '../widgets/w_upload.vue'
@@ -374,12 +377,11 @@ export default {
         addLink (href, command) {
             var that = this
 
-            // Request my own get title server
-            this.axios.get(this.api_getLink + "?link="+href).then(response => {
-                var res = response.data
-                var resSplit = res.split(':')
+            genGet(this.api_getLink, [{name: "link", val: href}], (res)=>{
                 var titleText = "Open Link: "
-                if(res.indexOf("success") != -1){
+                if(res.status){
+                    var res = res.data
+                    var resSplit = res.split(':')
                     titleText = resSplit[1]
                     command({href, titleText})
                 } else {

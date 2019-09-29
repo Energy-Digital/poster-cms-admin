@@ -44,6 +44,16 @@ export default {
       that.login = false
     })
 
+    EventBus.$on('force-logout', function(data){
+      that.clearLoginCookie()
+      that.login = false
+      that.$notify({
+          title: "You've been force logout",
+          message: "you are using other device or somebody logged in your account.",
+          type: 'warning'
+      })
+    })
+
   },
   methods:{
 

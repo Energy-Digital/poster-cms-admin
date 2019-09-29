@@ -64,6 +64,8 @@
 import { EventBus } from '../../bus'
 import WTitle from '../widgets/w_title.vue'
 
+import { genGet } from '../../request'
+
 export default {
   name: "cateslist",
   components:{
@@ -90,16 +92,16 @@ export default {
 
     getList () {
       this.upLoading = true
-      var that = this
-      this.axios.get(this.api).then((response) => {
-        var res = response.data
 
-        if(res.length  === 0){
-          return
+      var that = this
+      
+      genGet(this.api, [], (res)=>{
+        if(res.status){
+          if(res.data.length > 0){
+            that.catesList = res.data
+            that.upLoading = false
+          }
         }
-        
-        that.catesList = res
-        that.upLoading = false
       })
     },
 
