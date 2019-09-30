@@ -41,7 +41,7 @@
 
             <div class="submit" id="submit">
                 <el-button type="primary" @click="submit()">Save</el-button>
-                <el-button type="text" size="small" style="color:#FF5C5C;" @click="del()" v-if="mode === 'update'">Delete</el-button>
+                <el-button type="text" size="small" style="color:#FF5C5C;" @click="submit('del')" v-if="mode === 'update'">Delete</el-button>
             </div>
             
         </div>
@@ -79,7 +79,6 @@ export default {
         return{
             api: "https://api.isjeff.com/pot/data/social_media/",
             api_up: "https://api.isjeff.com/pot/updater/social_media_single/",
-            api_del: "https://api.isjeff.com/pot/updater/social_media_del/",
             smData: {
                 name: "",
                 url: "",
@@ -118,7 +117,7 @@ export default {
             })
         },
 
-        submit() {
+        submit(mode) {
             var that = this
 
             // Check mandatory content is not empty and did not excess certain words count
@@ -137,17 +136,17 @@ export default {
             this.upLoading = true
 
             var postReady = {
-                mode: this.mode,
+                mode: mode ? mode : this.mode,
                 smId: this.smId,
                 name: this.smData.name,
                 url: this.smData.url,
-                icon: this.smData.icon,
+                icon: this.smData.icon
             }
 
             genUpdate(this.api_up, postReady, (res)=>{
                 if(res.status){
                      that.$notify({
-                        title: 'Submit Successful',
+                        title: 'Success',
                         message: '',
                         type: 'success'
                     })
@@ -165,45 +164,6 @@ export default {
                 that.upLoading = false
             })
 
-        },
-
-        del () {
-
-            var that = this
-
-            var postReady = {
-                ukey: getCookie('u_key'), 
-                uuid: getCookie('u_uuid'), 
-                smId: this.smId
-            }
-
-            var postData = this.$qs.stringify(postReady)
-
-            this.axios.post(this.api_del, postData)
-            .then(function (response) {
-
-                var res = response.data
-
-                if(res.indexOf("success") != -1){
-
-                    that.$notify({
-                        title: 'Deleted',
-                        message: '',
-                        type: 'success'
-                    })
-
-                    that.$nextTick(() => {
-                        EventBus.$emit('toPage', './socialmedialist')
-                    })
-
-                } else {
-                    that.$notify({
-                        title: 'Delete Fail',
-                        message: 'Error: ' + res,
-                        type: 'warning'
-                    })
-                }
-            })
         },
 
         upIcon () {

@@ -236,8 +236,6 @@ export default {
 
         uploadHandler (d) {
 
-            console.log(d)
-
             var data = d.data
 
             if(d.type_des.type === "Image"){

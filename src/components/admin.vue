@@ -10,7 +10,12 @@
     </div>
     
     <div id="right-cont">
-      <router-view :pid.sync="pid" :cateId.sync="cateId" :smId.sync="smId"></router-view>
+      <router-view 
+        :pid.sync="pid" 
+        :cateId.sync="cateId" 
+        :smId.sync="smId" 
+        :navId.sync="navId">
+      </router-view>
     </div>
     
   </div>
@@ -39,6 +44,7 @@ export default {
       pid: "1",
       cateId: "",
       smId: "",
+      navId: "",
       api: "https://api.isjeff.com/pot/data/basic/",
       siteName: ""
     }
@@ -60,6 +66,10 @@ export default {
 
     EventBus.$on('toSMSingle', function(data){
       that.toSMSingle(data)
+    })
+
+    EventBus.$on('toNavSingle', function(data){
+      that.toNavSingle(data)
     })
     
   },
@@ -95,6 +105,11 @@ export default {
     toSMSingle (id) {
       this.smId = id
       this.$router.push( { path: '/socialmediasingle' } )
+    },
+
+    toNavSingle (id) {
+      this.navId = id
+      this.$router.push( { path: '/navsingle' } )
     }
 
   }

@@ -1,7 +1,7 @@
 <template>
     <div id="all" v-loading="upLoading">
-        <div>
-            <img src="" alt="">
+        <div class="logo">
+            <img src="logo.png" alt="poster-cms-logo">
         </div>
 
         <div id="login-window" @mousemove="robotTest" @keyup.enter="submit">
@@ -324,8 +324,17 @@ export default {
 <style scoped>
 #all{
     width:100%;
-    margin-top:10%;
+    margin-top:5%;
     text-align: center;
+}
+
+.logo{
+    width:100%;
+    text-align: center;
+}
+
+.logo img{
+    width:300px;
 }
 
 #login-window{

@@ -16,7 +16,10 @@ import settings from './components/settings'
 import adminsettings from './components/adminsettings'
 import socialmedialist from './components/socialmedialist'
 import socialmediasingle from './components/socialmediasingle'
-
+import navslist from './components/navslist'
+import navsingle from './components/navsingle'
+import themeslist from './components/themeslist'
+import themesettings from './components/themesettings'
 
 
 export default new VueRouter({
@@ -34,6 +37,10 @@ export default new VueRouter({
       { path: '/settings', name: 'settings', component: settings },
       { path: '/adminsettings', name: 'adminsettings', component: adminsettings },
       { path: '/socialmedialist', name: 'socialmedialist', component: socialmedialist },
-      { path: '/socialmediasingle', name: 'socialmediasingle', component: socialmediasingle }
+      { path: '/socialmediasingle', name: 'socialmediasingle', component: socialmediasingle },
+      { path: '/navslist', name: 'navslist', component: navslist },
+      { path: '/navsingle', name: 'navsingle', component: navsingle },
+      { path: '/themeslist', name: 'themeslist', component: themeslist },
+      { path: '/themesettings', name: 'themesettings', component: themesettings },
     ]
 })

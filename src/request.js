@@ -10,7 +10,15 @@ export function genGet (api, param, callback) {
     
     axios.get(contParam(api, param)).then((response) => {
 
-        callback({status: true, data: response.data})
+        if(typeof(response.data) == "string"){
+            callback({status: false, error: response.data})
+            return
+        } else {
+            callback({status: true, data: response.data})
+            return
+        }
+
+        
 
     }).catch((err) => {
 
@@ -49,13 +57,13 @@ export function encGet (api, pd, callback) {
     
 }
 
-export function genUpdate (api, pd, callback) {
+export function genUpdate (api, data, callback) {
     var postReady = {
         ukey: utils.getCookie('u_key'), 
         uuid: utils.getCookie('u_uuid')
     }
 
-    postReady = Object.assign(postReady, pd)
+    postReady = Object.assign(postReady, data)
 
     var postData = qs.stringify(postReady)
 
@@ -75,7 +83,7 @@ export function genUpdate (api, pd, callback) {
 
     }).catch(function(err){
 
-        callback({status: false, error: err})
+        callback({status: false, data: err})
 
     })
 }

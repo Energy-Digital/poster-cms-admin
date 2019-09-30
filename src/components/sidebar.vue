@@ -52,25 +52,48 @@
                     <el-submenu index="4">
                         <template slot="title">
                             <i class="el-icon-set-up"></i>
+                            <span class="el-sb-title">Outfit</span>
+                        </template>
+
+                        <el-menu-item index="4-1" v-on:click="toPage('./themeslist')">
+                            <i class="el-icon-brush"></i>
+                            <span>Themes</span>
+                        </el-menu-item>
+
+                        <el-menu-item index="4-2" v-on:click="toPage('./themesettings')">
+                            <i class="el-icon-brush"></i>
+                            <span>Themes Settings</span>
+                        </el-menu-item>
+
+                    </el-submenu>
+
+                    <el-submenu index="5">
+                        <template slot="title">
+                            <i class="el-icon-set-up"></i>
                             <span class="el-sb-title">Others</span>
                         </template>
 
-                        <el-menu-item index="4-1" v-on:click="toPage('./visitorlist')">
+                        <el-menu-item index="5-1" v-on:click="toPage('./visitorlist')">
                             <i class="el-icon-view"></i>
                             <span>Visitors</span>
                         </el-menu-item>
 
-                        <el-menu-item index="4-2" v-on:click="toPage('./socialmedialist')">
+                        <el-menu-item index="5-2" v-on:click="toPage('./socialmedialist')">
                             <i class="el-icon-share"></i>
                             <span>Social Media</span>
                         </el-menu-item>
 
-                        <el-menu-item index="4-3" v-on:click="toPage('./settings')">
+                        <el-menu-item index="5-3" v-on:click="toPage('./settings')">
                             <i class="el-icon-setting"></i>
                             <span>Settings</span>
                         </el-menu-item>
 
-                        <el-menu-item index="4-4" v-on:click="toPage('./adminsettings')">
+                        <el-menu-item index="5-4" v-on:click="toPage('./navslist')">
+                            <i class="el-icon-connection"></i>
+                            <span>Navigations</span>
+                        </el-menu-item>
+
+                        <el-menu-item index="5-5" v-on:click="toPage('./adminsettings')">
                             <i class="el-icon-user"></i>
                             <span>Admin</span>
                         </el-menu-item>
@@ -102,7 +125,6 @@ import { EventBus } from '../bus.js'
 export default {
     name: "sidebar",
     props:{
-        msg: String,
     },
     data (){
         return {

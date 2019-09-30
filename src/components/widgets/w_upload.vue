@@ -177,9 +177,9 @@ export default {
             var param = []
 
             if(openMode){
-                param = [{name: "type", val: openMode}]
+                param = [{name: "type", val: openMode}, {name: "size", val: "8"}]
             } else {
-                param = [{name: "type", val: "All"}]
+                param = [{name: "type", val: "All"}, {name: "size", val: "8"}]
             }
 
             genGet(this.api_getGallery, param, (res)=>{

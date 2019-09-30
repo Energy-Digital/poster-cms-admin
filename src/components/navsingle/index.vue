@@ -1,7 +1,7 @@
 <template>
     <div id="all" v-loading="upLoading">
         <div id="title">
-            <el-page-header @back="goBack" title="Back" content="Edit Category"></el-page-header>
+            <el-page-header @back="goBack" title="Back" content="Edit Navigation"></el-page-header>
             <!--WTitle txt="Edit Category"></WTitle-->
         </div>
 
@@ -13,35 +13,21 @@
         </div>
         
         <div id="form">
-            <span v-if="postLang === '0'">Category Name</span>
-            <span v-if="postLang === '1'">分类名称</span>
+            <span v-if="postLang === '0'">Name</span>
+            <span v-if="postLang === '1'">名称</span>
             <br>
             <div id="form-name">
-                <el-input v-model="cateData.cname" placeholder="Please Input Name" v-if="postLang === '0'"></el-input>
-                <el-input v-model="cateData.cname_sublang" placeholder="请输入分类名称" v-if="postLang === '1'"></el-input>
+                <el-input v-model="navData.name" placeholder="Please Name" v-if="postLang === '0'"></el-input>
+                <el-input v-model="navData.name_sublang" placeholder="请输入名称" v-if="postLang === '1'"></el-input>
             </div>
             <br>
 
-            <span v-if="postLang === '0'">Category Description</span>
-            <span v-if="postLang === '1'">分类描述</span>
+            <span v-if="postLang === '0'">URL</span>
+            <span v-if="postLang === '1'">链接</span>
             <br>
 
-            <div id="form-text">
-                <el-input
-                    type="textarea"
-                    :rows="3"
-                    v-if="postLang === '0'"
-                    placeholder="Please Input Description"
-                    v-model="cateData.des">
-                </el-input>
-
-                <el-input
-                    type="textarea"
-                    :rows="3"
-                    v-if="postLang === '1'"
-                    placeholder="请输入分类描述"
-                    v-model="cateData.des_sublang">
-                </el-input>
+           <div id="form-url">
+                <el-input v-model="navData.url" placeholder="URL"></el-input>
             </div>
             
             <br>
@@ -68,7 +54,7 @@ import { isEmpty, getCookie } from '../../utils.js'
 export default {
     name:"catesingle",
     props:{
-        cateId: {
+        navId: {
             type: String,
             default: "1"
         }
@@ -78,13 +64,12 @@ export default {
     },
     data(){
         return{
-            api: "https://api.isjeff.com/pot/data/cate/",
-            api_up: "https://api.isjeff.com/pot/updater/cate_single/",
-            cateData: {
-                cname: "",
-                cname_sublang: "",
-                des: "",
-                des_sublang: ""
+            api: "https://api.isjeff.com/pot/data/layout_nav/",
+            api_up: "https://api.isjeff.com/pot/updater/layout_nav/",
+            navData: {
+                name: "",
+                name_sublang: "",
+                url: "",
             },
             postLang: "0",
             mode: "update",
@@ -92,8 +77,8 @@ export default {
         }
     },
     created(){
-
-        if(this.cateId === "new") {
+        
+        if(this.navId === "new") {
             this.mode = "new"
         } else {
             this.getData()
@@ -103,7 +88,7 @@ export default {
     methods:{
 
         goBack() {
-            EventBus.$emit('toPage', './cateslist')
+            EventBus.$emit('toPage', './navslist')
         },
 
         getData(){
@@ -111,22 +96,22 @@ export default {
             this.upLoading = true
 
             genGet(this.api, [
-                {name: "cid", val: this.cateId}
+                {name: "id", val: this.navId}
             ], (res)=>{
                 if(res.status){
-                    that.cateData = res.data[0]
+                    that.navData = res.data[0]
                 }
                 that.upLoading = false
             })
         },
 
-        submit(mode) {
+        submit() {
             var that = this
 
             // Check mandatory content is not empty and did not excess certain words count
             if(
-                isEmpty(this.cateData.cname) ||
-                isEmpty(this.cateData.des)
+                isEmpty(this.navData.name) ||
+                isEmpty(this.navData.url)
             ){
                 this.$notify({
                     title: 'Check Needed',
@@ -139,12 +124,11 @@ export default {
             this.upLoading = true
 
             var postReady = {
-                mode: mode ? mode : this.mode,
-                cid: this.cateId,
-                cname: this.cateData.cname,
-                cname_sublang: this.cateData.cname_sublang,
-                des: this.cateData.des,
-                des_sublang: this.cateData.des_sublang
+                mode: this.mode,
+                id: this.navId,
+                name: this.navData.name,
+                name_sublang: this.navData.name_sublang,
+                url: this.navData.url,
             }
 
             genUpdate(this.api_up, postReady, (res)=>{
@@ -157,7 +141,7 @@ export default {
                     })
 
                     that.$nextTick(() => {
-                        EventBus.$emit('toPage', './cateslist')
+                        EventBus.$emit('toPage', './navslist')
                     })
                 } else {
                     that.$notify({
@@ -170,7 +154,7 @@ export default {
                 that.upLoading = false
             })
 
-        },
+        }
     }
 }
 </script>

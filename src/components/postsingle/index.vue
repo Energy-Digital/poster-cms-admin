@@ -154,7 +154,7 @@
 
     <div class="pc-b" id="pc-submit">
       <el-button type="primary" @click="submit()">Save</el-button>
-      <el-button type="text" size="small" style="color:#FF5C5C;" @click="del()" v-if="mode === 'update'">Delete</el-button>
+      <el-button type="text" size="small" style="color:#FF5C5C;" @click="submit('del')" v-if="mode === 'update'">Delete</el-button>
     </div>
 
 
@@ -196,7 +196,6 @@ export default {
       api_up_assets:"/",
       api_d_cate:"",
       api_up:"https://api.isjeff.com/pot/updater/post_single/",
-      api_del: "https://api.isjeff.com/pot/updater/post_del/",
 
       // Upload Window
       upload_win: false,
@@ -400,10 +399,7 @@ export default {
       })
     },
 
-    submit () {
-
-      
-
+    submit (mode) {
       var that = this
 
       var today = new Date().toISOString().slice(0, 19).replace('T', ' ')
@@ -437,7 +433,7 @@ export default {
       this.upLoading = true
 
       var postReady = {
-        mode: this.mode,
+        mode: mode ? mode : this.mode,
         pid: this.postData.id,
         cateId: this.postData.cateId,
         title: this.postData.title,
@@ -457,7 +453,7 @@ export default {
       genUpdate(this.api_up, postReady, (res)=>{
         if(res.status){
           that.$notify({
-              title: 'Submitted',
+              title: 'Success',
               type: 'success'
           })
 
@@ -476,49 +472,6 @@ export default {
         that.upLoading = false
       })
 
-    },
-
-    del () {
-      this.upLoading = true
-      var that = this
-
-      this.$confirm('You will delete a post permanently, continue?', 'Alert', {
-        confirmButtonText: 'DELETE',
-        cancelButtonText: 'Cancel',
-        type: 'warning'
-      }).then(() => {
-        
-        var postReady = {
-          pid: that.postData.id
-        }
-
-        genUpdate(that.api_del, postReady, (res)=>{
-          if(res.status){
-            that.$notify({
-                title: 'Success',
-                message: 'Post has been removed',
-                type: 'success'
-            })
-
-            EventBus.$emit('toPage', './postslist')
-          }else{
-            that.$notify({
-                title: 'Fail',
-                message: 'Error: ' + res.error,
-                type: 'warning'
-            })
-          }
-          that.upLoading = false
-        })
-
-
-      }).catch(() => {
-        that.upLoading = false
-        this.$message({
-          type: 'info',
-          message: 'Canceled'
-        });          
-      })
     },
 
     uploadTitleImg () {
