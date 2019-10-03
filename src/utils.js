@@ -14,6 +14,8 @@ var fileTypes =
         
     ]
 
+var replaceall = require("replaceall")
+
 export function limitLength (mode, str, num) {
     if(mode == ">") {
         if(str.length > num){
@@ -95,18 +97,29 @@ export function getFileIcon (type) {
 }
 
 export function decodeRichText (val) {
-    var replaceall = require("replaceall")
+    
     val = replaceall('|*|', '"', val)
     val = replaceall('|**|', "'", val)
     return val
 }
 
 export function encodeRichText (val) {
-    var replaceall = require("replaceall")
     val = replaceall('"', '|*|', val)
     val = replaceall("'", '|**|', val)
     return val
 }
+
+export function decodeImgSrc (val, base){
+    val = replaceall('[%base%]', base, val)
+    return val
+}
+
+
+export function encodeImgSrc (val, base){
+    val = replaceall('<img src="' + base, '<img src="[%base%]', val)
+    return val
+}
+
 
 export function strLenLimit (str, limit) {
 

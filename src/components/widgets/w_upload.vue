@@ -9,7 +9,7 @@
         <el-tabs v-model="imgInsMode">
             <el-tab-pane label="Upload" name="upload"></el-tab-pane>
             <el-tab-pane label="Multiple" name="multiple" v-if="allowMultiple"></el-tab-pane>
-            <el-tab-pane label="URL" name="url" v-if="allowUrl"></el-tab-pane>
+            <el-tab-pane label="URL" name="url" v-if="false"></el-tab-pane>
             <el-tab-pane label="Gallery" name="gallery" v-if="allowSelect"></el-tab-pane>
         </el-tabs>
 
@@ -64,7 +64,7 @@
             </div>
             
             <div class="au_assets_manager_btn">
-                <el-button type="primary" style="width:80px;" v-on:click="submit(inputedImg, 'Image', 'noname', 0, false)" plain>OK</el-button>
+                <el-button type="primary" style="width:80px;" v-on:click="submit(inputedImg, {type: 'Image', icon:0}, 'noname', 0, false)" plain>OK</el-button>
             </div>
             
         </div>
@@ -79,7 +79,7 @@
                         :style="item.type_des === 'Image' ? 'width: 100px; height: 100px' : 'width: 30px; height: 30px;margin-top: 35px;margin-left: -30px;'"
                         :src="item.type_des === 'Image' ? base_url + item.path : base_url + static_icons_url + getIcon(item.type)"
                         fit="contain"
-                        v-on:click="selectItem(item.id, base_url+item.path, item.type_des, item.name)">
+                        v-on:click="selectItem(item.id, item.path, item.type_des, item.name)">
                         <div slot="placeholder" class="au_img_placeholder">
                             <span>Loading</span>
                         </div>
@@ -224,9 +224,9 @@ export default {
 
                             // If is not multiple upload
                             if(that.waittingList.length === 0){
-                                that.submit(that.base_url + r[1], fileType, fileName, 0, false)
+                                that.submit(r[1], fileType, fileName, 0, false)
                             } else {
-                                that.pushToReturnList(that.base_url + r[1], fileType, fileName)
+                                that.pushToReturnList(r[1], fileType, fileName)
                             }
                         } else {
                             that.$notify({
@@ -281,6 +281,7 @@ export default {
         },
 
         selectItem (id, url, type, name) {
+            
             if(id === this.selected.id){
                 this.selected = {}
             } else {
@@ -304,11 +305,6 @@ export default {
         beforeImgUpload (file) {
 
             var fileSizeMB = file.size / 1024 / 1024
-
-            /*if (file.type != 'image/jpeg' && file.type != 'image/png' && file.type != 'image/gif') {
-                this.$message.error('JPG/PNG/GIF Image Only !')
-                return false
-            }*/
 
             if (fileSizeMB > 8) {
                 this.$message.error('Maximum file size is: 8 MB!')

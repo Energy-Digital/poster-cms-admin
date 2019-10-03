@@ -1,5 +1,5 @@
 <template>
-  <div id="all" v-loading="upLoading">
+  <div id="all" v-loading="upLoading" v-if="loaded">
 
     <div id="post-title">
       <!--WTitle txt="Edit Post"></WTitle-->
@@ -21,7 +21,7 @@
         <el-input v-model="postData.title_sublang" placeholder="请输入标题" v-if="postLang === '1'"></el-input>
       </div>
 
-      <div class="pc-b" id="pc-content" v-if="loaded">
+      <div class="pc-b" id="pc-content">
         <div id="pc-editmode-selector">
           <el-tabs v-model="editMode" type="card">
             <el-tab-pane label="Visual" name="view"></el-tab-pane>
@@ -107,9 +107,9 @@
             v-if="postData.title_img != null"
             class="tableImage"
             :style="'width: 400px; height: 160px'"
-            :src="postData.title_img"
+            :src="base_url + postData.title_img"
             fit="contain"
-            :preview-src-list="[postData.title_img]"
+            :preview-src-list="[base_url + postData.title_img]"
             lazy>
 
             <div slot="placeholder" class="au_img_placeholder">
@@ -158,7 +158,14 @@
     </div>
 
 
-    <upload-window v-if="upload_win" @uploaded="uploadHandler" @close="closeUpWin" :allowUrl="true" :allowSelect="true"></upload-window>
+    <upload-window 
+      v-if="upload_win" 
+      @uploaded="uploadHandler" 
+      @close="closeUpWin" 
+      :allowUrl="true" 
+      :allowSelect="true" 
+      :allowMultiple="false">
+    </upload-window>
     
   </div>
 </template>
@@ -167,7 +174,7 @@
 
 import { EventBus } from '../../bus.js'
 import { genGet, genUpdate } from '../../request'
-import { limitLength, isEmpty, getCookie, encodeRichText, decodeRichText } from '../../utils.js'
+import { limitLength, isEmpty, getCookie, encodeRichText, decodeRichText, encodeImgSrc, decodeImgSrc } from '../../utils.js'
 import uploadWindow from '../widgets/w_upload.vue'
 
 import TextEditor from '../texteditor/index.vue'
@@ -336,6 +343,8 @@ export default {
           var finalRes = res.data[0]
           finalRes.content = decodeRichText(finalRes.content)
           finalRes.content_sublang = decodeRichText(finalRes.content_sublang)
+          finalRes.content = decodeImgSrc(finalRes.content, that.base_url)
+          finalRes.content_sublang = decodeImgSrc(finalRes.content_sublang, that.base_url)
           finalRes.status = Number(finalRes.status)
 
           that.postData = finalRes
@@ -431,6 +440,11 @@ export default {
       }
 
       this.upLoading = true
+      var contentReady = encodeImgSrc(this.postData.content, this.base_url)
+      contentReady = encodeRichText(contentReady)
+
+      var contentSbReady = encodeImgSrc(this.postData.content_sublang, this.base_url)
+      contentSbReady = encodeRichText(contentSbReady)
 
       var postReady = {
         mode: mode ? mode : this.mode,
@@ -439,8 +453,8 @@ export default {
         title: this.postData.title,
         title_sublang: this.postData.title_sublang,
         title_img: this.postData.title_img,
-        content: encodeRichText(this.postData.content),
-        content_sublang: encodeRichText(this.postData.content_sublang),
+        content: contentReady,
+        content_sublang: contentSbReady,
         brief: this.postData.brief,
         brief_sublang: this.postData.brief_sublang,
         date_pub: this.mode === "update" ? this.postData.data_pub  : today,
@@ -449,6 +463,8 @@ export default {
         ux_likes: parseInt(this.postData.ux_likes),
         status: String(this.postData.status)
       }
+
+      
 
       genUpdate(this.api_up, postReady, (res)=>{
         if(res.status){

@@ -17,9 +17,7 @@ export function genGet (api, param, callback) {
             callback({status: true, data: response.data})
             return
         }
-
         
-
     }).catch((err) => {
 
         callback({status: false, error: err})
@@ -203,8 +201,6 @@ function contParam (api, param) {
         }    
     }
 
-    
-    
     return api
 }
 

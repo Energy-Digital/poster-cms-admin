@@ -11,6 +11,7 @@
     
     <div id="right-cont">
       <router-view 
+        ref="rot"
         :pid.sync="pid" 
         :cateId.sync="cateId" 
         :smId.sync="smId" 
@@ -110,7 +111,8 @@ export default {
     toNavSingle (id) {
       this.navId = id
       this.$router.push( { path: '/navsingle' } )
-    }
+    },
+
 
   }
 }

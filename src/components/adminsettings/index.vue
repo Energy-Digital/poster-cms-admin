@@ -19,9 +19,9 @@
             <el-image
                 class="file-single-img-img"
                 style="width: 180px; height: 180px"
-                :src="form.avatar"
+                :src="base_url + form.avatar"
                 fit="contain"
-                :preview-src-list="[form.avatar]">
+                :preview-src-list="[base_url + form.avatar]">
 
                 <div slot="placeholder" class="au_img_placeholder">
                     <span>Loading</span>
@@ -65,6 +65,7 @@ export default {
   },
   data(){
     return{
+      base_url: "https://api.isjeff.com/pot",
       api: "https://api.isjeff.com/pot/data_enc/user_enc/",
       api_up:"https://api.isjeff.com/pot/updater/user_up/",
       form:{},

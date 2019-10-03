@@ -61,8 +61,18 @@
                         </el-menu-item>
 
                         <el-menu-item index="4-2" v-on:click="toPage('./themesettings')">
-                            <i class="el-icon-brush"></i>
+                            <i class="el-icon-magic-stick"></i>
                             <span>Themes Settings</span>
+                        </el-menu-item>
+
+                        <el-menu-item index="4-3" v-on:click="toPage('./socialmedialist')">
+                            <i class="el-icon-share"></i>
+                            <span>Social Media</span>
+                        </el-menu-item>
+
+                        <el-menu-item index="4-5" v-on:click="toPage('./navslist')">
+                            <i class="el-icon-connection"></i>
+                            <span>Navigations</span>
                         </el-menu-item>
 
                     </el-submenu>
@@ -78,22 +88,14 @@
                             <span>Visitors</span>
                         </el-menu-item>
 
-                        <el-menu-item index="5-2" v-on:click="toPage('./socialmedialist')">
-                            <i class="el-icon-share"></i>
-                            <span>Social Media</span>
-                        </el-menu-item>
-
-                        <el-menu-item index="5-3" v-on:click="toPage('./settings')">
+                        
+                        <el-menu-item index="5-2" v-on:click="toPage('./settings')">
                             <i class="el-icon-setting"></i>
                             <span>Settings</span>
                         </el-menu-item>
 
-                        <el-menu-item index="5-4" v-on:click="toPage('./navslist')">
-                            <i class="el-icon-connection"></i>
-                            <span>Navigations</span>
-                        </el-menu-item>
-
-                        <el-menu-item index="5-5" v-on:click="toPage('./adminsettings')">
+                        
+                        <el-menu-item index="5-3" v-on:click="toPage('./adminsettings')">
                             <i class="el-icon-user"></i>
                             <span>Admin</span>
                         </el-menu-item>

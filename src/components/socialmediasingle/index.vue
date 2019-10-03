@@ -25,7 +25,7 @@
                 <el-image
                     class="file-single-img-img"
                     style="width: 40px; height: 40px"
-                    :src="smData.icon"
+                    :src="base_url + smData.icon"
                     fit="contain">
 
                     <div slot="placeholder" class="au_img_placeholder">
@@ -64,7 +64,7 @@ import uploadWindow from '../widgets/w_upload.vue'
 
 
 export default {
-    name:"catesingle",
+    name:"socialmediasingle",
     props:{
         smId: {
             type: String,
@@ -77,6 +77,7 @@ export default {
     },
     data(){
         return{
+            base_url: "https://api.isjeff.com/pot",
             api: "https://api.isjeff.com/pot/data/social_media/",
             api_up: "https://api.isjeff.com/pot/updater/social_media_single/",
             smData: {

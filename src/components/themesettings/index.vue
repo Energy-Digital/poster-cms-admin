@@ -1,5 +1,5 @@
 <template>
-  <div id="all">
+  <div id="all" v-loading="upLoading">
 
     <WTitle txt="Theme Data Settings"></WTitle>
 
@@ -14,9 +14,9 @@
                 v-if="item.val != ''"
                 class="file-single-img-img"
                 style="width: 180px; height: 180px"
-                :src="item.val"
+                :src="base_url + item.val"
                 fit="contain"
-                :preview-src-list="[item.val]">
+                :preview-src-list="[base_url + item.val]">
 
                 <div slot="placeholder" class="au_img_placeholder">
                     <span>Loading</span>
@@ -68,6 +68,7 @@ export default {
   },
   data(){
     return{
+      base_url: "https://api.isjeff.com/pot",
       api: "https://api.isjeff.com/pot/data/themes/",
       api_up:"https://api.isjeff.com/pot/updater/theme/",
       themeData: {},

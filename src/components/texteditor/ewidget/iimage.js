@@ -21,7 +21,9 @@ export default class IImage extends Node {
     return {
       inline: true,
       attrs: {
-        src: {},
+        src: {
+          default: null
+        },
         alt: {
           default: null,
         },
@@ -33,7 +35,7 @@ export default class IImage extends Node {
         },
         style: {
             default: this.width
-        }
+        },
       },
       group: 'inline',
       selectable: true,
@@ -47,7 +49,12 @@ export default class IImage extends Node {
           }),
         },
       ],
-      toDOM: node => ['img', node.attrs],
+      toDOM: node => ['img', {
+        src: node.attrs.src, 
+        alt: node.attrs.alt, 
+        width: node.attrs.width, 
+        style: node.attrs.style
+      }],
     }
   }
 
@@ -64,14 +71,36 @@ export default class IImage extends Node {
   inputRules({ type }) {
     return [
       nodeInputRule(IMAGE_INPUT_REGEX, type, match => {
-        const [, alt, src, title] = match
+        const [alt, src, title] = match
         return {
           src,
           alt,
-          title,
+          title
         }
       }),
     ]
+  }
+
+  get view() {
+    return {
+      props: ['node', 'updateAttrs', 'view'],
+      computed: {
+        src: {
+          get() {
+            return this.node.attrs.src
+          },
+          set(src) {
+            this.updateAttrs({
+              src
+            })
+          },
+        },
+
+      },
+      template: `
+        <img :src="src" width='100%' />
+      `,
+    }
   }
 
   get plugins() {

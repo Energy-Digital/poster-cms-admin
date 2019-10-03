@@ -130,6 +130,7 @@
 <script>
 
 import { genGet } from '../../request'
+import { decodeImgSrc, encodeImgSrc } from '../../utils'
 
 // Material Design Icon Pack
 import 'material-icons/iconfont/material-icons.css'
@@ -175,7 +176,7 @@ export default {
     },
     data(){
         return {
-            base_url: "https://api.isjeff.com/pot/",
+            base_url: "https://api.isjeff.com/pot",
             api_getLink: "https://api.isjeff.com/pot/data/getlink/",
             editor: null,
             dialog_link_v: false,
@@ -190,7 +191,6 @@ export default {
     },
     created () {
         var that = this
-
         // this.text = this.text ? "No Content" : this.text
     },
     mounted () {
@@ -219,7 +219,7 @@ export default {
                 new Iframe(),
                 new ILink(),
                 new IParagraph(),
-                new IImage(),
+                new IImage({base: this.base_url}),
             ],
             onUpdate(){
                 that.$emit('update', this.getHTML())
@@ -237,7 +237,7 @@ export default {
         uploadHandler (d) {
 
             var data = d.data
-
+            
             if(d.type_des.type === "Image"){
                 
                 if(d.multiple){
@@ -345,9 +345,15 @@ export default {
 
         // Insert an image
         addImage (src, command) {
-
+            
             if(src){
-                command({src, width:'100%'})
+                var base = "[%bu%]"
+                if(src.indexOf("http") != -1){
+                    
+                    base = ""
+                }
+
+                command({src: this.base_url + src, width:'100%'})
                 // Close window
                 this.closeUpWin()
             }

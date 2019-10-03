@@ -1,7 +1,7 @@
 <template>
   <div id="all">
 
-    <WTitle txt="Categories"></WTitle>
+    <WTitle txt="Social Media"></WTitle>
 
     <div id="new">
       <el-button type="primary" v-on:click="toSMNew()" plain>New</el-button>
@@ -35,7 +35,7 @@
           width="120">
           <template slot-scope="scope">
             <div>
-                <img :src="scope.row.icon" :alt="scope.row.name" style="width:30px">
+                <img :src="base_url + scope.row.icon" :alt="scope.row.name" style="width:30px">
             </div>
         </template>
         </el-table-column>
@@ -62,7 +62,7 @@ import { genGet } from '../../request'
 import WTitle from '../widgets/w_title.vue'
 
 export default {
-  name: "cateslist",
+  name: "socialmedialist",
   components:{
     WTitle
   },
@@ -71,6 +71,7 @@ export default {
   },
   data(){
     return{
+      base_url: "https://api.isjeff.com/pot",
       api: "https://api.isjeff.com/pot/data/social_media/",
       smList: [],
       upLoading: false,
