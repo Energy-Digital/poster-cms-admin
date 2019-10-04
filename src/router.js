@@ -23,7 +23,6 @@ import themesettings from './components/themesettings'
 
 
 export default new VueRouter({
-  mode: 'history',
   routes: [
       { path:'/', name:'Home', redirect: '/home' },
       { path: '/home', name: 'home', component: home },
