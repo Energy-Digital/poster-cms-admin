@@ -61,25 +61,21 @@
 <script>
 
 // Import common js
-import { EventBus }  from '../../bus.js'
 import { genGet, genUpdate } from '../../request'
 import { isEmpty, getCookie } from '../../utils.js'
 
 export default {
     name:"catesingle",
     props:{
-        cateId: {
-            type: String,
-            default: "1"
-        }
+        base: String
     },
     components:{
 
     },
     data(){
         return{
-            api: "https://api.isjeff.com/pot/data/cate/",
-            api_up: "https://api.isjeff.com/pot/updater/cate_single/",
+            api: "/data/cate/",
+            api_up: "/updater/cate_single/",
             cateData: {
                 cname: "",
                 cname_sublang: "",
@@ -93,6 +89,8 @@ export default {
     },
     created(){
 
+        this.cateId = this.$route.query.cateId
+
         if(this.cateId === "new") {
             this.mode = "new"
         } else {
@@ -103,14 +101,14 @@ export default {
     methods:{
 
         goBack() {
-            EventBus.$emit('toPage', './cateslist')
+            this.$router.push({ path: './cateslist' })
         },
 
         getData(){
             var that = this
             this.upLoading = true
 
-            genGet(this.api, [
+            genGet(this.base + this.api, [
                 {name: "cid", val: this.cateId}
             ], (res)=>{
                 if(res.status){
@@ -147,7 +145,7 @@ export default {
                 des_sublang: this.cateData.des_sublang
             }
 
-            genUpdate(this.api_up, postReady, (res)=>{
+            genUpdate(this.base + this.api_up, postReady, (res)=>{
                 if(res.status){
 
                     that.$notify({
@@ -157,7 +155,7 @@ export default {
                     })
 
                     that.$nextTick(() => {
-                        EventBus.$emit('toPage', './cateslist')
+                        that.goBack()
                     })
                 } else {
                     that.$notify({

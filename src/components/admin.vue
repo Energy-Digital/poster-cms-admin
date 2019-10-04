@@ -11,11 +11,9 @@
     
     <div id="right-cont">
       <router-view 
+        v-if="loaded"
         ref="rot"
-        :pid.sync="pid" 
-        :cateId.sync="cateId" 
-        :smId.sync="smId" 
-        :navId.sync="navId">
+        :base="base">
       </router-view>
     </div>
     
@@ -42,12 +40,10 @@ export default {
   data(){
     return{
       user:"Admin",
-      pid: "1",
-      cateId: "",
-      smId: "",
-      navId: "",
+      base: "",
       api: "https://api.isjeff.com/pot/data/basic/",
-      siteName: ""
+      siteName: "",
+      loaded: false,
     }
   },
   created(){
@@ -55,22 +51,6 @@ export default {
     this.getData()
     EventBus.$on("toPage", function(data){
       that.toPage(data)
-    })
-
-    EventBus.$on('toPostSingle', function(data){
-      that.toPostSingle(data)
-    })
-
-    EventBus.$on('toCateSingle', function(data){
-      that.toCateSingle(data)
-    })
-
-    EventBus.$on('toSMSingle', function(data){
-      that.toSMSingle(data)
-    })
-
-    EventBus.$on('toNavSingle', function(data){
-      that.toNavSingle(data)
     })
     
   },
@@ -80,7 +60,13 @@ export default {
       var that = this
       genGet(this.api, [], (res)=>{
         if(res.status){
+          that.base = res.data[0].baseUrl
           that.siteName = decodeRichText(res.data[0].title)
+          that.loaded = true
+        } else {
+          var newApiBase = prompt("Can not establish basic connection, you might just change your base url:", "")
+          that.api = newApiBase + "/data/basic/"
+          that.getData()
         }
       })
     },
@@ -91,27 +77,7 @@ export default {
 
     toPage (dir) {
       this.$router.push({ path: dir })
-    },
-
-    toPostSingle (id) {
-      this.pid = id
-      this.$router.push({ path: '/postsingle' })
-    },
-
-    toCateSingle (id) {
-      this.cateId = id
-      this.$router.push( { path: '/catesingle' } )
-    },
-
-    toSMSingle (id) {
-      this.smId = id
-      this.$router.push( { path: '/socialmediasingle' } )
-    },
-
-    toNavSingle (id) {
-      this.navId = id
-      this.$router.push( { path: '/navsingle' } )
-    },
+    }
 
 
   }

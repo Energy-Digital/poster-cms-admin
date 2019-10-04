@@ -84,7 +84,14 @@
         
     </div>
 
-    <upload-window v-if="upload_win" @uploaded="uploadHandler" @close="closeUpWin" :allowUrl="true" :allowSelect="true"></upload-window>
+    <upload-window 
+      v-if="upload_win" 
+      @uploaded="uploadHandler" 
+      @close="closeUpWin" 
+      :base="base"
+      :allowUrl="false" 
+      :allowSelect="true">
+    </upload-window>
     
   </div>
 </template>
@@ -105,12 +112,12 @@ export default {
     uploadWindow
   },
   props:{
-    
+    base: String
   },
   data(){
     return{
-      api: "https://api.isjeff.com/pot/data/basic/",
-      api_up:"https://api.isjeff.com/pot/updater/basic/",
+      api: "/data/basic/",
+      api_up:"/updater/basic/",
       form:{},
       keywords:[],
       inputVisible: false,
@@ -133,7 +140,7 @@ export default {
       this.upLoading = true
       var that = this
 
-      genGet(this.api, [], (res)=>{
+      genGet(this.base + this.api, [], (res)=>{
         if(res.status){
           var finalRes = res.data[0]
 
@@ -281,7 +288,7 @@ export default {
 
       this.upLoading = true
 
-      genUpdate(this.api_up, obj, (res)=>{
+      genUpdate(this.base + this.api_up, obj, (res)=>{
         if(res.status){
           that.$notify({
               title: 'Submitted',

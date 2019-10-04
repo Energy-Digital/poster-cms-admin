@@ -4,7 +4,9 @@
     <WTitle txt="Social Media"></WTitle>
 
     <div id="new">
-      <el-button type="primary" v-on:click="toSMNew()" plain>New</el-button>
+      <router-link :to="{ path:'/socialmediasingle', query: { smId: 'new'} }">
+        <el-button type="primary" plain>New</el-button>
+      </router-link>
     </div>
 
     <div id="list" v-loading="upLoading">
@@ -35,7 +37,7 @@
           width="120">
           <template slot-scope="scope">
             <div>
-                <img :src="base_url + scope.row.icon" :alt="scope.row.name" style="width:30px">
+                <img :src="base + scope.row.icon" :alt="scope.row.name" style="width:30px">
             </div>
         </template>
         </el-table-column>
@@ -46,7 +48,9 @@
           label="Action"
           width="100">
           <template slot-scope="scope">
-            <el-button @click="toSMSingle(scope.row.id)" type="text" size="small">Edit</el-button>
+            <router-link :to="{ path:'/socialmediasingle', query: { smId: scope.row.id} }">
+              <el-button type="text" size="small">Edit</el-button>
+            </router-link>
           </template>
         </el-table-column>
         
@@ -57,7 +61,6 @@
 </template>
 
 <script>
-import { EventBus } from '../../bus'
 import { genGet } from '../../request'
 import WTitle from '../widgets/w_title.vue'
 
@@ -67,12 +70,11 @@ export default {
     WTitle
   },
   props:{
-    
+    base: String
   },
   data(){
     return{
-      base_url: "https://api.isjeff.com/pot",
-      api: "https://api.isjeff.com/pot/data/social_media/",
+      api: "/data/social_media/",
       smList: [],
       upLoading: false,
     }
@@ -89,7 +91,7 @@ export default {
     getList () {
       this.upLoading = true
       var that = this
-      genGet(this.api, [], (res)=>{
+      genGet(this.base + this.api, [], (res)=>{
         if(res.status){
           if(res.data.length > 0){
             that.smList = res.data
@@ -97,14 +99,6 @@ export default {
           }
         }
       })
-    },
-
-    toSMSingle (data) {
-      EventBus.$emit('toSMSingle', data)
-    },
-
-    toSMNew () {
-      EventBus.$emit('toSMSingle', "new")
     },
 
     toLink (url) {

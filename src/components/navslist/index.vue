@@ -4,7 +4,9 @@
     <WTitle txt="Navigation Bar"></WTitle>
 
     <div id="new">
-      <el-button type="primary" v-on:click="toNavNew()" plain>New</el-button>
+      <router-link :to="{ path:'/navsingle', query: { navId: 'new'} }">
+        <el-button type="primary" plain>New</el-button>
+      </router-link>
     </div>
 
     <div id="list" v-loading="upLoading">
@@ -39,7 +41,9 @@
           label="Action"
           width="100">
           <template slot-scope="scope">
-            <el-button @click="toNavSingle(scope.row)" type="text" size="small">Edit</el-button>
+            <router-link :to="{ path:'/navsingle', query: { navId: scope.row.id} }">
+              <el-button type="text" size="small">Edit</el-button>
+            </router-link>
           </template>
         </el-table-column>
         
@@ -50,7 +54,6 @@
 </template>
 
 <script>
-import { EventBus } from '../../bus'
 import WTitle from '../widgets/w_title.vue'
 
 import { genGet } from '../../request'
@@ -61,11 +64,11 @@ export default {
     WTitle
   },
   props:{
-    
+    base: String
   },
   data(){
     return{
-      api: "https://api.isjeff.com/pot/data/layout_nav/",
+      api: "/data/layout_nav/",
       navsList: [],
       upLoading: false,
     }
@@ -84,7 +87,7 @@ export default {
 
       var that = this
       
-      genGet(this.api, [], (res)=>{
+      genGet(this.base + this.api, [], (res)=>{
         if(res.status){
           if(res.data.length > 0){
             that.navsList = res.data
@@ -92,14 +95,6 @@ export default {
           }
         }
       })
-    },
-
-    toNavSingle (data) {
-      EventBus.$emit('toNavSingle', data.id)
-    },
-
-    toNavNew () {
-      EventBus.$emit('toNavSingle', "new")
     }
 
   }

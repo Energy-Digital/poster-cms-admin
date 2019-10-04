@@ -77,7 +77,7 @@
                     <el-image
                         class="file-single-img-img"
                         :style="item.type_des === 'Image' ? 'width: 100px; height: 100px' : 'width: 30px; height: 30px;margin-top: 35px;margin-left: -30px;'"
-                        :src="item.type_des === 'Image' ? base_url + item.path : base_url + static_icons_url + getIcon(item.type)"
+                        :src="item.type_des === 'Image' ? base + item.path : base + static_icons_url + getIcon(item.type)"
                         fit="contain"
                         v-on:click="selectItem(item.id, item.path, item.type_des, item.name)">
                         <div slot="placeholder" class="au_img_placeholder">
@@ -130,16 +130,16 @@ export default {
             type: Boolean,
             default: true
         },
-        allowType: String
+        allowType: String,
+        base: String
     },
     data () {
         return {
             session: false,
             res: {},
-            base_url: "https://api.isjeff.com/pot",
             static_icons_url: "/static/icons/",
-            api_upFile: "https://api.isjeff.com/pot/manager/up_file/",
-            api_getGallery: "https://api.isjeff.com/pot/manager/all_media/?ls=0&size=8",
+            api_upFile: "/manager/up_file/",
+            api_getGallery: "/manager/all_media/?ls=0&size=8",
             imgInsMode: "upload",
             gallery: [],
             inputedImg: "",
@@ -182,7 +182,7 @@ export default {
                 param = [{name: "type", val: "All"}, {name: "size", val: "8"}]
             }
 
-            genGet(this.api_getGallery, param, (res)=>{
+            genGet(this.base + this.api_getGallery, param, (res)=>{
                 that.gallery = res.data.data
             })
         },
@@ -208,7 +208,7 @@ export default {
 
                 bmf.md5(obj.file, (err, md5) => {
                     
-                    genUpload(that.api_upFile, file, {
+                    genUpload(that.base + that.api_upFile, file, {
                         name: fileName,
                         type: fileType,
                         md5: md5

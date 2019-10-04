@@ -4,7 +4,9 @@
     <WTitle txt="Categories"></WTitle>
 
     <div id="new">
-      <el-button type="primary" v-on:click="toCateNew()" plain>New</el-button>
+      <router-link :to="{ path:'/catesingle', query: { cateId: 'new'} }">
+        <el-button type="primary" plain>New</el-button>
+      </router-link>
     </div>
 
     <div id="list" v-loading="upLoading">
@@ -50,7 +52,9 @@
           label="Action"
           width="100">
           <template slot-scope="scope">
-            <el-button @click="toCateSingle(scope.row)" type="text" size="small">Edit</el-button>
+            <router-link :to="{ path:'/catesingle', query: { cateId: scope.row.id} }">
+              <el-button type="text" size="small">Edit</el-button>
+            </router-link>
           </template>
         </el-table-column>
         
@@ -72,11 +76,11 @@ export default {
     WTitle
   },
   props:{
-    
+    base: String
   },
   data(){
     return{
-      api: "https://api.isjeff.com/pot/data/cate/",
+      api: "/data/cate/",
       catesList: [],
       upLoading: false,
     }
@@ -95,7 +99,7 @@ export default {
 
       var that = this
       
-      genGet(this.api, [], (res)=>{
+      genGet(this.base + this.api, [], (res)=>{
         if(res.status){
           if(res.data.length > 0){
             that.catesList = res.data
@@ -103,14 +107,6 @@ export default {
           }
         }
       })
-    },
-
-    toCateSingle (data) {
-      EventBus.$emit('toCateSingle', data.id)
-    },
-
-    toCateNew () {
-      EventBus.$emit('toCateSingle', "new")
     }
 
   }

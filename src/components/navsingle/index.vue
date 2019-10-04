@@ -47,25 +47,21 @@
 <script>
 
 // Import common js
-import { EventBus }  from '../../bus.js'
 import { genGet, genUpdate } from '../../request'
 import { isEmpty, getCookie } from '../../utils.js'
 
 export default {
     name:"catesingle",
     props:{
-        navId: {
-            type: String,
-            default: "1"
-        }
+        base: String
     },
     components:{
 
     },
     data(){
         return{
-            api: "https://api.isjeff.com/pot/data/layout_nav/",
-            api_up: "https://api.isjeff.com/pot/updater/layout_nav/",
+            api: "/data/layout_nav/",
+            api_up: "/updater/layout_nav/",
             navData: {
                 name: "",
                 name_sublang: "",
@@ -77,6 +73,8 @@ export default {
         }
     },
     created(){
+
+        this.navId = this.$route.query.navId
         
         if(this.navId === "new") {
             this.mode = "new"
@@ -88,14 +86,14 @@ export default {
     methods:{
 
         goBack() {
-            EventBus.$emit('toPage', './navslist')
+            this.$router.push({ path: './navslist' })
         },
 
         getData(){
             var that = this
             this.upLoading = true
 
-            genGet(this.api, [
+            genGet(this.base + this.api, [
                 {name: "id", val: this.navId}
             ], (res)=>{
                 if(res.status){
@@ -131,7 +129,7 @@ export default {
                 url: this.navData.url,
             }
 
-            genUpdate(this.api_up, postReady, (res)=>{
+            genUpdate(this.base + this.api_up, postReady, (res)=>{
                 if(res.status){
 
                     that.$notify({
@@ -141,7 +139,7 @@ export default {
                     })
 
                     that.$nextTick(() => {
-                        EventBus.$emit('toPage', './navslist')
+                        that.goBack()
                     })
                 } else {
                     that.$notify({

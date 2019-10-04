@@ -14,9 +14,9 @@
                 v-if="item.val != ''"
                 class="file-single-img-img"
                 style="width: 180px; height: 180px"
-                :src="base_url + item.val"
+                :src="base + item.val"
                 fit="contain"
-                :preview-src-list="[base_url + item.val]">
+                :preview-src-list="[base + item.val]">
 
                 <div slot="placeholder" class="au_img_placeholder">
                     <span>Loading</span>
@@ -43,7 +43,14 @@
 
     <el-button type="primary" v-on:click="submit">Save</el-button>
 
-    <upload-window v-if="upload_win" @uploaded="uploadHandler" @close="closeUpWin" :allowUrl="false" :allowSelect="true" :allowMultiple="false"></upload-window>
+    <upload-window 
+    v-if="upload_win" 
+    @uploaded="uploadHandler" 
+    @close="closeUpWin" 
+    :base="base"
+    :allowUrl="false" 
+    :allowSelect="true" 
+    :allowMultiple="false"></upload-window>
     
   </div>
 </template>
@@ -64,13 +71,12 @@ export default {
     uploadWindow
   },
   props:{
-
+    base: String,
   },
   data(){
     return{
-      base_url: "https://api.isjeff.com/pot",
-      api: "https://api.isjeff.com/pot/data/themes/",
-      api_up:"https://api.isjeff.com/pot/updater/theme/",
+      api: "/data/themes/",
+      api_up:"/updater/theme/",
       themeData: {},
       themeName: "",
       themeId: "",
@@ -93,7 +99,7 @@ export default {
       this.upLoading = true
       var that = this
 
-      genGet(this.api, [{name: "active", val: "true"}], (res)=>{
+      genGet(this.base + this.api, [{name: "active", val: "true"}], (res)=>{
         if(res.status){
             
             var finalRes = res.data.data[0]
@@ -144,7 +150,7 @@ export default {
             data_struct: encodeRichText(JSON.stringify(this.themeData)),
         }
 
-        genUpdate(this.api_up, postReady, (res)=>{
+        genUpdate(this.base + this.api_up, postReady, (res)=>{
             if(res.status){
                 that.$notify({
                     title: 'Submitted',

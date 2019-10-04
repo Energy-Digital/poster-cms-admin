@@ -25,9 +25,9 @@
                     <el-image
                         class="file-single-img-img"
                         :style="item.type_des === 'Image' ? 'width: 180px; height: 180px' : 'width: 60px; height: 60px;margin-top: 60px;margin-left: 30px;'"
-                        :src="item.type_des === 'Image' ? base_url + item.path : base_url + static_icons_url + getIcon(item.type)"
+                        :src="item.type_des === 'Image' ? base + item.path : base + static_icons_url + getIcon(item.type)"
                         :fit="item.type_des === 'Image' ? 'contain' : 'scale-down'"
-                        :preview-src-list="[base_url + item.path]"
+                        :preview-src-list="[base + item.path]"
                         lazy>
 
                         <div slot="placeholder" class="au_img_placeholder">
@@ -46,11 +46,11 @@
                     <div class="file-name">
                         <span>{{realFileName(item.name, 18)}}</span>
                     </div>
-                    <div class="file-single-btn" v-on:click="toCopyLink(base_url + item.path)">
+                    <div class="file-single-btn" v-on:click="toCopyLink(base + item.path)">
                         <span>URL</span>
                     </div>
 
-                    <div class="file-single-btn" v-on:click="toOpenFile(base_url + item.path)">
+                    <div class="file-single-btn" v-on:click="toOpenFile(base + item.path)">
                         <span>Open</span>
                     </div>
 
@@ -64,7 +64,15 @@
 
     </div>
 
-    <upload-window v-if="upload_win" @uploaded="uploadHandler" @close="closeUpWin" :allowMultiple="true" :allowUrl="false" :allowSelect="false"></upload-window>
+    <upload-window 
+        v-if="upload_win" 
+        @uploaded="uploadHandler" 
+        @close="closeUpWin" 
+        :base="base"
+        :allowMultiple="true" 
+        :allowUrl="false" 
+        :allowSelect="false">
+    </upload-window>
     
   </div>
 </template>
@@ -82,11 +90,10 @@ export default {
     uploadWindow
   },
   props:{
-    
+    base: String
   },
   data(){
     return{
-        base_url: "https://api.isjeff.com/pot",
         static_icons_url: "/static/icons/",
         api: "https://api.isjeff.com/pot/manager/all_media/",
         api_file_del: "https://api.isjeff.com/pot/manager/file_del/",

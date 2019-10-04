@@ -79,12 +79,15 @@ export default {
   components:{
     WTitle
   },
+  props:{
+      base: String
+  },
   data(){
     return{
         static_icons_url: "/static/icons/",
-        api: "https://api.isjeff.com/pot/data/themes/",
-        api_up: "https://api.isjeff.com/pot/updater/theme/",
-        api_setTheme: "https://api.isjeff.com/pot/updater/basic/",
+        api: "/data/themes/",
+        api_up: "/updater/theme/",
+        api_setTheme: "/updater/basic/",
         themesListAll: [],
         activeTheme: "",
         mode: "new",
@@ -113,7 +116,7 @@ export default {
         this.upLoading = true
         var that = this
 
-        genGet(this.api, [], (res)=>{
+        genGet(this.base + this.api, [], (res)=>{
             
             if(res.status){
                 that.activeTheme = res.data.activeTheme
@@ -134,7 +137,7 @@ export default {
             themeData = JSON.parse(reader.result)
             themeData.mode = "new"
             themeData.data_struct = encodeRichText(JSON.stringify(themeData.data_struct))
-            genUpdate(that.api_up, themeData, (res)=>{
+            genUpdate(that.base + that.api_up, themeData, (res)=>{
                 if(res.status){
                     that.$notify({
                         title: 'Theme Imported',
@@ -170,7 +173,7 @@ export default {
                     mode: "del"
                 }
 
-                genUpdate(that.api_up, postReady, (res)=>{
+                genUpdate(that.base + that.api_up, postReady, (res)=>{
                     if(res.status){
                         that.$notify({
                             title: 'Deleted',
@@ -203,7 +206,7 @@ export default {
 
         var postReady = { currentThemeId: id, mode: "theme" }
 
-        genUpdate(this.api_setTheme, postReady, (res)=>{
+        genUpdate(this.base + this.api_setTheme, postReady, (res)=>{
             if(res.status){
 
                 that.$notify({

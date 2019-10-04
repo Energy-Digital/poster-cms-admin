@@ -117,6 +117,7 @@
         v-if="upload_win" 
         @uploaded="uploadHandler" 
         @close="closeUpWin" 
+        :base="base"
         :allowSelect="true" 
         :allowMultiple="upload_win_multiple"
         :allowUrl="upload_win_url" 
@@ -168,6 +169,7 @@ export default {
     name: "texteditor",
     props:{
         text: String,
+        base: String
     },
     components: {
         EditorMenuBar,
@@ -176,8 +178,7 @@ export default {
     },
     data(){
         return {
-            base_url: "https://api.isjeff.com/pot",
-            api_getLink: "https://api.isjeff.com/pot/data/getlink/",
+            api_getLink: "/data/getlink/",
             editor: null,
             dialog_link_v: false,
             input_link: "",
@@ -219,7 +220,7 @@ export default {
                 new Iframe(),
                 new ILink(),
                 new IParagraph(),
-                new IImage({base: this.base_url}),
+                new IImage({base: this.base}),
             ],
             onUpdate(){
                 that.$emit('update', this.getHTML())
@@ -295,7 +296,6 @@ export default {
                     this.addIframe(value, command)
                 }
 
-
                 this.$message({
                     type: 'success',
                     message: 'Video Added'
@@ -353,7 +353,7 @@ export default {
                     base = ""
                 }
 
-                command({src: this.base_url + src, width:'100%'})
+                command({src: this.base + src, width:'100%'})
                 // Close window
                 this.closeUpWin()
             }
@@ -373,7 +373,7 @@ export default {
         // Insert an iframe
         addIframe (src, command) {
             if(src) {
-                command({src})
+                command({src: src, height: "300px", width: "600px"})
             }
         },
 
@@ -381,7 +381,7 @@ export default {
         addLink (href, command) {
             var that = this
 
-            genGet(this.api_getLink, [{name: "link", val: href}], (res)=>{
+            genGet(this.base + this.api_getLink, [{name: "link", val: href}], (res)=>{
                 var titleText = "Open Link: "
                 if(res.status){
                     var res = res.data

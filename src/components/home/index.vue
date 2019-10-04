@@ -99,7 +99,7 @@ import { encGet } from '../../request'
 export default {
   name: "home",
   props:{
-
+    base: String
   },
   components:{
     'apexchart': VueApexCharts,
@@ -108,7 +108,7 @@ export default {
   },
   data(){
     return{
-      api: "https://api.isjeff.com/pot/data_enc/count_enc/",
+      api: "/data_enc/count_enc/",
       numbersData: {},
       loaded: false,
       upLoading: false,
@@ -179,7 +179,7 @@ export default {
 
       var that = this
 
-      encGet(this.api, {}, (res)=>{
+      encGet(this.base + this.api, {}, (res)=>{
         if(res.status){
           var res = res.data
           

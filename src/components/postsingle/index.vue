@@ -34,8 +34,8 @@
         </div>
 
         <div id="pc-content-view" v-if="editMode === 'view'">
-          <text-editor v-if="postLang === '0'" :text.sync="postData.content" @update="textUpdate"></text-editor>
-          <text-editor v-if="postLang === '1'" :text.sync="postData.content_sublang" @update="textUpdate"></text-editor>
+          <text-editor v-if="postLang === '0'" :base="base" :text.sync="postData.content" @update="textUpdate"></text-editor>
+          <text-editor v-if="postLang === '1'" :base="base" :text.sync="postData.content_sublang" @update="textUpdate"></text-editor>
         </div>
 
         <div id="pc-content-view" v-if="editMode === 'source'">
@@ -101,15 +101,15 @@
 
         <div class="pc-ti-img-cont">
 
-          <span v-if="postData.title_img == null" v-on:click="uploadTitleImg">+ Add Title Image</span>
+          <span v-if="postData.title_img.length == 0" v-on:click="uploadTitleImg">+ Add Title Image</span>
 
           <el-image
-            v-if="postData.title_img != null"
+            v-if="postData.title_img.length > 0"
             class="tableImage"
             :style="'width: 400px; height: 160px'"
-            :src="base_url + postData.title_img"
+            :src="base + postData.title_img"
             fit="contain"
-            :preview-src-list="[base_url + postData.title_img]"
+            :preview-src-list="[base + postData.title_img]"
             lazy>
 
             <div slot="placeholder" class="au_img_placeholder">
@@ -118,7 +118,7 @@
 
           </el-image>
 
-          <el-button v-if="postData.title_img != null" type="text" class="pc-ti-img-btn" v-on:click="uploadTitleImg">Change</el-button>
+          <el-button v-if="postData.title_img.lengh > 0" type="text" class="pc-ti-img-btn" v-on:click="uploadTitleImg">Change</el-button>
         </div>
 
         
@@ -162,6 +162,7 @@
       v-if="upload_win" 
       @uploaded="uploadHandler" 
       @close="closeUpWin" 
+      :base="base"
       :allowUrl="true" 
       :allowSelect="true" 
       :allowMultiple="false">
@@ -172,7 +173,6 @@
 
 <script>
 
-import { EventBus } from '../../bus.js'
 import { genGet, genUpdate } from '../../request'
 import { limitLength, isEmpty, getCookie, encodeRichText, decodeRichText, encodeImgSrc, decodeImgSrc } from '../../utils.js'
 import uploadWindow from '../widgets/w_upload.vue'
@@ -191,18 +191,18 @@ export default {
   },
 
   props:{
-    pid: String,
+    base: String
   },
 
   data () {
     return{
+      //PID
+      pid: 1,
+
       // APIs
-      base_url: "https://api.isjeff.com/pot",
-      api: "https://api.isjeff.com/pot/data/post_single/",
-      api_cate: "https://api.isjeff.com/pot/data/cate/",
-      api_up_assets:"/",
-      api_d_cate:"",
-      api_up:"https://api.isjeff.com/pot/updater/post_single/",
+      api: "/data/post_single/",
+      api_cate: "/data/cate/",
+      api_up:"/updater/post_single/",
 
       // Upload Window
       upload_win: false,
@@ -218,9 +218,10 @@ export default {
         cateId: "1",
         brief: "",
         brief_sublang: "",
-        ux_likes:"",
-        ux_visit:"",
+        ux_likes:"0",
+        ux_visit:"0",
         status: 0,
+        authorId: "",
       },
       postCate: "",
       postLang: "0", // 0: First lang, second++
@@ -259,6 +260,8 @@ export default {
   created () {
 
     var that = this
+    this.pid = this.$route.query.pid ? this.$route.query.pid : "new"
+     
 
     // Check if is new page
     if(this.pid == "new"){
@@ -280,17 +283,11 @@ export default {
       
     }
 
+   
+
     // Get Category
     this.$nextTick(()=>{
       this.getCate()
-    })
-        
-    EventBus.$on("closeUpWin", function(data){
-        that.upload_win = false
-    })
-
-    EventBus.$on("upWinRes", function(data){
-        
     })
     
   },
@@ -331,20 +328,20 @@ export default {
     },
 
     goBack() {
-      EventBus.$emit('toPage', './postslist')
+      this.$router.push({ path: './postslist'})
     },
 
     getData () {
       var that = this
       this.upLoading = true
 
-      genGet(this.api, [{name:"pid", val: this.pid}], (res)=>{
+      genGet(this.base + this.api, [{name:"pid", val: this.pid}], (res)=>{
         if(res.status){
           var finalRes = res.data[0]
           finalRes.content = decodeRichText(finalRes.content)
           finalRes.content_sublang = decodeRichText(finalRes.content_sublang)
-          finalRes.content = decodeImgSrc(finalRes.content, that.base_url)
-          finalRes.content_sublang = decodeImgSrc(finalRes.content_sublang, that.base_url)
+          finalRes.content = decodeImgSrc(finalRes.content, that.base)
+          finalRes.content_sublang = decodeImgSrc(finalRes.content_sublang, that.base)
           finalRes.status = Number(finalRes.status)
 
           that.postData = finalRes
@@ -359,7 +356,7 @@ export default {
 
     getCate () {
       var that = this
-      genGet(this.api_cate, [], (res)=>{
+      genGet(this.base + this.api_cate, [], (res)=>{
         if(res.status){
           that.postCateOptions = res.data
 
@@ -390,7 +387,7 @@ export default {
     updateAll () {
 
       if(this.mode === "new") {
-        EventBus.$emit('toPage', './postslist')
+        this.goBack()
         return
       }
 
@@ -440,10 +437,10 @@ export default {
       }
 
       this.upLoading = true
-      var contentReady = encodeImgSrc(this.postData.content, this.base_url)
+      var contentReady = encodeImgSrc(this.postData.content, this.base)
       contentReady = encodeRichText(contentReady)
 
-      var contentSbReady = encodeImgSrc(this.postData.content_sublang, this.base_url)
+      var contentSbReady = encodeImgSrc(this.postData.content_sublang, this.base)
       contentSbReady = encodeRichText(contentSbReady)
 
       var postReady = {
@@ -461,12 +458,11 @@ export default {
         date_modi: today,
         ux_visit: parseInt(this.postData.ux_visit),
         ux_likes: parseInt(this.postData.ux_likes),
+        authorId: getCookie('u_uuid'),
         status: String(this.postData.status)
       }
 
-      
-
-      genUpdate(this.api_up, postReady, (res)=>{
+      genUpdate(this.base + this.api_up, postReady, (res)=>{
         if(res.status){
           that.$notify({
               title: 'Success',
@@ -475,7 +471,7 @@ export default {
 
           that.updateAll()
           that.$nextTick(() => {
-            EventBus.$emit('toPage', './postslist')
+            that.goBack()
           })
         } else {
           that.$notify({

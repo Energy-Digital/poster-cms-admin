@@ -19,9 +19,9 @@
             <el-image
                 class="file-single-img-img"
                 style="width: 180px; height: 180px"
-                :src="base_url + form.avatar"
+                :src="base + form.avatar"
                 fit="contain"
-                :preview-src-list="[base_url + form.avatar]">
+                :preview-src-list="[base + form.avatar]">
 
                 <div slot="placeholder" class="au_img_placeholder">
                     <span>Loading</span>
@@ -41,7 +41,14 @@
         </el-form-item>
     </el-form>
 
-    <upload-window v-if="upload_win" @uploaded="uploadHandler" @close="closeUpWin" :allowUrl="true" :allowSelect="true"></upload-window>
+    <upload-window 
+    v-if="upload_win" 
+    @uploaded="uploadHandler" 
+    @close="closeUpWin" 
+    :base="base"
+    :allowUrl="true" 
+    :allowSelect="true">
+    </upload-window>
     
   </div>
 </template>
@@ -61,13 +68,12 @@ export default {
     uploadWindow
   },
   props:{
-    
+    base: String
   },
   data(){
     return{
-      base_url: "https://api.isjeff.com/pot",
-      api: "https://api.isjeff.com/pot/data_enc/user_enc/",
-      api_up:"https://api.isjeff.com/pot/updater/user_up/",
+      api: "/data_enc/user_enc/",
+      api_up:"/updater/user_up/",
       form:{},
       keywords:[],
       upLoading: false,
@@ -92,7 +98,7 @@ export default {
         userId: getCookie('u_uuid'),
       }
 
-      encGet(this.api, postReady, (res)=>{
+      encGet(this.base + this.api, postReady, (res)=>{
         if(res.status){
           that.form = res.data[0]
           that.upLoading = false
@@ -154,7 +160,7 @@ export default {
         pin: this.form.pin
       }
 
-      genUpdate(this.api_up, postReady, (res)=>{
+      genUpdate(this.base + this.api_up, postReady, (res)=>{
         if(res.status){
 
           that.$notify({

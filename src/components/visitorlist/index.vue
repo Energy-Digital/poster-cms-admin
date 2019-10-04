@@ -87,11 +87,11 @@ export default {
     WTitle
   },
   props:{
-    
+    base: String
   },
   data(){
     return{
-      api: "https://api.isjeff.com/pot/data_enc/visitor_list_enc/",
+      api: "/data_enc/visitor_list_enc/",
       visitorList: [],
       visitorListTotal: 0,
       page:0,
@@ -121,7 +121,7 @@ export default {
         {name: "size", val: this.pageSize}
       ] : []
 
-      encGet(this.api, param, (res)=>{
+      encGet(this.base + this.api, param, (res)=>{
         if(res.status){
           that.visitorListTotal = parseInt(res.data.total)
         

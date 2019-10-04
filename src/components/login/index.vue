@@ -53,7 +53,7 @@ import { getCookie, setCookie } from '../../utils.js'
 export default {
     name:"login",
     props: {
-
+        
     },
     data () {
         return {

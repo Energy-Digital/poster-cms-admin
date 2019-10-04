@@ -18,14 +18,14 @@ export default {
     WTitle
   },
   props:{
-    
+    base: String
   },
   data(){
     return{
-      api_ip: "https://api.isjeff.com/pot/data/getip/",
+      api_ip: base + "/data/getip/",
       api_getIpInfo: "http://api.ipstack.com/",
       api_key: "?access_key=4a0d7c9b3e1b25a888b23bea248723dd",
-      api_up: "https://api.isjeff.com/pot/updater/visit_adm/",
+      api_up: base + "/updater/visit_adm/",
       userInfoRes: {},
     }
   },

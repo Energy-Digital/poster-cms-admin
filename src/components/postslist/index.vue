@@ -4,7 +4,9 @@
     <WTitle txt="All Posts"></WTitle>
 
     <div id="new">
-      <el-button type="primary" v-on:click="toSingleNew()" plain>New</el-button>
+      <router-link :to="{ path:'/postsingle', query: { pid: 'new'} }">
+        <el-button type="primary" plain>New</el-button>
+      </router-link>
     </div>
 
     <div id="list" v-loading="upLoading">
@@ -85,7 +87,9 @@
           label="Action"
           width="100">
           <template slot-scope="scope">
-            <el-button @click="toSingleEdit(scope.row)" type="text" size="small">Edit</el-button>
+            <router-link :to="{ path:'/postsingle', query: { pid: scope.row.id} }">
+              <el-button type="text" size="small">Edit</el-button>
+            </router-link>
             <el-button type="text" size="small">View</el-button>
           </template>
         </el-table-column>
@@ -106,7 +110,6 @@
 </template>
 
 <script>
-import { EventBus } from '../../bus'
 import { strLenLimit } from '../../utils'
 import { genGet } from '../../request'
 import WTitle from '../widgets/w_title.vue'
@@ -117,11 +120,11 @@ export default {
     WTitle
   },
   props:{
-    
+    base: String
   },
   data(){
     return{
-      api: "https://api.isjeff.com/pot/data/posts_list/",
+      api: "/data/posts_list/",
       postsList: [],
       postsListTotal: 0,
       page:0,
@@ -145,7 +148,6 @@ export default {
 
       // Pagination
       var limit = this.pageToLimit(page)
-      var api = page ? this.api + '?ls=' + limit + '&size=' + this.pageSize : this.api
       var param = page ? [ 
         {
           name: "ls", 
@@ -156,7 +158,7 @@ export default {
         } 
       ] : []
 
-      genGet(api, param, (res)=>{
+      genGet(this.base + this.api, param, (res)=>{
         if(res.status){
           that.postsListTotal = parseInt(res.data.total)
         
@@ -177,13 +179,6 @@ export default {
         return (val - 1) * 10
     },
 
-    toSingleEdit (data) {
-      EventBus.$emit('toPostSingle', data.id)
-    },
-
-    toSingleNew () {
-      EventBus.$emit('toPostSingle', 'new')
-    },
 
     parseBrief (str, limit) {
       return strLenLimit(str, limit)

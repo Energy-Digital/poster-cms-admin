@@ -25,7 +25,7 @@
                 <el-image
                     class="file-single-img-img"
                     style="width: 40px; height: 40px"
-                    :src="base_url + smData.icon"
+                    :src="base + smData.icon"
                     fit="contain">
 
                     <div slot="placeholder" class="au_img_placeholder">
@@ -46,7 +46,13 @@
             
         </div>
 
-        <upload-window v-if="upload_win" @uploaded="uploadHandler" @close="closeUpWin" :allowUrl="true" :allowSelect="true"></upload-window>
+        <upload-window 
+        v-if="upload_win" 
+        @uploaded="uploadHandler" 
+        @close="closeUpWin" 
+        :base="base"
+        :allowUrl="false" 
+        :allowSelect="true"></upload-window>
 
     </div>
 </template>
@@ -54,7 +60,6 @@
 <script>
 
 // Import common js
-import { EventBus }  from '../../bus.js'
 import { genGet, genUpdate } from '../../request'
 import { isEmpty, getCookie } from '../../utils.js'
 
@@ -66,10 +71,7 @@ import uploadWindow from '../widgets/w_upload.vue'
 export default {
     name:"socialmediasingle",
     props:{
-        smId: {
-            type: String,
-            default: "1"
-        }
+        base: String,
     },
     components:{
         WTitle,
@@ -77,9 +79,8 @@ export default {
     },
     data(){
         return{
-            base_url: "https://api.isjeff.com/pot",
-            api: "https://api.isjeff.com/pot/data/social_media/",
-            api_up: "https://api.isjeff.com/pot/updater/social_media_single/",
+            api: "/data/social_media/",
+            api_up: "/updater/social_media_single/",
             smData: {
                 name: "",
                 url: "",
@@ -92,6 +93,8 @@ export default {
     },
     created(){
 
+        this.smId = this.$route.query.smId
+
         if(this.smId === "new") {
             this.mode = "new"
         } else {
@@ -102,14 +105,14 @@ export default {
     methods:{
 
         goBack() {
-            EventBus.$emit('toPage', './socialmedialist')
+            this.$router.push({ path: './socialmedialist' })
         },
 
         getData(){
             var that = this
             this.upLoading = true
 
-            genGet(this.api, [{name:"sid", val: this.smId}], (res)=>{
+            genGet(this.base + this.api, [{name:"sid", val: this.smId}], (res)=>{
                 if(res.status){
                     that.smData = res.data[0]
                 }
@@ -144,7 +147,7 @@ export default {
                 icon: this.smData.icon
             }
 
-            genUpdate(this.api_up, postReady, (res)=>{
+            genUpdate(this.base + this.api_up, postReady, (res)=>{
                 if(res.status){
                      that.$notify({
                         title: 'Success',
@@ -153,7 +156,7 @@ export default {
                     })
 
                     that.$nextTick(() => {
-                        EventBus.$emit('toPage', './socialmedialist')
+                        that.goBack()
                     })
                 } else{
                     that.$notify({

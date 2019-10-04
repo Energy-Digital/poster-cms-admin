@@ -12,17 +12,27 @@ export default class Iframe extends Node {
         src: {
           default: null,
         },
+        height: {
+          default: null,
+        },
+        width: {
+          default: null,
+        }
       },
       group: 'block',
       selectable: false,
       parseDOM: [{
         tag: 'iframe',
         getAttrs: dom => ({
+          height: dom.getAttribute('height'),
+          width: dom.getAttribute('width'),
           src: dom.getAttribute('src'),
         }),
       }],
       toDOM: node => ['iframe', {
         src: node.attrs.src,
+        width: node.attrs.width,
+        height: node.attrs.height,
         frameborder: 0,
         allowfullscreen: 'true',
       }],
@@ -53,10 +63,32 @@ export default class Iframe extends Node {
             })
           },
         },
+
+        height: {
+          get() {
+            return this.node.attrs.height
+          },
+          set(height) {
+            this.updateAttrs({
+              height,
+            })
+          },
+        },
+
+        width: {
+          get() {
+            return this.node.attrs.width
+          },
+          set(width) {
+            this.updateAttrs({
+              width,
+            })
+          },
+        },
       },
       template: `
         <div class="iframe">
-          <iframe class="iframe__embed" :src="src"></iframe>
+          <iframe class="iframe__embed" :src="src" :height="height" :width="width"></iframe>
           <!--input class="iframe__input" @paste.stop type="text" v-model="src" v-if="view.editable" /-->
         </div>
       `,
