@@ -1,0 +1,42 @@
+{
+    "name": "Moment",
+    "preview": "https://miro.medium.com/max/3840/1*wogDV86zrS8BNYI-8Th-TA.jpeg",
+    "author": "JIANFENG WU",
+    "market_id": "0",
+    "market_key": "0",
+    "data_struct": {
+        "Topping-Logo": {
+            "val": "https://api.isjeff.com/pot/upload/imgs/1569945758_547.png",
+            "type": "Image"
+        },
+        "Center-Logo": {
+            "val": "https://api.isjeff.com/pot/upload/imgs/1569890255_46.png",
+            "type": "Image"
+        },
+        "Side-Logo": {
+            "val": "https://api.isjeff.com/pot/upload/imgs/1569927500_293.png",
+            "type": "Image"
+        },
+        "Footer-Logo": {
+            "val": "https://api.isjeff.com/pot/upload/imgs/1570112440_66.png",
+            "type": "Image"
+        },
+        "PDF-Portfolio": {
+            "val": "",
+            "type": "File"
+        },
+        "CV-English": {
+            "val": "",
+            "type": "File"
+        },
+        "CV-Chinese": {
+            "val": "",
+            "type": "File"
+        },
+        "China-ICP-License": {
+            "val": "粤ICP备17037995号",
+            "type": "Text"
+        }
+    },
+    "version": "1.0.3"
+}
