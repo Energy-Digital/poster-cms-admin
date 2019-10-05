@@ -269,7 +269,6 @@ export default {
         var res
         var parse = str.split('_')
         res = strLenLimit(parse[parse.length-1], limit)
-        //res = parse[parse.length-1].length < limit ? parse[parse.length-1] : parse[parse.length-1].slice(0, limit) + '...'
 
         return res
     }
