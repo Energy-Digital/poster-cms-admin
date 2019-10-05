@@ -33,40 +33,43 @@
           fixed
           prop="title"
           label="Title"
-          width="150">
+          width="300">
+          <template slot-scope="scope">
+            <span style="font-weight: bold; word-wrap: break-word;">{{parseTextLimit(scope.row.title, 64)}}</span>
+          </template>
         </el-table-column>
 
         <el-table-column
           prop="cname"
           label="Category"
-          width="100">
+          width="90">
         </el-table-column>
 
-        <el-table-column
+        <!--el-table-column
           prop="brief"
           label="Brief"
           width="240">
           <template slot-scope="scope">
-            <span>{{parseBrief(scope.row.brief, 48)}}</span>
+            <span>{{parseTextLimit(scope.row.brief, 36)}}</span>
           </template>
         </el-table-column>
 
         <el-table-column
           prop="name"
           label="Author"
-          width="120">
-        </el-table-column>
+          width="100">
+        </el-table-column-->
 
         <el-table-column
           prop="date_pub"
           label="Publish Date"
-          width="140">
+          width="160">
         </el-table-column>
 
         <el-table-column
           prop="date_modi"
           label="Last Edit"
-          width="140">
+          width="160">
         </el-table-column>
 
         <el-table-column
@@ -81,11 +84,21 @@
           width="120">
         </el-table-column>
 
+        <el-table-column
+          fixed="right"
+          label="Order"
+          width="60">
+          <template slot-scope="scope">
+            <el-button type="text" size="small" v-on:click="postOrder(scope.row.id, scope.row.listOrder, 'up')" :disabled="scope.row.listOrder == 1"><i class="el-icon-top"></i></el-button>
+            <el-button type="text" size="small" v-on:click="postOrder(scope.row.id, scope.row.listOrder, 'down')" :disabled="scope.row.listOrder == postsListTotal"><i class="el-icon-bottom"></i></el-button>
+          </template>
+        </el-table-column>
+
 
         <el-table-column
           fixed="right"
           label="Action"
-          width="100">
+          width="120">
           <template slot-scope="scope">
             <router-link :to="{ path:'/postsingle', query: { pid: scope.row.id} }">
               <el-button type="text" size="small">Edit</el-button>
@@ -111,7 +124,7 @@
 
 <script>
 import { strLenLimit } from '../../utils'
-import { genGet } from '../../request'
+import { genGet, genUpdate } from '../../request'
 import WTitle from '../widgets/w_title.vue'
 
 export default {
@@ -125,6 +138,7 @@ export default {
   data(){
     return{
       api: "/data/posts_list/",
+      api_order: "/updater/post_order/",
       postsList: [],
       postsListTotal: 0,
       page:0,
@@ -171,6 +185,37 @@ export default {
 
     },
 
+    postOrder (id, order, mode) {
+
+      
+
+      if(mode === "up" && order == 1){
+        
+        return
+      }
+
+      if(mode === "down" && order == this.postsListTotal){
+        return
+      }
+
+      this.upLoading = true
+
+
+      var that = this
+      var postData = {
+        mode: mode,
+        pid: id,
+        order: order
+      }
+      console.log(postData)
+      genUpdate(this.base + this.api_order, postData, (res)=>{
+        console.log(res)
+        if(res.status){
+          that.getList(that.page)
+        }
+      })
+    },
+
     changePage (val) {
         this.getList(val)
     },
@@ -180,7 +225,7 @@ export default {
     },
 
 
-    parseBrief (str, limit) {
+    parseTextLimit (str, limit) {
       return strLenLimit(str, limit)
     }
 

@@ -1,5 +1,5 @@
 <template>
-  <div id="all">
+  <div id="all" v-loading="themeImporting">
 
     <WTitle txt="Themes"></WTitle>
 
@@ -92,7 +92,8 @@ export default {
         activeTheme: "",
         mode: "new",
         upload_win: false,
-        upLoading: false
+        upLoading: false,
+        themeImporting: false,
     }
   },
   http: {
@@ -128,6 +129,8 @@ export default {
     },
 
     importTheme (obj){
+        this.themeImporting = true
+        
         var that = this
         var themeData = {}
         const reader = new FileReader()
@@ -137,6 +140,9 @@ export default {
             themeData = JSON.parse(reader.result)
             themeData.mode = "new"
             themeData.data_struct = encodeRichText(JSON.stringify(themeData.data_struct))
+
+            that.$message('Importing theme ... this may take a while');
+
             genUpdate(that.base + that.api_up, themeData, (res)=>{
                 if(res.status){
                     that.$notify({
@@ -150,6 +156,7 @@ export default {
                         type: 'warning'
                     })
                 }
+                that.themeImporting = false
             })
         }
         reader.readAsText(obj.file)

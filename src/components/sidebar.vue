@@ -3,16 +3,35 @@
         <el-row class="tac">
             <el-col :span="12">
                 <el-menu
-                default-active="1"
+                default-active="1-1"
                 :default-openeds=defaultOpeneds
                 class="el-menu-vertical-demo"
                 @open="handleOpen"
                 @close="handleClose">
 
-                    <el-menu-item index="1" v-on:click="toPage('./home')">
-                        <i class="el-icon-house"></i>
-                        <span slot="title" class="el-sb-title">Home</span>
-                    </el-menu-item>
+                    <el-submenu index="1">
+                        <template slot="title">
+                                <i class="el-icon-house"></i>
+                                <span class="el-sb-title">Basic</span>
+                        </template>
+
+                        <el-menu-item-group>
+
+                            <el-menu-item index="1-1" v-on:click="toPage('./home')">
+                                <i class="el-icon-data-line"></i>
+                                <span>Home</span>
+                            </el-menu-item>
+
+                            <el-menu-item index="5-2" v-on:click="toPage('./settings')">
+                                <i class="el-icon-setting"></i>
+                                <span>Settings</span>
+                            </el-menu-item>
+
+                        </el-menu-item-group>
+
+                    </el-submenu>
+
+                    
                 
                     <el-submenu index="2">
                         <template slot="title">
@@ -51,7 +70,7 @@
 
                     <el-submenu index="4">
                         <template slot="title">
-                            <i class="el-icon-set-up"></i>
+                            <i class="el-icon-sugar"></i>
                             <span class="el-sb-title">Outfit</span>
                         </template>
 
@@ -79,19 +98,13 @@
 
                     <el-submenu index="5">
                         <template slot="title">
-                            <i class="el-icon-set-up"></i>
-                            <span class="el-sb-title">Others</span>
+                            <i class="el-icon-umbrella"></i>
+                            <span class="el-sb-title">Security</span>
                         </template>
 
                         <el-menu-item index="5-1" v-on:click="toPage('./visitorlist')">
                             <i class="el-icon-view"></i>
                             <span>Visitors</span>
-                        </el-menu-item>
-
-                        
-                        <el-menu-item index="5-2" v-on:click="toPage('./settings')">
-                            <i class="el-icon-setting"></i>
-                            <span>Settings</span>
                         </el-menu-item>
 
                         
@@ -103,14 +116,14 @@
 
                     </el-submenu>
 
-                    <el-submenu index="5">
+                    <el-submenu index="6">
                         <template slot="title">
                             <i class="el-icon-coordinate"></i>
                             <span class="el-sb-title">Testing Function</span>
                         </template>
 
-                        <el-menu-item index="5-1" v-on:click="toPage('./visittest')">User Visit</el-menu-item>
-                        <el-menu-item index="5-2" v-on:click="toPage('./visittestadm')">Admin Visit</el-menu-item>
+                        <el-menu-item index="6-1" v-on:click="toPage('./visittest')">User Visit</el-menu-item>
+                        <el-menu-item index="6-2" v-on:click="toPage('./visittestadm')">Admin Visit</el-menu-item>
 
                     </el-submenu>
 
@@ -130,7 +143,7 @@ export default {
     },
     data (){
         return {
-            defaultOpeneds: ["2","3","4"],
+            defaultOpeneds: ["1","2","3","4"],
         }
     },
     created () {

@@ -10,7 +10,7 @@
             <div id="header-right">
                 <div id="header-user" v-on:click="toAdmSet">
                     <div id="header-user-avatar">
-                        <el-avatar :size="24" :src="avatar"></el-avatar>
+                        <el-avatar :size="24" :src="base + avatar"></el-avatar>
                     </div>
 
                     <div id="header-user-name">
@@ -38,7 +38,8 @@ export default {
         siteName: {
             type: String,
             default: "Rider"
-        }
+        },
+        base: String
     },
     data (){
         return {

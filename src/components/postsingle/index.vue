@@ -101,10 +101,10 @@
 
         <div class="pc-ti-img-cont">
 
-          <span v-if="postData.title_img.length == 0" v-on:click="uploadTitleImg">+ Add Title Image</span>
+          <span v-if="postData.title_img == ''" v-on:click="uploadTitleImg">+ Add Title Image</span>
 
           <el-image
-            v-if="postData.title_img.length > 0"
+            v-if="postData.title_img"
             class="tableImage"
             :style="'width: 400px; height: 160px'"
             :src="base + postData.title_img"
@@ -118,7 +118,7 @@
 
           </el-image>
 
-          <el-button v-if="postData.title_img.lengh > 0" type="text" class="pc-ti-img-btn" v-on:click="uploadTitleImg">Change</el-button>
+          <el-button v-if="postData.title_img" type="text" class="pc-ti-img-btn" v-on:click="uploadTitleImg">Change</el-button>
         </div>
 
         
@@ -414,22 +414,11 @@ export default {
       if(
         isEmpty(this.postData.title) ||
         isEmpty(this.postData.content) ||
-        limitLength("<", this.postData.title, 4) ||
-        limitLength("<", this.postData.brief, 12)
+        limitLength("<", this.postData.title, 4)
       ){
         this.$notify({
             title: 'Check Needed',
             message: 'Please check your title or contents is not empty and meet text count requirement',
-            type: 'warning'
-        })
-        this.upLoading = false
-        return
-      }
-
-      if(this.postData.ux_likes > this.postData.ux_visit){
-        this.$notify({
-            title: 'Not Possible',
-            message: 'Likes count should not larger than views count',
             type: 'warning'
         })
         this.upLoading = false
@@ -458,6 +447,7 @@ export default {
         date_modi: today,
         ux_visit: parseInt(this.postData.ux_visit),
         ux_likes: parseInt(this.postData.ux_likes),
+        listOrder: parseInt(this.postData.listOrder),
         authorId: getCookie('u_uuid'),
         status: String(this.postData.status)
       }

@@ -21,10 +21,10 @@ export default {
   },
   data(){
     return{
-      api_ip: base + "/data/getip/",
+      api_ip: "/data/getip/",
       api_getIpInfo: "http://api.ipstack.com/",
       api_key: "?access_key=4a0d7c9b3e1b25a888b23bea248723dd",
-      api_up: base + "/updater/visit/",
+      api_up: "/updater/visit/",
       userInfoRes: {},
     }
   },
@@ -54,7 +54,7 @@ export default {
 
         var that = this
 
-        this.axios.get(this.api_ip).then((response) => {
+        this.axios.get(this.base + this.api_ip).then((response) => {
 
           if(response.data.result == false){
             console.log("rec fail")
@@ -88,7 +88,7 @@ export default {
                 postReady = Object.assign(that.userInfoRes, postReady)
                 var postData = that.$qs.stringify(postReady)
 
-                that.axios.post(that.api_up, postData)
+                that.axios.post(that.base + that.api_up, postData)
                 .then(function (response) {
                   //console.log(response.data)
                     if(response.data.indexOf("success") != -1){

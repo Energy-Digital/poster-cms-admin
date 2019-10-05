@@ -9,8 +9,7 @@
 <script>
 import { EventBus } from '../../bus'
 import WTitle from '../widgets/w_title.vue'
-
-import { setCookieExInMin, getCookie } from '../../utils.js'
+import { setCookieExInMin, getCookie } from '../../utils'
 
 export default {
   name: "visittestadm",
@@ -22,10 +21,10 @@ export default {
   },
   data(){
     return{
-      api_ip: base + "/data/getip/",
+      api_ip: "/data/getip/",
       api_getIpInfo: "http://api.ipstack.com/",
       api_key: "?access_key=4a0d7c9b3e1b25a888b23bea248723dd",
-      api_up: base + "/updater/visit_adm/",
+      api_up: "/updater/visit_adm/",
       userInfoRes: {},
     }
   },
@@ -54,7 +53,7 @@ export default {
 
         var that = this
 
-        this.axios.get(this.api_ip).then((response) => {
+        this.axios.get(this.base + this.api_ip).then((response) => {
           
 
             that.userInfoRes.ip = response.data
@@ -85,7 +84,7 @@ export default {
                     postReady = Object.assign(that.userInfoRes, postReady)
                     var postData = that.$qs.stringify(postReady)
 
-                    that.axios.post(that.api_up, postData)
+                    that.axios.post(that.base + that.api_up, postData)
                     .then(function (response) {
                         if(response.data.indexOf("success") != -1){
                           console.log('Visit Loged')
@@ -97,7 +96,7 @@ export default {
                 })
 
             } else {
-                that.axios.post(that.api_up, postData)
+                that.axios.post(that.base + that.api_up, postData)
                 .then(function (response) {
                     if(response.data.indexOf("success") != -1){
                       console.log('Visit Loged')

@@ -2,7 +2,7 @@
   <div class="all">
 
     <div id="header-cont">
-      <topping :siteName="siteName"></topping>
+      <topping :siteName="siteName" :base="base"></topping>
     </div>
     
     <div id="left-cont">
