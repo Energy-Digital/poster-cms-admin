@@ -207,9 +207,7 @@ export default {
         pid: id,
         order: order
       }
-      console.log(postData)
       genUpdate(this.base + this.api_order, postData, (res)=>{
-        console.log(res)
         if(res.status){
           that.getList(that.page)
         }

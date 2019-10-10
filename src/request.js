@@ -156,6 +156,7 @@ export function delFile (api, pd, callback) {
 }
 
 export function genUpload (api, file, infos, callback){
+
     // Construct form data
     let form = new FormData()
     form.append('file', file)
@@ -165,11 +166,14 @@ export function genUpload (api, file, infos, callback){
     form.append('ukey', utils.getCookie('u_key'))
     form.append('uuid', utils.getCookie('u_uuid'))
 
-    let h = {
-        headers:{'Content-Type':'multipart/form-data'}
-    }
 
-    axios.post(api, form, h).then((response)=>{
+    axios({
+        method: "post",
+        url: api,
+        data: form,
+        timeout: 60 * 4 * 1000,
+        headers:{'Content-Type':'multipart/form-data'}
+    }).then((response)=>{
         if(response.data.indexOf('success') != -1){
             callback({status: true, data: response.data})
         } else {

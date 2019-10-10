@@ -76,7 +76,7 @@
                 <div class="file-single-img">
                     <el-image
                         class="file-single-img-img"
-                        :style="item.type_des === 'Image' ? 'width: 100px; height: 100px' : 'width: 30px; height: 30px;margin-top: 35px;margin-left: -30px;'"
+                        :style="item.type_des === 'Image' ? 'width: 100px; height: 100px' : 'width: 30px; height: 30px;margin-top: 35px;margin-left: 35px;'"
                         :src="item.type_des === 'Image' ? base + item.path : base + static_icons_url + getIcon(item.type)"
                         fit="contain"
                         v-on:click="selectItem(item.id, item.path, item.type_des, item.name)">
@@ -85,11 +85,7 @@
                         </div>
                     </el-image>
 
-                    <span v-if="item.type_des !== 'Image'" class="file-single-des">
-                        {{item.type_des}}
-                    </span>
-
-                    <span class="au_file_name" v-if="item.type_des !== 'Image'">{{realFileName(item.name)}}</span>
+                    <span class="au_file_name" v-if="item.type_des !== 'Image'">{{realFileName(item.name, 14)}}</span>
                 </div>
 
             </div>
@@ -213,6 +209,7 @@ export default {
                         type: fileType,
                         md5: md5
                     }, (res)=>{
+
                         if(res.status){
                             
                             var r = res.data.split(',')
@@ -231,23 +228,12 @@ export default {
                         } else {
                             that.$notify({
                                 title: "Fail",
-                                message: 'Error: ' + res,
+                                message: 'Error: ' + res.data,
                                 type: 'warning'
                             })
                         }
                     })
 
-                    /*that.$http.post(that.api_upFile,formObj,h)
-                    .then(function(response) {
-                        var res = response.data
-                        if(res.indexOf('success' != -1)) {
-
-                            
-
-                        } else {
-                            
-                        }
-                    })*/
                 })
             }
 
@@ -422,7 +408,6 @@ export default {
     }
 
     .au_file_name{
-        margin-left: -100px;
         font-size: 8px;
         z-index: 99;
         position: absolute;

@@ -1,7 +1,7 @@
 var fileTypes = 
     [
         { name: "png", type:"Image" }, { name: "jpg", type:"Image" },{ name: "svg", type:"Image" },
-        { name: "jpeg", type:"Image" }, { name: "pdf", type:"PDF Document", icon:"pdf.png" },
+        { name: "jpeg", type:"Image" }, { name: "pdf", type:"PDF Document", icon:"pdf.png" },{ name: "gif", type:"Image" },
         { name: "doc", type:"Word Document", icon:"word.png" }, { name: "docx", type:"Word Document", icon:"word.png" },
         { name: "ppt", type:"PowerPoint Document", icon:"ppt.png" }, { name: "pptx", type:"PowerPoint Document", icon:"ppt.png" },
         { name: "xls", type:"Excel Document", icon:"excel.png" }, { name: "xlsx", type:"Excel Document", icon:"excel.png" },
