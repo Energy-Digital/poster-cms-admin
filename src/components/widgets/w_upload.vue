@@ -308,7 +308,7 @@ export default {
 
             if(isMultiple){
 
-                this.$emit('uploaded', {multiple: true, data: list, type_des: 'Image'})
+                this.$emit('uploaded', {multiple: true, data: list, type_des: {type: 'Image', icon:0}})
 
             } else {
 

@@ -40,8 +40,9 @@
                 <div class="theme-inner">
                     <div class="theme-info">
                         <span>Name: {{item.name}}</span><br>
-                        <span>Version: {{item.version}}</span><br>
-                        <span>Author: {{item.author}}</span>
+                        <span>Author: {{item.author}}</span><br>
+                        <span>Version: {{item.version}}</span>
+                        
                     </div>
 
                     <div class="theme-action">
@@ -277,7 +278,7 @@ export default {
 
 .theme{
     width:400px;
-    height: 342px;
+    height: 356px;
     margin-right:20px;
     margin-bottom:20px;
     border:1px dashed rgba(0,0,0,0.1);
@@ -293,6 +294,7 @@ export default {
 
 .theme-inner{
     position:relative;
+    margin-top: 16px;
     width:100%;
     height:48px;
     display:flex;

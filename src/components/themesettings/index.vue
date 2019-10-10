@@ -24,7 +24,22 @@
 
             </el-image>
             <br>
-            <el-button @click="upImg(key)">Upload</el-button>
+            <br>
+            <el-button @click="upFile(key)">Upload</el-button>
+            <br>
+            <br>
+            
+        </div>
+    </div>
+
+    <br>
+
+    <div class="type-file" v-for="(item, key, index) in themeData" :key="'F'+key+index">
+        <div class="type-file-single" v-if="item.type === 'File'">
+            <div>{{key}}:</div>
+            <el-input v-model="item.val"></el-input>
+            <br><br>
+            <el-button @click="upFile(key)">Upload</el-button>
             <br>
             <br>
             
@@ -40,17 +55,19 @@
         </div>
         <br>
     </div>
+    
 
     <el-button type="primary" v-on:click="submit">Save</el-button>
 
     <upload-window 
-    v-if="upload_win" 
-    @uploaded="uploadHandler" 
-    @close="closeUpWin" 
-    :base="base"
-    :allowUrl="false" 
-    :allowSelect="true" 
-    :allowMultiple="false"></upload-window>
+      v-if="upload_win" 
+      @uploaded="uploadHandler" 
+      @close="closeUpWin" 
+      :base="base"
+      :allowUrl="false" 
+      :allowSelect="true" 
+      :allowMultiple="false">
+    </upload-window>
     
   </div>
 </template>
@@ -116,20 +133,10 @@ export default {
     uploadHandler (d) {
         var data = d.data
         var target = this.imageUploadTarget
-        if(data.type.type === "Image"){
-
-            this.themeData[target].val = data.path
-
-        } else {
-
-            this.$notify({
-                title: 'This must be an image',
-                type: 'warning'
-            })
-        }
+        this.themeData[target].val = data.path
     },
 
-    upImg (key) {
+    upFile (key) {
         this.imageUploadTarget = key
         this.upload_win = true
     },

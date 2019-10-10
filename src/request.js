@@ -184,6 +184,67 @@ export function genUpload (api, file, infos, callback){
     })
 }
 
+export function genPost (api, data, callback) {
+
+
+    var postData = qs.stringify(data)
+
+    axios.post(api, postData)
+    .then(function (response) {
+
+        callback({status: true, data: response.data})
+
+    }).catch(function(err){
+
+        callback({status: false, data: err})
+
+    })
+}
+
+export function logVisit (api) {
+    
+    if(utils.getCookie('isjeffcom')){
+        return
+    } else {
+        /*var tmpUid = parseInt(Math.ceil(Math.random()*1000) * Date.parse( new Date()) / 10000000)
+        utils.setCookieExInMin('isjeffcom', tmpUid, 5)*/
+    }
+
+    var postData = {
+        userAgent: navigator.userAgent,
+        userLanguage: navigator.language,
+        appName: navigator.appName,
+        platform: navigator.platform
+    }
+
+    genPost(api, postData, (res)=>{
+        if(res.status){
+            // do nothing
+        }
+    })
+}
+
+export function logVisitAdm (api) {
+    
+    if(utils.getCookie('isjeffcom')){
+        return
+    } else {
+        /*var tmpUid = parseInt(Math.ceil(Math.random()*1000) * Date.parse( new Date()) / 10000000)
+        utils.setCookieExInMin('isjeffcom', tmpUid, 5)*/
+    }
+
+    var postData = {
+        userAgent: navigator.userAgent,
+        userLanguage: navigator.language,
+        appName: navigator.appName,
+        platform: navigator.platform
+    }
+
+    genUpdate(api, postData, (res)=>{
+        // do nothing
+    })
+}
+
 
 
 // Construct url with paramaters
