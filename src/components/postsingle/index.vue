@@ -125,6 +125,44 @@
       </div>
     </div>
 
+    <div class="pc-t" id="pc-t">
+      <WSubTitle txt="Publish Date"></WSubTitle>
+      <el-switch
+          active-text="Overwrite"
+          inactive-text="Auto"
+          v-model="owDatePub"
+          active-color="#13ce66"
+          inactive-color="#ff4949">
+      </el-switch>
+      <br><br>
+      <el-date-picker
+        v-model="postData.date_pub"
+        value-format="yyyy-MM-dd hh:mm:ss"
+        type="datetime"
+        placeholder="Choose a date"
+        :clearable="false"
+        :disabled="!owDatePub">
+      </el-date-picker>
+      <br><br>
+      <WSubTitle txt="Modification Date"></WSubTitle>
+      <el-switch
+          active-text="Overwrite"
+          inactive-text="Auto"
+          v-model="owDateModi"
+          active-color="#13ce66"
+          inactive-color="#ff4949">
+      </el-switch>
+      <br><br>
+      <el-date-picker
+        v-model="postData.date_modi"
+        value-format="yyyy-MM-dd hh:mm:ss"
+        type="datetime"
+        placeholder="Choose a date"
+        :clearable="false"
+        :disabled="!owDateModi">
+      </el-date-picker>
+    </div>
+
 
     <div class="pc-b" id="pc-cate">
       <WSubTitle txt="Category"></WSubTitle>
@@ -218,6 +256,8 @@ export default {
         cateId: "1",
         brief: "",
         brief_sublang: "",
+        date_pub: "0",
+        date_modi: "0",
         ux_likes:"0",
         ux_visit:"0",
         status: 0,
@@ -226,6 +266,9 @@ export default {
       postCate: "",
       postLang: "0", // 0: First lang, second++
       postStatus: 0,
+
+      owDatePub: false,
+      owDateModi: false,
 
       // Options Info
       postCateOptions: [], // Storage all category, keep updated
@@ -282,8 +325,6 @@ export default {
       })
       
     }
-
-   
 
     // Get Category
     this.$nextTick(()=>{
@@ -452,6 +493,14 @@ export default {
         status: String(this.postData.status)
       }
 
+      if(this.owDatePub){
+        postReady.date_pub = this.postData.date_pub
+      }
+
+      if(this.owDateModi){
+        postReady.date_modi = this.postData.date_modi
+      }
+
       genUpdate(this.base + this.api_up, postReady, (res)=>{
         if(res.status){
           that.$notify({
@@ -505,6 +554,10 @@ export default {
 }
 
 .pc-b{
+  margin-top:24px;
+}
+
+.pc-t{
   margin-top:24px;
 }
 

@@ -74,7 +74,17 @@ export default class ILink extends Node {
                     titleText,
                 })
             },
-        }
+        },
+        type: {
+          get() {
+              return this.node.attrs.type
+          },
+          set(type) {
+              this.updateAttrs({
+                  type,
+              })
+          },
+      }
       },
       template: `
         <div class="ilink">

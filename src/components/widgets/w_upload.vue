@@ -135,7 +135,7 @@ export default {
             res: {},
             static_icons_url: "/static/icons/",
             api_upFile: "/manager/up_file/",
-            api_getGallery: "/manager/all_media/?ls=0&size=8",
+            api_getGallery: "/manager/all_media/",
             imgInsMode: "upload",
             gallery: [],
             inputedImg: "",
@@ -171,7 +171,7 @@ export default {
             var that = this
             this.gallery = []
             var param = []
-
+            
             if(openMode){
                 param = [{name: "type", val: openMode}, {name: "size", val: "8"}]
             } else {
@@ -179,6 +179,7 @@ export default {
             }
 
             genGet(this.base + this.api_getGallery, param, (res)=>{
+                console.log(param)
                 that.gallery = res.data.data
             })
         },
@@ -236,8 +237,6 @@ export default {
 
                 })
             }
-
-            
 
         },
 

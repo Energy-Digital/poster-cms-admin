@@ -17,6 +17,11 @@
         </el-pagination>
     </div>
 
+    <div class="searchBar">
+        <el-input v-model="searchVal" placeholder="Search" clearable></el-input>
+        <el-button type="primary" v-on:click="search()">Find</el-button>
+    </div>
+
     <div id="list" v-loading="upLoading">
 
         <div id="file-grid">
@@ -95,10 +100,13 @@ export default {
   data(){
     return{
         static_icons_url: "/static/icons/",
-        api: "https://api.isjeff.com/pot/manager/all_media/",
-        api_file_del: "https://api.isjeff.com/pot/manager/file_del/",
+        api: "/manager/all_media/",
+        api_file_del: "/manager/file_del/",
+        api_search: "/manager/s_media/",
         filesListAll: [],
+        filesListRes: [],
         filesListTotal: 0,
+        searchVal: "",
         page:1,
         pageSize:10,
         upload_win: false,
@@ -111,6 +119,13 @@ export default {
   },
   created(){
     this.getList(1)
+  },
+  watch:{
+      searchVal:function (){
+          if(this.searchVal.length === 1){
+              this.searchClear()
+          }
+      }
   },
   methods:{
 
@@ -134,7 +149,7 @@ export default {
 
         // pagination Limit
         var limit = this.pageToLimit(page)
-        var api = this.api + '?ls=' + limit + '&size=' + this.pageSize + '&file=All'
+        var api = this.base + this.api + '?ls=' + limit + '&size=' + this.pageSize + '&file=All'
         var param = [{
             name: "ls",
             val: limit
@@ -146,12 +161,13 @@ export default {
             val: "all"
         }]
 
-        genGet(this.api, param, (res)=>{
+        genGet(this.base + this.api, param, (res)=>{
             if(res.status){
                 that.filesListTotal = parseInt(res.data.total)
                 if(that.filesListTotal > 0){
                     that.$nextTick(()=>{
-                        that.filesListAll = res.data.data
+                        that.filesListRes = res.data.data
+                        that.filesListAll = that.filesListRes
                     })
                 }
             }
@@ -160,6 +176,22 @@ export default {
         })
 
         
+    },
+
+    search () {
+        var that = this
+        var param = [{
+            name: "s",
+            val: this.searchVal
+        }]
+        genGet(this.base + this.api_search, param, (res)=>{
+            console.log(res)
+            that.filesListAll = res.data
+        })
+    },
+
+    searchClear () {
+        this.filesListAll = this.filesListRes
     },
 
     changePage (val) {
@@ -214,7 +246,7 @@ export default {
                     fpath: path
                 }
 
-                delFile(that.api_file_del, postReady, (res)=>{
+                delFile(that.base + that.api_file_del, postReady, (res)=>{
                     if(res.status === 1 || res.status === 2){
                         that.$notify({
                             title: 'Deleted',
@@ -298,6 +330,26 @@ export default {
     position: absolute;
     right: 100px;
     top: 26px;
+}
+
+.searchBar{
+    width: 300px;
+    position: absolute;
+    left: 200px;
+    top: 22px;
+    display: flex;
+}
+
+.searchBar input{
+    height: 32px;
+}
+
+.searchBar button{
+    height: 32px;
+    width: 54px;
+    margin-left: 12px;
+    padding-left: 13px;
+    padding-top: 8px;
 }
 
 #list{

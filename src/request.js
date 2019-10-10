@@ -7,7 +7,6 @@ var EventBus = require('./bus.js')
 
 // General get data
 export function genGet (api, param, callback) {
-    
     axios.get(contParam(api, param)).then((response) => {
 
         if(typeof(response.data) == "string"){

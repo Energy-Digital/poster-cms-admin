@@ -196,7 +196,6 @@ export default {
     },
     mounted () {
         var that = this
-        // console.log(that.text)
         this.editor = new Editor({
             content: that.text,
             extensions: [
@@ -251,6 +250,7 @@ export default {
                 }
                 
             } else {
+                
                 this.addFile(data.path, data.name, this.current_command, 'file')
                 // Do nothing else for now
             }
