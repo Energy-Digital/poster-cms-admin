@@ -141,7 +141,7 @@ export default {
       api_order: "/updater/post_order/",
       postsList: [],
       postsListTotal: 0,
-      page:0,
+      page:1,
       pageSize:10, // 10, 20, 30
       upLoading: false,
     }
@@ -215,7 +215,8 @@ export default {
     },
 
     changePage (val) {
-        this.getList(val)
+      this.getList(val)
+      this.page = val
     },
 
     pageToLimit ( val ) {

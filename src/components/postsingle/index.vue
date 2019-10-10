@@ -484,7 +484,7 @@ export default {
         content_sublang: contentSbReady,
         brief: this.postData.brief,
         brief_sublang: this.postData.brief_sublang,
-        date_pub: this.mode === "update" ? this.postData.data_pub  : today,
+        date_pub: this.mode === "update" ? this.postData.date_pub : today,
         date_modi: today,
         ux_visit: parseInt(this.postData.ux_visit),
         ux_likes: parseInt(this.postData.ux_likes),
@@ -500,7 +500,6 @@ export default {
       if(this.owDateModi){
         postReady.date_modi = this.postData.date_modi
       }
-
       genUpdate(this.base + this.api_up, postReady, (res)=>{
         if(res.status){
           that.$notify({
