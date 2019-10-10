@@ -43,7 +43,21 @@
                     v-model="cateData.des_sublang">
                 </el-input>
             </div>
+
+            <br>
+
+            <span v-if="postLang === '0'">Hide Category in Listview</span>
+            <span v-if="postLang === '1'">列表隐藏分类</span>
+
+            <br>
+
+            <el-switch
+                v-model="cateData.hide"
+                active-color="#13ce66"
+                inactive-color="#ff4949">
+            </el-switch>
             
+            <br>
             <br>
 
             <div class="submit" id="submit">
@@ -80,7 +94,8 @@ export default {
                 cname: "",
                 cname_sublang: "",
                 des: "",
-                des_sublang: ""
+                des_sublang: "",
+                hide: 0
             },
             postLang: "0",
             mode: "update",
@@ -111,8 +126,10 @@ export default {
             genGet(this.base + this.api, [
                 {name: "cid", val: this.cateId}
             ], (res)=>{
+                
                 if(res.status){
                     that.cateData = res.data[0]
+                    that.cateData.hide = res.data[0].hide == "0" ? false : true
                 }
                 that.upLoading = false
             })
@@ -142,7 +159,8 @@ export default {
                 cname: this.cateData.cname,
                 cname_sublang: this.cateData.cname_sublang,
                 des: this.cateData.des,
-                des_sublang: this.cateData.des_sublang
+                des_sublang: this.cateData.des_sublang,
+                hide: this.cateData.hide ? "1" : "0"
             }
 
             genUpdate(this.base + this.api_up, postReady, (res)=>{
