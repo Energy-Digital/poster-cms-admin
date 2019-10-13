@@ -28,7 +28,7 @@ export default {
       setupShow: false,
       adminShow: false,
       username: "Admin",
-      base: "https://api.isjeff.com/pot"
+      base: "https://isjeff.com/api"
     }
     
   },

@@ -60,7 +60,6 @@ export default {
       var that = this
       genGet(this.base + this.api, [], (res)=>{
         if(res.status){
-          that.base = res.data[0].baseUrl
           that.siteName = decodeRichText(res.data[0].title)
           that.loaded = true
         } else {
