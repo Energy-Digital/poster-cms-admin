@@ -83,7 +83,7 @@
 </template>
 
 <script>
-import { getCookie, getFileIcon, strLenLimit } from '../../utils.js'
+import { getFileIcon, strLenLimit } from '../../utils.js'
 import { genGet, delFile } from '../../request'
 import WTitle from '../widgets/w_title.vue'
 import uploadWindow from '../widgets/w_upload.vue'
@@ -149,7 +149,6 @@ export default {
 
         // pagination Limit
         var limit = this.pageToLimit(page)
-        var api = this.base + this.api + '?ls=' + limit + '&size=' + this.pageSize + '&file=All'
         var param = [{
             name: "ls",
             val: limit
@@ -284,7 +283,7 @@ export default {
                 })
 
 
-        }).catch((err) => {
+        }).catch(() => {
             that.$notify({
                 title: 'Cancelled',
                 type: 'warning'

@@ -35,13 +35,13 @@ export default {
     sidebar
   },
   props: {
+    base: String,
     username: String
   },
   data(){
     return{
       user:"Admin",
-      base: "",
-      api: "https://api.isjeff.com/pot/data/basic/",
+      api: "/data/basic/",
       siteName: "",
       loaded: false,
     }
@@ -58,21 +58,23 @@ export default {
 
     getData () {
       var that = this
-      genGet(this.api, [], (res)=>{
+      genGet(this.base + this.api, [], (res)=>{
         if(res.status){
           that.base = res.data[0].baseUrl
           that.siteName = decodeRichText(res.data[0].title)
           that.loaded = true
         } else {
+          if(res.error.indexOf("n") != -1){
+            EventBus.$emit("needsetup", true)
+            return
+          }
+        }
+        /* else {
           var newApiBase = prompt("Can not establish basic connection, you might just change your base url:", "")
           that.api = newApiBase + "/data/basic/"
-          that.getData()
-        }
+          that.getData(api)
+        }*/
       })
-    },
-
-    checkCookies () {
-      //console.log(document.cookie)
     },
 
     toPage (dir) {

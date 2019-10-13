@@ -48,7 +48,7 @@
 
 // Import common js
 import { genGet, genUpdate } from '../../request'
-import { isEmpty, getCookie } from '../../utils.js'
+import { isEmpty } from '../../utils.js'
 
 export default {
     name:"catesingle",

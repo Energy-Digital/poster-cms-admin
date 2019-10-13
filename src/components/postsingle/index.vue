@@ -301,8 +301,6 @@ export default {
   },
 
   created () {
-
-    var that = this
     this.pid = this.$route.query.pid ? this.$route.query.pid : "new"
      
 

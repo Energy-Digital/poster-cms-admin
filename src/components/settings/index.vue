@@ -97,9 +97,8 @@
 </template>
 
 <script>
-import { EventBus } from '../../bus'
 import { genGet, genUpdate } from '../../request'
-import { getCookie, encodeRichText, decodeRichText, isEmpty } from '../../utils'
+import { encodeRichText, decodeRichText, isEmpty } from '../../utils'
 import WTitle from '../widgets/w_title.vue'
 import WSubTitle from '../widgets/w_subtitle.vue'
 import uploadWindow from '../widgets/w_upload'

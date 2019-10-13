@@ -89,7 +89,6 @@
 </template>
 
 <script>
-import { getCookie } from '../../utils'
 import VueApexCharts from 'vue-apexcharts'
 import WSubTitle from '../widgets/w_subtitle.vue'
 import ICountUp from 'vue-countup-v2'
@@ -285,10 +284,6 @@ export default {
   font-size:16px;
   font-weight: normal;
   opacity: .7;
-}
-
-.charts{
-
 }
 
 .charts-cont{

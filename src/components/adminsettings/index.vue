@@ -90,7 +90,7 @@ export default {
   },
   methods:{
 
-    getData (page) {
+    getData () {
       this.upLoading = true
       var that = this
 

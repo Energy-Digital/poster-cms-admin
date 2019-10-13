@@ -8,8 +8,7 @@
 
 <script>
 import WTitle from '../widgets/w_title.vue'
-
-import { setCookieExInMin, getCookie } from '../../utils.js'
+import { logVisit } from '../../request.js'
 
 export default {
   name: "visittest",

@@ -47,18 +47,19 @@
 <script>
 
 import { EventBus } from '../../bus.js'
-import { loginRequest } from '../../request'
+import { genGet, loginRequest } from '../../request'
 import { getCookie, setCookie } from '../../utils.js'
 
 export default {
     name:"login",
     props: {
-        
+        base: String
     },
     data () {
         return {
-            api:"https://api.isjeff.com/pot/login/",
-            api_mobile: "https://api.isjeff.com/pot/login/login_sms/",
+            api:"/login/",
+            api_mobile: "/login/login_sms/",
+            api_ava:"/login/login_ava/",
             email: "",
             phone: "",
             psw: "",
@@ -76,9 +77,17 @@ export default {
         }
     },
     created () {
-        if(getCookie('u_email')){
-            this.email = getCookie('u_email')
-        }
+        var that = this
+        genGet(this.base + this.api_ava, [], (res)=>{
+            if(res.error.indexOf("needsetup") != -1){
+                EventBus.$emit('setup', true)
+            } else {
+                if(getCookie('u_email')){
+                    that.email = getCookie('u_email')
+                }
+            }
+        })
+        
     },
 
     watch: {
@@ -148,12 +157,12 @@ export default {
 
                 var postReady = { email: this.email, psw: this.psw }
 
-                var api = this.api
+                var api = this.base + this.api
                  
                 if(this.tab === "mobile"){
                     postReady['tel'] = this.phone
                     postReady['mode'] = "vsms"
-                    api = this.api_mobile
+                    api = this.base + this.api_mobile
                 }
 
                 loginRequest(api, postReady, (res)=>{
@@ -204,7 +213,7 @@ export default {
             this.upLoading = false
         },
 
-        getVcode (m) {
+        getVcode () {
             this.upLoading = true
             var that = this
             
@@ -214,7 +223,7 @@ export default {
                 mode:'sms'
             }
 
-            loginRequest(this.api_mobile, postReady, (res)=>{
+            loginRequest(this.base + this.api_mobile, postReady, (res)=>{
                 if(res.status){
                     var finalRes = res.data
                     if(finalRes.result == 0){

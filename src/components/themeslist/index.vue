@@ -198,7 +198,7 @@ export default {
                 })
 
 
-        }).catch((err) => {
+        }).catch(() => {
             that.$notify({
                 title: 'Cancelled',
                 type: 'warning'

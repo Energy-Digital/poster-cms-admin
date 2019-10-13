@@ -1,7 +1,8 @@
 <template>
   <div id="app">
-    <login v-if="!login"></login>
-    <admin v-if="login" msg="Welcome to Your Vue.js App"/>
+    <setup v-if="setupShow" :base="base"></setup>
+    <login v-if="loginShow" :base="base"></login>
+    <admin v-if="adminShow" :base="base"/>
   </div>
 </template>
 
@@ -10,19 +11,24 @@
 import { EventBus } from './bus.js'
 import {setCookie, getCookie} from './utils.js'
 
-import admin from './components/admin.vue'
-import login from './components/login/index.vue'
+import admin from './components/admin'
+import login from './components/login/index'
+import setup from './components/setup/index'
 
 export default {
   name: 'app',
   components: {
-    admin,
-    login
+    setup,
+    login,
+    admin
   },
   data(){
     return{
-      login: false,
-      username: "Admin"
+      loginShow: false,
+      setupShow: false,
+      adminShow: false,
+      username: "Admin",
+      base: "https://api.isjeff.com/pot"
     }
     
   },
@@ -30,23 +36,45 @@ export default {
     var that = this
 
     if(getCookie('u_key') && getCookie('u_uuid')){
-      this.login = true
+      that.setupShow = false
+      that.loginShow = false
+      that.adminShow = true
     } else {
       this.username = getCookie('u_email')
+      that.loginShow = true
     }
 
+    EventBus.$on('setup', function(data){
+      that.clearLoginCookie()
+      that.setupShow = true
+      that.loginShow = false
+      that.adminShow = false
+    })
+
+    EventBus.$on('setup-done', function(data){
+      that.setupShow = false
+      that.loginShow = true
+      that.adminShow = false
+    })
+
     EventBus.$on('login', function(data){
-      that.login = true
+      that.setupShow = false
+      that.loginShow = false 
+      that.adminShow = true
     })
 
     EventBus.$on('logout', function(data){
       that.clearLoginCookie()
-      that.login = false
+      that.setupShow = false
+      that.loginShow = true
+      that.adminShow = false
     })
 
     EventBus.$on('force-logout', function(data){
       that.clearLoginCookie()
-      that.login = false
+      that.setupShow = false
+      that.loginShow = true
+      that.adminShow = false
       that.$notify({
           title: "You've been force logout",
           message: "you are using other device or somebody logged in your account.",

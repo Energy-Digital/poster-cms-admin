@@ -65,7 +65,6 @@
 </template>
 
 <script>
-import { EventBus } from '../../bus'
 import WTitle from '../widgets/w_title.vue'
 
 import { genGet } from '../../request'

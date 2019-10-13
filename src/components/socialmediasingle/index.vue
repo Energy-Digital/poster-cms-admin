@@ -2,7 +2,6 @@
     <div id="all" v-loading="upLoading">
         <div id="title">
             <el-page-header @back="goBack" title="Back" content="Edit Social Media"></el-page-header>
-            <!--WTitle txt="Edit Category"></WTitle-->
         </div>
         
         <div id="form">
@@ -61,10 +60,9 @@
 
 // Import common js
 import { genGet, genUpdate } from '../../request'
-import { isEmpty, getCookie } from '../../utils.js'
+import { isEmpty } from '../../utils.js'
 
 // Import widgets
-import WTitle from '../widgets/w_title.vue'
 import uploadWindow from '../widgets/w_upload.vue'
 
 
@@ -74,7 +72,6 @@ export default {
         base: String,
     },
     components:{
-        WTitle,
         uploadWindow
     },
     data(){

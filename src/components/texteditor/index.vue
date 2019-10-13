@@ -131,7 +131,6 @@
 <script>
 
 import { genGet } from '../../request'
-import { decodeImgSrc, encodeImgSrc } from '../../utils'
 
 // Material Design Icon Pack
 import 'material-icons/iconfont/material-icons.css'
@@ -191,8 +190,7 @@ export default {
         }
     },
     created () {
-        var that = this
-        // this.text = this.text ? "No Content" : this.text
+
     },
     mounted () {
         var that = this
@@ -379,13 +377,12 @@ export default {
 
         // Insert an link
         addLink (href, command) {
-            var that = this
 
             genGet(this.base + this.api_getLink, [{name: "link", val: href}], (res)=>{
                 var titleText = "Open Link: "
                 if(res.status){
-                    var res = res.data
-                    var resSplit = res.split(':')
+                    var mRes = res.data
+                    var resSplit = mRes.split(':')
                     titleText = resSplit[1]
                     command({href, titleText})
                 } else {

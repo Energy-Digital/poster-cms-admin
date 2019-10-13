@@ -7,10 +7,8 @@
 </template>
 
 <script>
-import { EventBus } from '../../bus'
 import WTitle from '../widgets/w_title.vue'
-import { setCookieExInMin, getCookie } from '../../utils'
-import { genPost, logVisitAdm } from '../../request'
+import { logVisitAdm } from '../../request'
 
 export default {
   name: "visittestadm",

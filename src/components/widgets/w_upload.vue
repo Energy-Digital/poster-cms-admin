@@ -102,9 +102,7 @@
 </template>
 
 <script>
-
-import { EventBus } from '../../bus.js'
-import { idFileTypeDes, getFileIcon, getCookie } from '../../utils.js'
+import { idFileTypeDes, getFileIcon } from '../../utils.js'
 import { genGet, genUpload } from '../../request'
 import BMF from 'browser-md5-file'
 
@@ -179,7 +177,6 @@ export default {
             }
 
             genGet(this.base + this.api_getGallery, param, (res)=>{
-                console.log(param)
                 that.gallery = res.data.data
             })
         },
