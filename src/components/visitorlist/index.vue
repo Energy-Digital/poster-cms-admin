@@ -95,7 +95,7 @@ export default {
       visitorList: [],
       visitorListTotal: 0,
       page:0,
-      pageSize:50,
+      pageSize:30,
       upLoading: false,
     }
   },
@@ -104,7 +104,7 @@ export default {
     emulateHTTP: true
   },
   created(){
-    this.getList()
+    this.getList(1)
     
   },
   methods:{
@@ -116,12 +116,13 @@ export default {
       // Pagination
       var limit = this.pageToLimit(page)
 
-      var param = page ? [
-        {name: "ls", val: limit}, 
-        {name: "size", val: this.pageSize}
-      ] : []
+      var postData = {
+        ls: limit,
+        size: this.pageSize
+      }
 
-      encGet(this.base + this.api, param, (res)=>{
+      encGet(this.base + this.api, postData, (res)=>{
+        console.log(res.data)
         if(res.status){
           that.visitorListTotal = parseInt(res.data.total)
         
@@ -140,7 +141,7 @@ export default {
     },
 
     pageToLimit ( val ) {
-        return (val - 1) * 10
+        return (val - 1) * this.pageSize
     },
 
     toMap (geo) {

@@ -22,6 +22,7 @@
             <br>
             <div id="form-icon">
                 <el-image
+                    v-if="smData.icon"
                     class="file-single-img-img"
                     style="width: 40px; height: 40px"
                     :src="base + smData.icon"
