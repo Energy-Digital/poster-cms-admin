@@ -9,7 +9,7 @@ export default class Size extends Node {
 
   get defaultOptions() {
     return {
-      textSize: [16, 24, 36],
+      textSizes: ["16px", "24px", "36px"],
     }
   }
 
@@ -17,32 +17,32 @@ export default class Size extends Node {
     return {
       attrs: {
         textSize: {
-          default: 16,
+          default: "16px",
         },
       },
+
       content: 'inline*',
       group: 'block',
-      defining: true,
       draggable: false,
-      parseDOM: this.options.textSize
-        .map(textSize => ({
+      parseDOM: this.options.textSizes
+        .map(t => ({
           tag: `p`,
-          attrs: { textSize },
+          attrs: { style: `font-size: `+ t },
         })),
-      toDOM: (node) => [ 'p', { style: `font-size: ${node.attrs.textSize}px` }, 0 ]
+      toDOM: (node) => [ 'p', { style: `font-size: ${node.attrs.textSize}` }, 0 ]
     }
   }
 
   commands({ type, schema }) {
-    return attrs => toggleBlockType(type, schema.nodes.size, attrs)
+    return attrs => toggleBlockType(type, schema.nodes.textSize, attrs)
   }
 
 
   inputRules({ type }) {
-    return this.options.textSize.map(size => textblockTypeInputRule(
-      new RegExp(`^(#{1,${size}})\\s$`),
+    return this.options.textSizes.map(textSize => textblockTypeInputRule(
+      new RegExp(`^(#{1,${textSize}})\\s$`),
       type,
-      () => ({ size }),
+      () => ({ textSize }),
     ))
   }
 
