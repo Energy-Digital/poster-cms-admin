@@ -19,23 +19,18 @@
             </button>
             
             <!-- Headline Text Size 1 -->
-            <button :class="{ 'is-active': isActive.size({ textSize: 32 }) }" @click="commands.size({ textSize: 32 })">
+            <button :class="{ 'is-active': isActive.heading({ level: 1 }) }" @click="commands.heading({ level: 1 })">
                 <p style="font-weight:bold;">H1</p>
             </button>
 
             <!-- Headline Text Size 2 -->
-            <button :class="{ 'is-active': isActive.size({ textSize: 28 }) }" @click="commands.size({ textSize: 28 })">
+            <button :class="{ 'is-active': isActive.heading({ level: 2 }) }" @click="commands.heading({ level: 2 })">
                 <p style="font-weight:bold;">H2</p>
             </button>
 
             <!-- Headline Text Size 3 -->
-            <button :class="{ 'is-active': isActive.size({ textSize: 24 }) }" @click="commands.size({ textSize: 24 })">
+            <button :class="{ 'is-active': isActive.heading({ level: 3 }) }" @click="commands.heading({ level: 3 })">
                 <p style="font-weight:bold;">H3</p>
-            </button>
-
-            <!-- Headline Text Size 3 -->
-            <button :class="{ 'is-active': isActive.size({ textSize: 16 }) }" @click="commands.size({ textSize: 16 })">
-                <p style="font-weight:bold;">NS</p>
             </button>
 
             <!-- Alignment Left -->
@@ -200,7 +195,8 @@ export default {
                 new Blockquote(),
                 new CodeBlock(),
                 new HardBreak(),
-                new ISize({ textSize: [24, 28, 32] }),
+                new Heading({ levels: [1, 2, 3] }),
+                //new ISize({ textSizes: ['24px', '28px', '32px'] }),
                 new HorizontalRule(),
                 new BulletList(),
                 new OrderedList(),
