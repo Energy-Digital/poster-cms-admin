@@ -28,6 +28,18 @@
             <el-input v-model="form.baseUrl"></el-input>
         </el-form-item>
 
+        <el-form-item el-form-item label="Tencent COS">
+          <el-switch
+            v-model="form.tp_cos_enable"
+            active-color="#13ce66"
+            inactive-color="#ff4949">
+          </el-switch>
+        </el-form-item>
+
+        <el-form-item label="COS Token" v-if="form.tp_cos_enable">
+            <el-input v-model="form.tp_cos_token"></el-input>
+        </el-form-item>
+
         <el-form-item label="Cookie Notice">
           <el-switch
             v-model="form.isCookieNotice"
@@ -148,7 +160,7 @@ export default {
           finalRes.subtitle = decodeRichText(finalRes.subtitle)
           finalRes.desText = decodeRichText(finalRes.desText)
           finalRes.seoTitle = decodeRichText(finalRes.seoTitle)
-
+          finalRes.tp_cos_enable = finalRes.tp_cos_enable == 1 ? true : false
           finalRes.isCookieNotice = finalRes.isCookieNotice === "true" ? true : false
 
           that.form = finalRes
@@ -185,8 +197,6 @@ export default {
         mode: this.mode,
         keywords: this.keywords.join(),
       }
-
-      
 
       this.upData(postReady)
       this.closeTagInput()
@@ -272,7 +282,13 @@ export default {
         desText: encodeRichText(this.form.desText),
         baseUrl: this.form.baseUrl,
         seoTitle: encodeRichText(this.form.seoTitle),
+        tp_cos_enable: this.form.tp_cos_enable ? 1 : 0,
+        tp_cos_token: this.form.tp_cos_token ? this.form.tp_cos_token : "",
         isCookieNotice: this.form.isCookieNotice
+      }
+
+      if(postReady.tp_cos_enable == 0){
+        postReady.tp_cos_token = ""
       }
 
       this.upData(postReady)

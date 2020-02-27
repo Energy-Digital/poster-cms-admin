@@ -44,33 +44,33 @@ export default {
       that.loginShow = true
     }
 
-    EventBus.$on('setup', function(data){
+    EventBus.$on('setup', function(){
       that.clearLoginCookie()
       that.setupShow = true
       that.loginShow = false
       that.adminShow = false
     })
 
-    EventBus.$on('setup-done', function(data){
+    EventBus.$on('setup-done', function(){
       that.setupShow = false
       that.loginShow = true
       that.adminShow = false
     })
 
-    EventBus.$on('login', function(data){
+    EventBus.$on('login', function(){
       that.setupShow = false
       that.loginShow = false 
       that.adminShow = true
     })
 
-    EventBus.$on('logout', function(data){
+    EventBus.$on('logout', function(){
       that.clearLoginCookie()
       that.setupShow = false
       that.loginShow = true
       that.adminShow = false
     })
 
-    EventBus.$on('force-logout', function(data){
+    EventBus.$on('force-logout', function(){
       that.clearLoginCookie()
       that.setupShow = false
       that.loginShow = true
