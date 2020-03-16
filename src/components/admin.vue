@@ -24,9 +24,11 @@
 
 import { EventBus } from '../bus'
 import { genGet } from '../request'
-import { decodeRichText } from '../utils'
+import { decodeRichText, saveGlobalStatus } from '../utils'
 import topping from './topping.vue'
 import sidebar from "./sidebar.vue"
+
+
 
 export default {
   name: 'admin',
@@ -61,7 +63,15 @@ export default {
       genGet(this.base + this.api, [], (res)=>{
         if(res.status){
           that.siteName = decodeRichText(res.data[0].title)
+
+          saveGlobalStatus([
+            {name: "poster_cos_enable", value: res.data[0].tp_cos_enable == '1' ? true : false},
+            {name: "poster_cos_bucket", value: res.data[0].tp_cos_bucket},
+            {name: "poster_cos_region", value: res.data[0].tp_cos_region}
+          ])
+
           that.loaded = true
+
         } else {
           if(res.error.indexOf("n") != -1){
             EventBus.$emit("needsetup", true)
@@ -75,6 +85,8 @@ export default {
         }*/
       })
     },
+
+    
 
     toPage (dir) {
       this.$router.push({ path: dir })

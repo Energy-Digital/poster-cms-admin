@@ -180,9 +180,9 @@ export default {
 
       encGet(this.base + this.api, {}, (res)=>{
         if(res.status){
-          var res = res.data
+          var result = res.data
           
-          that.numbersData = res
+          that.numbersData = result
 
           var hoursChartOptions = {
             xaxis: {

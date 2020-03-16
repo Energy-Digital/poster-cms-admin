@@ -341,13 +341,16 @@ export default {
         addImage (src, command) {
             
             if(src){
-                var base = "[%bu%]"
-                if(src.indexOf("http") != -1){
-                    
-                    base = ""
+
+                if(src.indexOf("myqcloud") == -1){
+
+                    src = this.base + src
+                    //base = ""
+                } else {
+                    src = 'https://' + src
                 }
 
-                command({src: this.base + src, width:'100%'})
+                command({src: src, width:'100%'})
                 // Close window
                 this.closeUpWin()
             }

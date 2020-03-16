@@ -1,8 +1,107 @@
 
-var utils = require('./utils.js')
-var qs = require('qs')
-var axios = require('axios')
-var EventBus = require('./bus.js')
+const utils = require('./utils.js')
+const qs = require('qs')
+const axios = require('axios')
+const EventBus = require('./bus.js')
+const COS = require('cos-js-sdk-v5')
+
+export async function cosDelete(tmpKeyApi, bucket, region, name, callback){
+
+    const prefix = "upload/"
+
+    let res = {status: false, data: null, err:null}
+
+    var cos = new COS({
+        getAuthorization: (options, callback)=>{
+            encGet(tmpKeyApi, { bucket: bucket, region: region}, (data)=>{
+
+                var credentials = data.data && data.data.credentials
+
+                if (!data || !credentials) res.err = 'credentials invalid'
+
+                //alert(JSON.stringify(data))
+
+                callback({
+                    TmpSecretId: credentials.tmpSecretId,
+                    TmpSecretKey: credentials.tmpSecretKey,
+                    XCosSecurityToken: credentials.sessionToken,
+                    // 建议返回服务器时间作为签名的开始时间，避免用户浏览器本地时间偏差过大导致签名错误
+                    StartTime: data.data.startTime, // 时间戳，单位秒，如：1580000000
+                    ExpiredTime: data.data.expiredTime // 时间戳，单位秒，如：1580000900
+                })
+            })
+        }
+    })
+
+    cos.deleteObject({
+        Bucket: bucket, /* 必须 */
+        Region: region,    /* 必须 */
+        Key: prefix + name                            /* 必须 */
+    }, function(err, data) {
+        if(err){
+            res.err = err
+        } else {
+            res.status = true
+            res.data = data
+        }
+
+        callback(res)
+        //console.log(err || data);
+    });
+} 
+
+export async function cosUpload(tmpKeyApi, bucket, region, file, name, callback){
+
+    const prefix = "upload/"
+
+    var res = {status: false, data: null, err:null}
+
+    //const cosAuth = await getCOSToken(tmpKeyApi, bucket, region)
+    
+    var cos = new COS({
+        getAuthorization: (options, callback)=>{
+            encGet(tmpKeyApi, { bucket: bucket, region: region}, (data)=>{
+
+                var credentials = data.data && data.data.credentials
+
+                if (!data || !credentials) res.err = 'credentials invalid'
+
+                //alert(JSON.stringify(data))
+
+                callback({
+                    TmpSecretId: credentials.tmpSecretId,
+                    TmpSecretKey: credentials.tmpSecretKey,
+                    XCosSecurityToken: credentials.sessionToken,
+                    // 建议返回服务器时间作为签名的开始时间，避免用户浏览器本地时间偏差过大导致签名错误
+                    StartTime: data.data.startTime, // 时间戳，单位秒，如：1580000000
+                    ExpiredTime: data.data.expiredTime // 时间戳，单位秒，如：1580000900
+                })
+            })
+        }
+    })
+    
+
+    cos.putObject({
+        Bucket: bucket,
+        Region: region,
+        Key: prefix + name,  
+        StorageClass: 'STANDARD',
+        Body: file,
+        onProgress: function(progressData) {
+            EventBus.uploadProgress(progressData)
+            //alert(JSON.stringify(progressData));
+        }
+    }, function(err, data) {
+        if(err){
+            res.err = err
+        } else {
+            res.status = true
+            res.data = data
+        }
+
+        callback(res)
+    })
+}
 
 
 // General get data
@@ -184,7 +283,6 @@ export function genUpload (api, file, infos, callback){
 }
 
 export function genPost (api, data, callback) {
-
 
     var postData = qs.stringify(data)
 

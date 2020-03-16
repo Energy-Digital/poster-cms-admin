@@ -15,6 +15,17 @@ var fileTypes =
     ]
 
 var replaceall = require("replaceall")
+const ls = require('local-storage')
+
+export function saveGlobalStatus(data){
+    data.forEach(el => {
+        ls.set(el.name, el.value)
+    })
+}
+
+export function getGlobalStatus(name){
+    return ls.get(name)
+}
 
 export function limitLength (mode, str, num) {
     if(mode == ">") {
@@ -86,6 +97,11 @@ export function idFileTypeDes (filename) {
         }
     }
 
+}
+
+export function getFileExtension(filename){
+    var ft = filename.split('.')
+    return ft[ft.length - 1]
 }
 
 export function getFileIcon (type) {

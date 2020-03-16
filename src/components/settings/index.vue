@@ -36,9 +36,27 @@
           </el-switch>
         </el-form-item>
 
-        <el-form-item label="COS Token" v-if="form.tp_cos_enable">
-            <el-input v-model="form.tp_cos_token"></el-input>
-        </el-form-item>
+        <div v-if="form.tp_cos_enable">
+
+          <el-form-item label="COS Bucket">
+              <el-input v-model="form.tp_cos_bucket"></el-input>
+          </el-form-item>
+
+          <el-form-item label="COS Region">
+              <el-input v-model="form.tp_cos_region"></el-input>
+          </el-form-item>
+
+          <el-form-item label="COS Key">
+              <el-input v-model="form.tp_cos_key"></el-input>
+          </el-form-item>
+
+          <el-form-item label="COS Id">
+              <el-input v-model="form.tp_cos_id"></el-input>
+          </el-form-item>
+
+        </div>
+
+        
 
         <el-form-item label="Cookie Notice">
           <el-switch
@@ -109,8 +127,8 @@
 </template>
 
 <script>
-import { genGet, genUpdate } from '../../request'
-import { encodeRichText, decodeRichText, isEmpty } from '../../utils'
+import { encGet, genUpdate } from '../../request'
+import { encodeRichText, decodeRichText, isEmpty, saveGlobalStatus } from '../../utils'
 import WTitle from '../widgets/w_title.vue'
 import WSubTitle from '../widgets/w_subtitle.vue'
 import uploadWindow from '../widgets/w_upload'
@@ -127,7 +145,7 @@ export default {
   },
   data(){
     return{
-      api: "/data/basic/",
+      api: "/data_enc/basic_enc/",
       api_up:"/updater/basic/",
       form:{},
       keywords:[],
@@ -151,7 +169,9 @@ export default {
       this.upLoading = true
       var that = this
 
-      genGet(this.base + this.api, [], (res)=>{
+      encGet(this.base + this.api, {}, (res)=>{
+
+
         if(res.status){
           var finalRes = res.data[0]
 
@@ -166,6 +186,12 @@ export default {
           that.form = finalRes
           // Decode keywords
           that.keywords = finalRes.keywords.split(',')
+
+          saveGlobalStatus([
+            {name: "poster_cos_enable", value: finalRes.tp_cos_enable},
+            {name: "poster_cos_bucket", value: finalRes.tp_cos_bucket},
+            {name: "poster_cos_region", value: finalRes.tp_cos_region}
+          ])
           
         }
         that.upLoading = false
@@ -272,6 +298,22 @@ export default {
         return
       }
 
+      if(this.form.tp_cos_enable){
+        if(
+          isEmpty(this.form.tp_cos_key) ||
+          isEmpty(this.form.tp_cos_id) ||
+          isEmpty(this.form.tp_cos_bucket) ||
+          isEmpty(this.form.tp_cos_region)
+        ){
+          this.$notify({
+            title: 'Check Needed',
+            message: 'You need key, token, bucket and region for enabling COS',
+            type: 'warning'
+          })
+          return
+        }
+      }
+
       this.mode = "normal"
 
       var postReady = {
@@ -283,12 +325,11 @@ export default {
         baseUrl: this.form.baseUrl,
         seoTitle: encodeRichText(this.form.seoTitle),
         tp_cos_enable: this.form.tp_cos_enable ? 1 : 0,
-        tp_cos_token: this.form.tp_cos_token ? this.form.tp_cos_token : "",
+        tp_cos_key: this.form.tp_cos_key ? this.form.tp_cos_key : "",
+        tp_cos_id: this.form.tp_cos_id ? this.form.tp_cos_id : "",
+        tp_cos_bucket: this.form.tp_cos_bucket ? this.form.tp_cos_bucket : "",
+        tp_cos_region: this.form.tp_cos_region ? this.form.tp_cos_region : "",
         isCookieNotice: this.form.isCookieNotice
-      }
-
-      if(postReady.tp_cos_enable == 0){
-        postReady.tp_cos_token = ""
       }
 
       this.upData(postReady)

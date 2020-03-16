@@ -30,7 +30,7 @@
                     <el-image
                         class="file-single-img-img"
                         :style="item.type_des === 'Image' ? 'width: 180px; height: 180px' : 'width: 60px; height: 60px;margin-top: 60px;margin-left: 30px;'"
-                        :src="item.type_des === 'Image' ? base + item.path : base + static_icons_url + getIcon(item.type)"
+                        :src="getSrc(item.path, item.type_des, item.type)"
                         :fit="item.type_des === 'Image' ? 'contain' : 'scale-down'"
                         :preview-src-list="[base + item.path]"
                         lazy>
@@ -59,7 +59,7 @@
                         <span>Open</span>
                     </div>
 
-                    <div class="file-single-btn" v-on:click="toDelFile(item.id, item.path, item.seed)">
+                    <div class="file-single-btn" v-on:click="toDelFile(item.id, item.path, item.seed, item.name, item.isCOS)">
                         <span style="color:#F56C6C;">Remove</span>
                     </div>
                 </div>
@@ -83,8 +83,8 @@
 </template>
 
 <script>
-import { getFileIcon, strLenLimit } from '../../utils.js'
-import { genGet, delFile } from '../../request'
+import { getFileIcon, strLenLimit, getGlobalStatus } from '../../utils.js'
+import { genGet, delFile, cosDelete } from '../../request'
 import WTitle from '../widgets/w_title.vue'
 import uploadWindow from '../widgets/w_upload.vue'
 
@@ -103,6 +103,7 @@ export default {
         api: "/manager/all_media/",
         api_file_del: "/manager/file_del/",
         api_search: "/manager/s_media/",
+        api_tosTmpKey: "/data_enc/cos_enc/",
         filesListAll: [],
         filesListRes: [],
         filesListTotal: 0,
@@ -177,6 +178,35 @@ export default {
         
     },
 
+    getSrc (str, des, type) {
+        let res 
+        if(des == "Image"){
+            
+            if(str.indexOf("myqcloud") == -1){
+
+                res = this.base + str
+                //base = ""
+            } else {
+                res = 'https://' + str
+            }
+        } else {
+            res = this.base + this.static_icons_url + this.getIcon(type)
+        }
+
+        return res
+        
+    },
+
+    cosDel(name){
+        let bucket = getGlobalStatus('poster_cos_bucket')
+        let region = getGlobalStatus('poster_cos_region')
+        cosDelete(this.base + this.api_tosTmpKey, bucket, region, name, (res)=>{
+            if(res.status){
+                // do nothing
+            }
+        })
+    },
+
     search () {
         var that = this
         var param = [{
@@ -184,7 +214,6 @@ export default {
             val: this.searchVal
         }]
         genGet(this.base + this.api_search, param, (res)=>{
-            console.log(res)
             that.filesListAll = res.data
         })
     },
@@ -225,7 +254,11 @@ export default {
         window.open(link)
     },
 
-    toDelFile (id, path, seed) {
+    toDelFile (id, path, seed, name, isCOS) {
+
+        if(isCOS){
+            this.cosDel(name)
+        }
         
         var that = this
 
@@ -242,7 +275,8 @@ export default {
                 var postReady = {
                     fid: id,
                     fseed: seed,
-                    fpath: path
+                    fpath: path,
+                    isCOS: isCOS
                 }
 
                 delFile(that.base + that.api_file_del, postReady, (res)=>{
@@ -251,7 +285,6 @@ export default {
                             title: 'Deleted',
                             type: 'success'
                         })
-                        that.updateAll()
                     } 
                     
                     else if(res.status === 3) {
@@ -277,6 +310,8 @@ export default {
                             type: 'warning'
                         })
                     }
+
+                    that.updateAll()
 
                     
                     that.upLoading = false

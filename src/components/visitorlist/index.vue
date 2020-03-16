@@ -122,7 +122,6 @@ export default {
       }
 
       encGet(this.base + this.api, postData, (res)=>{
-        console.log(res.data)
         if(res.status){
           that.visitorListTotal = parseInt(res.data.total)
         

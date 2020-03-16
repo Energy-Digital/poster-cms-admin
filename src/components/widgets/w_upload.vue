@@ -9,6 +9,7 @@
         <el-tabs v-model="imgInsMode">
             <el-tab-pane label="Upload" name="upload"></el-tab-pane>
             <el-tab-pane label="Multiple" name="multiple" v-if="allowMultiple"></el-tab-pane>
+            <el-tab-pane label="COS" name="cos" v-if="allowCOS"></el-tab-pane>
             <el-tab-pane label="URL" name="url" v-if="false"></el-tab-pane>
             <el-tab-pane label="Gallery" name="gallery" v-if="allowSelect"></el-tab-pane>
         </el-tabs>
@@ -57,6 +58,25 @@
  
         </div>
 
+        <div id="au_upload_button" v-if="imgInsMode === 'cos'">
+
+            <el-upload
+                class="upload-win"
+                drag
+                action="0"
+                :before-upload="beforeImgUpload"
+                :http-request="cosFileUpload">
+
+                <i class="el-icon-upload"></i>
+                <div class="el-upload__text">Drop file <em>or click to upload</em></div>
+                <div class="el-upload__tip" slot="tip">Image and document only, 8MB max</div>
+
+            </el-upload>
+
+            <div id="progress" v-show="progress.percent < 1">Progress: {{ (progress.percent * 100) + '%' }} | Speed: {{progress.speed}}</div>
+ 
+        </div>
+
         <div id="au_url_input" v-if="imgInsMode === 'url'">
 
             <div class="au_url_input_box">
@@ -93,17 +113,22 @@
             <div class="au_assets_manager_btn">
                 <el-button type="primary" style="width:80px;" v-on:click="submit(selected.path, selected.type, selected.name, 0, false)" plain>OK</el-button>
             </div>
+
         </div>
 
       </div>
 
       <div id="assets_upload_bg" v-on:click="close"></div>
+
+      
     </div>
 </template>
 
 <script>
-import { idFileTypeDes, getFileIcon } from '../../utils.js'
-import { genGet, genUpload } from '../../request'
+import { idFileTypeDes, getFileIcon, getGlobalStatus, getFileExtension } from '../../utils.js'
+import { genGet, genUpload, cosUpload, genUpdate } from '../../request'
+
+import { EventBus } from '../../bus'
 import BMF from 'browser-md5-file'
 
 export default {
@@ -133,12 +158,21 @@ export default {
             res: {},
             static_icons_url: "/static/icons/",
             api_upFile: "/manager/up_file/",
+            api_addFile: "/manager/add_file/",
             api_getGallery: "/manager/all_media/",
+            api_tosTmpKey: "/data_enc/cos_enc/",
+            allowCOS: false,
             imgInsMode: "upload",
             gallery: [],
             inputedImg: "",
             selected: {},
             fileType: "",
+            progress: {
+                loaded: 0,
+                total: 0,
+                speed: 0,
+                percent: 0
+            },
             imgHighlight: "border: 1px solid #00B3FF",
             imgNormal: "border: 1px dashed rgba(0,0,0,0.1)",
             // For multiple upload
@@ -150,6 +184,14 @@ export default {
         var that = this
         that.initial()
         this.getGallery(this.allowType)
+
+        this.allowCOS = getGlobalStatus('poster_cos_enable')
+
+        EventBus.$on("upload-progress", (data)=>[
+            this.progress = data
+            //console.log(data)
+        ])
+
     },
 
     methods: {
@@ -178,6 +220,38 @@ export default {
 
             genGet(this.base + this.api_getGallery, param, (res)=>{
                 that.gallery = res.data.data
+            })
+        },
+
+        cosFileUpload(obj){
+            var that = this
+
+            let bucket = getGlobalStatus('poster_cos_bucket')
+            let region = getGlobalStatus('poster_cos_region')
+
+            const fileName = obj.file.name
+            const fileType = idFileTypeDes(obj.file.name)
+            const fileExt = getFileExtension(obj.file.name)
+
+            cosUpload(this.base + this.api_tosTmpKey, bucket, region, obj.file, fileName, (res)=>{
+                if(res.status){
+                    
+                    that.submit(res.data.Location, fileType, fileName, 0, false)
+
+                    genUpdate(that.base + that.api_addFile, {
+                        name: fileName,
+                        end: fileExt,
+                        des: fileType.type,
+                        url: res.data.Location
+                    }, (res)=>{
+                        if(res.status){
+                            // Do nothing
+                        }
+
+                        // do nothing
+                    })
+                }
+                
             })
         },
 
@@ -219,6 +293,7 @@ export default {
 
                             // If is not multiple upload
                             if(that.waittingList.length === 0){
+                                // r1 is link
                                 that.submit(r[1], fileType, fileName, 0, false)
                             } else {
                                 that.pushToReturnList(r[1], fileType, fileName)
@@ -314,6 +389,8 @@ export default {
                     name: name,
                     path: url
                 }
+
+                
 
                 this.$emit('uploaded', {multiple: false, data: this.res, type_des: type})
 
