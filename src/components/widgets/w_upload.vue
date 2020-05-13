@@ -97,7 +97,7 @@
                     <el-image
                         class="file-single-img-img"
                         :style="item.type_des === 'Image' ? 'width: 100px; height: 100px' : 'width: 30px; height: 30px;margin-top: 35px;margin-left: 35px;'"
-                        :src="item.type_des === 'Image' ? base + item.path : base + static_icons_url + getIcon(item.type)"
+                        :src="readAMImageType(item)"
                         fit="contain"
                         v-on:click="selectItem(item.id, item.path, item.type_des, item.name)">
                         <div slot="placeholder" class="au_img_placeholder">
@@ -414,6 +414,25 @@ export default {
             res = parse[parse.length-1].length < limit ? parse[parse.length-1] : parse[parse.length-1].slice(0, limit) + '...'
 
             return res
+        },
+
+        // Because COS, it needs more complex config
+        readAMImageType(item){
+            
+            // If is COS
+            if(item.isCOS == '1'){
+                return 'https://' + item.path
+            }
+
+            // If is not COS but image
+            else if(item.type_des === 'Image'){
+                return this.base + item.path
+            } 
+            
+            // If is not COS and not image
+            else {
+                return this.base + this.static_icons_url + this.getIcon(item.type)
+            }
         }
 
     }

@@ -106,6 +106,7 @@ export async function cosUpload(tmpKeyApi, bucket, region, file, name, callback)
 
 // General get data
 export function genGet (api, param, callback) {
+   
     axios.get(contParam(api, param)).then((response) => {
 
         if(typeof(response.data) == "string"){
@@ -117,7 +118,7 @@ export function genGet (api, param, callback) {
         }
         
     }).catch((err) => {
-
+        
         callback({status: false, error: err})
 
     })
@@ -337,7 +338,7 @@ export function logVisitAdm (api) {
         platform: navigator.platform
     }
 
-    genUpdate(api, postData, (res)=>{
+    genUpdate(api, postData, ()=>{
         // do nothing
     })
 }
