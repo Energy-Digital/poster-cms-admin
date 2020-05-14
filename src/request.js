@@ -106,9 +106,12 @@ export async function cosUpload(tmpKeyApi, bucket, region, file, name, callback)
 
 // General get data
 export function genGet (api, param, callback) {
+
+    param.push({ name: "tss", val: new Date().getTime()})
+    console.log(param)
    
     axios.get(contParam(api, param)).then((response) => {
-
+        console.log(contParam(api, param))
         if(typeof(response.data) == "string"){
             callback({status: false, error: response.data})
             return

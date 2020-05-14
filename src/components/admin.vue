@@ -137,5 +137,6 @@ a {
   right:0px;
   height:100%;
   width:85%;
+  overflow-y: scroll;
 }
 </style>

@@ -107,9 +107,9 @@
             v-if="postData.title_img"
             class="tableImage"
             :style="'width: 400px; height: 160px'"
-            :src="base + postData.title_img"
+            :src="readTitleImgURL(postData.title_img, 'str')"
             fit="contain"
-            :preview-src-list="[base + postData.title_img]"
+            :preview-src-list="readTitleImgURL(postData.title_img, 'arr')"
             lazy>
 
             <div slot="placeholder" class="au_img_placeholder">
@@ -134,7 +134,9 @@
           active-color="#13ce66"
           inactive-color="#ff4949">
       </el-switch>
+
       <br><br>
+
       <el-date-picker
         v-model="postData.date_pub"
         value-format="yyyy-MM-dd hh:mm:ss"
@@ -143,7 +145,9 @@
         :clearable="false"
         :disabled="!owDatePub">
       </el-date-picker>
+
       <br><br>
+
       <WSubTitle txt="Modification Date"></WSubTitle>
       <el-switch
           active-text="Overwrite"
@@ -152,7 +156,9 @@
           active-color="#13ce66"
           inactive-color="#ff4949">
       </el-switch>
+
       <br><br>
+
       <el-date-picker
         v-model="postData.date_modi"
         value-format="yyyy-MM-dd hh:mm:ss"
@@ -532,6 +538,18 @@ export default {
 
     setTitleImg (url) {
       this.postData.title_img = url
+    },
+
+    readTitleImgURL(url, type){
+
+      let res = url.indexOf('cos') != -1 ? 'https://' + url : this.base + url
+      if(type == 'str'){
+        return res
+      }
+
+      if(type == 'arr'){
+        return [res]
+      }
     }
 
 
