@@ -9,6 +9,11 @@
       </router-link>
     </div>
 
+    <!--div id="tags">
+      <el-tag v-on:click="switchPostType('All')">All</el-tag>
+      <el-tag v-for="item in cateList" :key="item.id" v-on:click="switchPostType(item.cname)">{{ item.cname }}</el-tag>
+    </div-->
+
     <div id="list" v-loading="upLoading">
       <el-table
       :data="postsList"
@@ -139,6 +144,8 @@ export default {
     return{
       api: "/data/posts_list/",
       api_order: "/updater/post_order/",
+      api_cate: "/data/cate/",
+      cateList: [],
       postsList: [],
       postsListTotal: 0,
       page:1,
@@ -185,6 +192,12 @@ export default {
 
     },
 
+    getCate(){
+      genGet(this.base + this.api_cate, [], (res)=>{
+        this.cateList = res.data
+      })
+    },
+
     postOrder (id, order, mode) {
 
       
@@ -222,6 +235,18 @@ export default {
     pageToLimit ( val ) {
         return (val - 1) * 10
     },
+
+    /*switchPostType(type){
+      if(type){
+        if(type == 'All'){
+
+        }
+
+        else{
+
+        }
+      }
+    },*/
 
 
     parseTextLimit (str, limit) {
